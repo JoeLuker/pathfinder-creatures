@@ -738,6 +738,7 @@ export function useCreatures() {
 
   return {
     creatures: paginatedCreatures,
+    allCreatures: creatures, // All creatures for filter extraction
     totalCreatures: creatures.length,
     filteredCount: sortedCreatures.length,
     loading,

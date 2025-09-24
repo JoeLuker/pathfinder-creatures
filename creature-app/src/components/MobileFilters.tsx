@@ -5,17 +5,17 @@ import { Badge } from '@/components/ui/badge';
 import { SlidersHorizontal } from 'lucide-react';
 import { Sidebar } from './Sidebar';
 import type { Filters, SortField, SortDirection } from '@/hooks/useCreatures';
+import { getActiveFilterCount, createDefaultFilters } from '@/utils/filterUtils';
 
 interface MobileFiltersProps {
   filters: Filters;
   setFilters: React.Dispatch<React.SetStateAction<Filters>>;
-  uniqueTypes: string[];
-  uniqueSizes: string[];
-  uniqueAlignments: string[];
-  uniqueSubtypes: string[];
-  uniqueMovementTypes: string[];
-  uniqueSpecialAbilities: string[];
-  uniqueDefensiveAbilities: string[];
+  creatures: any[];
+  crDistribution?: {
+    distribution: { cr: number; count: number }[];
+    minCR: number;
+    maxCR: number;
+  };
   sortField: SortField;
   setSortField: (field: SortField) => void;
   sortDirection: SortDirection;
@@ -26,15 +26,7 @@ export function MobileFilters(props: MobileFiltersProps) {
   const [open, setOpen] = useState(false);
 
   // Count active filters
-  const activeCount =
-    props.filters.types.length +
-    props.filters.sizes.length +
-    props.filters.alignments.length +
-    (props.filters.crMin !== null || props.filters.crMax !== null ? 1 : 0) +
-    props.filters.subtypes.length +
-    props.filters.movementTypes.length +
-    props.filters.specialAbilities.length +
-    props.filters.defensiveAbilities.length;
+  const activeCount = getActiveFilterCount(props.filters);
 
   return (
     <Sheet open={open} onOpenChange={setOpen}>
@@ -54,7 +46,12 @@ export function MobileFilters(props: MobileFiltersProps) {
           <SheetTitle>Filters & Sort</SheetTitle>
         </SheetHeader>
         <div className="h-[calc(100vh-5rem)] overflow-y-auto px-6 py-4">
-          <Sidebar {...props} />
+          <Sidebar
+            filters={props.filters}
+            setFilters={props.setFilters}
+            creatures={props.creatures}
+            crDistribution={props.crDistribution}
+          />
         </div>
         <div className="absolute bottom-0 left-0 right-0 p-4 bg-white border-t">
           <div className="flex gap-2">
@@ -62,18 +59,7 @@ export function MobileFilters(props: MobileFiltersProps) {
               variant="outline"
               className="flex-1"
               onClick={() => {
-                props.setFilters({
-                  search: '',
-                  type: '',
-                  size: '',
-                  crMin: null,
-                  crMax: null,
-                  alignment: '',
-                  subtypes: [],
-                  movementTypes: [],
-                  specialAbilities: [],
-                  defensiveAbilities: []
-                });
+                props.setFilters(createDefaultFilters());
               }}
             >
               Clear All

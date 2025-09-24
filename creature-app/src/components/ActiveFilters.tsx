@@ -2,6 +2,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { X, Filter } from 'lucide-react';
 import type { Filters } from '@/hooks/useCreatures';
+import { createDefaultFilters } from '@/utils/filterUtils';
 
 interface ActiveFiltersProps {
   filters: Filters;
@@ -130,18 +131,10 @@ export function ActiveFilters({ filters, setFilters }: ActiveFiltersProps) {
             variant="ghost"
             size="sm"
             className="h-7 px-2 text-xs"
-            onClick={() => setFilters({
-              search: filters.search, // Keep search
-              types: [],
-              sizes: [],
-              crMin: null,
-              crMax: null,
-              alignments: [],
-              subtypes: [],
-              movementTypes: [],
-              specialAbilities: [],
-              defensiveAbilities: []
-            })}
+            onClick={() => {
+              const defaultFilters = createDefaultFilters();
+              setFilters({ ...defaultFilters, search: filters.search }); // Keep search
+            }}
           >
             Clear All
           </Button>

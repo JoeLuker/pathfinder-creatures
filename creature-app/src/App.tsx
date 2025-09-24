@@ -6,7 +6,7 @@ import { ActiveFilters } from '@/components/ActiveFilters';
 import { SmartSearch } from '@/components/SmartSearch';
 import { MobileFilters } from '@/components/MobileFilters';
 import type { CreatureEnriched } from '@/types/creature-complete';
-import { Loader2, SlidersHorizontal, ChevronLeft, ChevronRight, PanelLeftClose, PanelLeftOpen } from 'lucide-react';
+import { Loader2, ChevronLeft, ChevronRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { ScrollArea } from '@/components/ui/scroll-area';
@@ -27,20 +27,7 @@ function App() {
     currentPage,
     setCurrentPage,
     totalPages,
-    uniqueTypes,
-    uniqueSizes,
-    uniqueAlignments,
-    uniqueSubtypes,
-    uniqueMovementTypes,
-    uniqueSpecialAbilities,
-    uniqueDefensiveAbilities,
-    uniqueTypesWithCounts,
-    uniqueSizesWithCounts,
-    uniqueAlignmentsWithCounts,
-    uniqueSubtypesWithCounts,
-    uniqueMovementTypesWithCounts,
-    uniqueSpecialAbilitiesWithCounts,
-    uniqueDefensiveAbilitiesWithCounts,
+    allCreatures,
     crDistribution
   } = useCreatures();
 
@@ -97,13 +84,8 @@ function App() {
                 <MobileFilters
                   filters={filters}
                   setFilters={setFilters}
-                  uniqueTypes={uniqueTypes}
-                  uniqueSizes={uniqueSizes}
-                  uniqueAlignments={uniqueAlignments}
-                  uniqueSubtypes={uniqueSubtypes}
-                  uniqueMovementTypes={uniqueMovementTypes}
-                  uniqueSpecialAbilities={uniqueSpecialAbilities}
-                  uniqueDefensiveAbilities={uniqueDefensiveAbilities}
+                  creatures={allCreatures}
+                  crDistribution={crDistribution}
                   sortField={sortField}
                   setSortField={setSortField}
                   sortDirection={sortDirection}
@@ -173,20 +155,7 @@ function App() {
               <Sidebar
                 filters={filters}
                 setFilters={setFilters}
-                uniqueTypes={uniqueTypes}
-                uniqueSizes={uniqueSizes}
-                uniqueAlignments={uniqueAlignments}
-                uniqueSubtypes={uniqueSubtypes}
-                uniqueMovementTypes={uniqueMovementTypes}
-                uniqueSpecialAbilities={uniqueSpecialAbilities}
-                uniqueDefensiveAbilities={uniqueDefensiveAbilities}
-                uniqueTypesWithCounts={uniqueTypesWithCounts}
-                uniqueSizesWithCounts={uniqueSizesWithCounts}
-                uniqueAlignmentsWithCounts={uniqueAlignmentsWithCounts}
-                uniqueSubtypesWithCounts={uniqueSubtypesWithCounts}
-                uniqueMovementTypesWithCounts={uniqueMovementTypesWithCounts}
-                uniqueSpecialAbilitiesWithCounts={uniqueSpecialAbilitiesWithCounts}
-                uniqueDefensiveAbilitiesWithCounts={uniqueDefensiveAbilitiesWithCounts}
+                creatures={allCreatures}
                 crDistribution={crDistribution}
               />
             </div>
