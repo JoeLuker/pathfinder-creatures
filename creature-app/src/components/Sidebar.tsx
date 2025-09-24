@@ -199,7 +199,7 @@ export function Sidebar({
   return (
     <div className="space-y-4 h-full overflow-y-auto">
       {/* Filters */}
-      <div className="bg-white rounded-lg shadow-sm border p-4">
+      <div className="bg-surface-primary rounded-lg shadow-sm border p-4">
         <div className="flex items-center justify-between mb-3">
           <div className="flex items-center gap-2">
             <SlidersHorizontal className="h-4 w-4 text-muted-foreground" />
@@ -293,7 +293,7 @@ export function Sidebar({
                                 <div
                                   key={cr}
                                   className={`flex-1 min-w-[2px] transition-colors ${
-                                    isInRange ? 'bg-primary opacity-70' : 'bg-gray-300'
+                                    isInRange ? 'bg-primary opacity-70' : 'border-border'
                                   }`}
                                   style={{ height: `${height}%` }}
                                   title={`CR ${cr}: ${count} creatures`}
@@ -503,7 +503,7 @@ export function Sidebar({
                                 return (
                                   <label
                                     key={value}
-                                    className="relative flex items-center justify-between px-2 py-1 hover:bg-gray-50 rounded cursor-pointer"
+                                    className="relative flex items-center justify-between px-2 py-1 hover:bg-surface-secondary rounded cursor-pointer"
                                   >
                                     <div
                                       className="absolute inset-0 bg-blue-50 opacity-20 rounded"
@@ -514,7 +514,7 @@ export function Sidebar({
                                         type="checkbox"
                                         checked={isChecked}
                                         onChange={() => handleMultiSelectToggle(filter.key, value)}
-                                        className="rounded border-gray-300"
+                                        className="rounded border-border"
                                       />
                                       <span className="text-sm capitalize">{value}</span>
                                     </div>

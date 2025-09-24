@@ -5,6 +5,8 @@ import { Sidebar } from '@/components/Sidebar';
 import { ActiveFilters } from '@/components/ActiveFilters';
 import { SmartSearch } from '@/components/SmartSearch';
 import { MobileFilters } from '@/components/MobileFilters';
+import { ThemeToggle } from '@/components/ThemeToggle';
+import { ThemeDebug } from '@/design-system/theme-debug';
 import type { CreatureEnriched } from '@/types/creature-complete';
 import { Loader2, ChevronLeft, ChevronRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -72,16 +74,17 @@ function App() {
   // Mobile view - show either list or details
   if (isMobile) {
     return (
-      <div className="min-h-screen bg-gray-50 flex flex-col">
+      <div className="min-h-screen bg-surface-secondary flex flex-col">
         {/* Mobile Header */}
-        <header className="bg-white border-b sticky top-0 z-40">
+        <header className="bg-surface-primary border-border border-b sticky top-0 z-40">
           <div className="px-4 py-3">
             <div className="flex items-center justify-between">
-              <h1 className="text-lg font-semibold">Creatures</h1>
+              <h1 className="text-lg font-display font-semibold text-text-primary">Pathfinder Creatures</h1>
               <div className="flex items-center gap-2">
-                <span className="text-sm text-muted-foreground">
+                <span className="text-sm text-text-secondary">
                   {filteredCount}
                 </span>
+                <ThemeToggle />
                 <MobileFilters
                   filters={filters}
                   setFilters={setFilters}
@@ -117,7 +120,7 @@ function App() {
                 <div
                   key={creature.url}
                   onClick={() => handleCreatureClick(creature)}
-                  className="bg-white rounded-lg shadow-sm border p-4 hover:shadow-md transition-shadow cursor-pointer"
+                  className="bg-surface-primary rounded-lg shadow-sm border p-4 hover:shadow-md transition-shadow cursor-pointer"
                 >
                   <div className="flex items-center justify-between">
                     <div>
@@ -135,17 +138,22 @@ function App() {
             </div>
           </div>
         )}
+        <ThemeDebug />
       </div>
     );
   }
 
   // Desktop view - split screen
   return (
-    <div className="h-screen bg-gray-50 flex">
+    <div className="h-screen bg-surface-secondary flex">
       {/* Sidebar with Filters */}
-      <aside className={`${showFilters ? 'w-80' : 'w-12'} transition-all duration-300 border-r bg-white flex-shrink-0 relative`}>
+      <aside className={`${showFilters ? 'w-80' : 'w-12'} transition-all duration-300 border-r border-border bg-surface-primary flex-shrink-0 relative`}>
         <div className={`h-full flex flex-col ${showFilters ? '' : 'opacity-0 pointer-events-none'}`}>
-          <div className="p-4 border-b">
+          <div className="p-4 border-b border-border flex flex-col gap-3">
+            <div className="flex items-center justify-between">
+              <h2 className="text-lg font-display font-semibold text-text-primary">Pathfinder Creatures</h2>
+              <ThemeToggle />
+            </div>
             <SmartSearch
               value={filters.search}
               onChange={(value) => setFilters(prev => ({ ...prev, search: value }))}
@@ -169,7 +177,7 @@ function App() {
           variant="ghost"
           size="sm"
           onClick={() => setShowFilters(!showFilters)}
-          className="absolute -right-6 top-1/2 -translate-y-1/2 h-20 w-6 p-0 bg-white border border-l-0 rounded-r-md hover:bg-gray-100 z-10 shadow-md"
+          className="absolute -right-6 top-1/2 -translate-y-1/2 h-20 w-6 p-0 bg-surface-primary border border-l-0 rounded-r-md hover:bg-interactive-secondary z-10 shadow-md"
           title={showFilters ? "Hide filters" : "Show filters"}
         >
           {showFilters ? <ChevronLeft className="h-4 w-4" /> : <ChevronRight className="h-4 w-4" />}
@@ -179,7 +187,7 @@ function App() {
       {/* Main Content Area */}
       <div className="flex-1 flex">
         {/* Creature List */}
-        <div className={`${showCreatureList ? 'w-96' : 'w-12'} transition-all duration-300 border-r bg-white flex-shrink-0 relative`}>
+        <div className={`${showCreatureList ? 'w-96' : 'w-12'} transition-all duration-300 border-r bg-surface-primary flex-shrink-0 relative`}>
           <div className={`flex flex-col h-full ${showCreatureList ? '' : 'opacity-0 pointer-events-none'}`}>
             {/* List Header */}
             <div className="p-4 border-b">
@@ -201,7 +209,7 @@ function App() {
                   </select>
                   <button
                     onClick={() => setSortDirection(sortDirection === 'asc' ? 'desc' : 'asc')}
-                    className="text-xs px-2 py-1 border rounded hover:bg-gray-50"
+                    className="text-xs px-2 py-1 border rounded hover:bg-surface-secondary"
                     title={`Sort ${sortDirection === 'asc' ? 'Descending' : 'Ascending'}`}
                   >
                     {sortDirection === 'asc' ? '↑' : '↓'}
@@ -408,7 +416,7 @@ function App() {
             variant="ghost"
             size="sm"
             onClick={() => setShowCreatureList(!showCreatureList)}
-            className="absolute -right-6 top-1/2 -translate-y-1/2 h-20 w-6 p-0 bg-white border border-l-0 rounded-r-md hover:bg-gray-100 z-10 shadow-md"
+            className="absolute -right-6 top-1/2 -translate-y-1/2 h-20 w-6 p-0 bg-surface-primary border border-l-0 rounded-r-md hover:bg-interactive-secondary z-10 shadow-md"
             title={showCreatureList ? "Hide creature list" : "Show creature list"}
           >
             {showCreatureList ? <ChevronLeft className="h-4 w-4" /> : <ChevronRight className="h-4 w-4" />}
@@ -421,6 +429,7 @@ function App() {
           onBack={() => setSelectedCreature(null)}
         />
       </div>
+      <ThemeDebug />
     </div>
   );
 }
