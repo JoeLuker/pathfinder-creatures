@@ -293,9 +293,14 @@ export function Sidebar({
                                 <div
                                   key={cr}
                                   className={`flex-1 min-w-[2px] transition-colors ${
-                                    isInRange ? 'bg-primary opacity-70' : 'border-border'
+                                    isInRange
+                                      ? 'opacity-80'
+                                      : 'opacity-20'
                                   }`}
-                                  style={{ height: `${height}%` }}
+                                  style={{
+                                    height: `${height}%`,
+                                    backgroundColor: 'var(--color-interactive-primary)'
+                                  }}
                                   title={`CR ${cr}: ${count} creatures`}
                                 />
                               );

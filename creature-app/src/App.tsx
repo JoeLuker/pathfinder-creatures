@@ -147,7 +147,7 @@ function App() {
   return (
     <div className="h-screen bg-surface-secondary flex">
       {/* Sidebar with Filters */}
-      <aside className={`${showFilters ? 'w-80' : 'w-12'} transition-all duration-300 border-r border-border bg-surface-primary flex-shrink-0 relative`}>
+      <aside className={`${showFilters ? 'w-96' : 'w-12'} transition-all duration-300 border-r border-border bg-surface-primary flex-shrink-0 relative`}>
         <div className={`h-full flex flex-col ${showFilters ? '' : 'opacity-0 pointer-events-none'}`}>
           <div className="p-2 border-b border-border flex flex-col gap-2">
             <div className="flex items-center justify-between">
