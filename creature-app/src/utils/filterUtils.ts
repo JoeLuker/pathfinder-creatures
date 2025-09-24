@@ -60,7 +60,7 @@ export const applyFilter = (
       const creatureValues = Array.isArray(creatureValue) ? creatureValue : [creatureValue];
       const matches = selectedValues.some((filterVal: string) =>
         creatureValues.some((creatureVal: string) =>
-          creatureVal.toLowerCase().includes(filterVal.toLowerCase())
+          creatureVal.toLowerCase() === filterVal.toLowerCase()
         )
       );
 
@@ -253,10 +253,18 @@ export const getPredictiveCount = (
   switch (filterConfig.type) {
     case 'multiSelect': {
       const currentValues = (currentFilters[filterConfig.key as keyof Filters] as string[]) || [];
-      const newValues = currentValues.includes(filterValue as string)
-        ? currentValues // Already selected, no change
-        : [...currentValues, filterValue as string];
-      (simulatedFilters as any)[filterConfig.key] = newValues;
+      const isCurrentlySelected = currentValues.includes(filterValue as string);
+
+      if (isCurrentlySelected) {
+        // For selected items: simulate removing this item from the current selection
+        const newValues = currentValues.filter(v => v !== filterValue as string);
+        (simulatedFilters as any)[filterConfig.key] = newValues;
+      } else {
+        // For unselected items: simulate adding this item to the current selection
+        const newValues = [...currentValues, filterValue as string];
+        (simulatedFilters as any)[filterConfig.key] = newValues;
+      }
+
       break;
     }
     case 'boolean': {

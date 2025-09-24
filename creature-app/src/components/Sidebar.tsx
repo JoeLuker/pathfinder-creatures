@@ -88,39 +88,110 @@ export function Sidebar({
   };
 
 
-  // Extract unique values with predictive counts - show how many creatures will remain
-  const getUniqueValues = (filterConfig: FilterConfig): CountItem[] => {
-    const valuesSet = new Set<string>();
-
-    // First collect all possible values from all creatures
+  // Get unique numeric values for range fields
+  const getUniqueRangeValues = (filterConfig: FilterConfig): number[] => {
+    const values = new Set<number>();
     creatures.forEach(creature => {
+      const value = filterConfig.getValue?.(creature);
+      if (typeof value === 'number' && !isNaN(value)) {
+        values.add(value);
+      }
+    });
+    return Array.from(values).sort((a, b) => a - b);
+  };
+
+  // Extract unique values with counts - show all options for multiselect filters
+  const getUniqueValues = (filterConfig: FilterConfig): CountItem[] => {
+    const valueCounts = new Map<string, number>();
+
+    // For multiselect filters, we need to show all possible values from all creatures
+    // so users can select multiple options. Count from filtered creatures (excluding this filter)
+    const sourceCreatures = filterConfig.type === 'multiSelect'
+      ? creatures  // Show all possible values for multiselect
+      : (filteredCreatures || creatures); // Use filtered for other types
+
+    // Get counts from currently filtered creatures (for display)
+    const countFromFiltered = filteredCreatures || creatures;
+
+    // First, collect all possible values
+    sourceCreatures.forEach(creature => {
       const value = filterConfig.getValue?.(creature);
       if (value != null) {
         if (Array.isArray(value)) {
           value.forEach(v => {
             if (v) {
-              valuesSet.add(String(v).toLowerCase());
+              const key = String(v).toLowerCase();
+              if (!valueCounts.has(key)) {
+                valueCounts.set(key, 0); // Initialize with 0
+              }
             }
           });
         } else {
-          valuesSet.add(String(value).toLowerCase());
+          const key = String(value).toLowerCase();
+          if (!valueCounts.has(key)) {
+            valueCounts.set(key, 0); // Initialize with 0
+          }
         }
       }
     });
 
-    // Calculate predictive count for each value
-    return Array.from(valuesSet)
-      .map(value => ({
-        value,
-        count: getPredictiveCount(
-          filteredCreatures || creatures,
-          filters,
-          filterConfig,
-          value
-        )
-      }))
-      .filter(item => item.count > 0) // Only show values that will return results
-      .sort((a, b) => b.count - a.count); // Sort by count descending
+    // Then count from filtered creatures to get accurate counts
+    countFromFiltered.forEach(creature => {
+      const value = filterConfig.getValue?.(creature);
+      if (value != null) {
+        if (Array.isArray(value)) {
+          value.forEach(v => {
+            if (v) {
+              const key = String(v).toLowerCase();
+              if (valueCounts.has(key)) {
+                valueCounts.set(key, (valueCounts.get(key) || 0) + 1);
+              }
+            }
+          });
+        } else {
+          const key = String(value).toLowerCase();
+          if (valueCounts.has(key)) {
+            valueCounts.set(key, (valueCounts.get(key) || 0) + 1);
+          }
+        }
+      }
+    });
+
+    // Convert to array and sort with natural ordering for specific fields
+    const items = Array.from(valueCounts.entries())
+      .map(([value, count]) => ({ value, count }));
+
+    // Define natural orderings for specific fields
+    const naturalOrders: Record<string, string[]> = {
+      sizes: ['Fine', 'Diminutive', 'Tiny', 'Small', 'Medium', 'Large', 'Huge', 'Gargantuan', 'Colossal'],
+      alignments: [
+        'Lawful Good', 'Neutral Good', 'Chaotic Good',
+        'Lawful Neutral', 'True Neutral', 'Chaotic Neutral',
+        'Lawful Evil', 'Neutral Evil', 'Chaotic Evil'
+      ]
+    };
+
+    const naturalOrder = naturalOrders[filterConfig.key];
+    if (naturalOrder) {
+      // Sort by natural order, with unknown values at the end alphabetically
+      return items.sort((a, b) => {
+        const indexA = naturalOrder.findIndex(item => item.toLowerCase() === a.value.toLowerCase());
+        const indexB = naturalOrder.findIndex(item => item.toLowerCase() === b.value.toLowerCase());
+
+        if (indexA !== -1 && indexB !== -1) {
+          return indexA - indexB; // Both found, use natural order
+        } else if (indexA !== -1) {
+          return -1; // A is in natural order, B is not - A comes first
+        } else if (indexB !== -1) {
+          return 1; // B is in natural order, A is not - B comes first
+        } else {
+          return a.value.localeCompare(b.value); // Both unknown, alphabetical
+        }
+      });
+    }
+
+    // Default to alphabetical sorting
+    return items.sort((a, b) => a.value.localeCompare(b.value));
   };
 
   const activeFiltersCount = getActiveFilterCount(filters);
@@ -289,16 +360,25 @@ export function Sidebar({
                       {/* Other filters in the category */}
                       {categoryFilters.filter(f => f.key !== 'cr').map(filter => (
                         <div key={filter.key}>
-                          {filter.type === 'range' && (
-                            <RangeSlider
-                              label={filter.label}
-                              min={filter.min!}
-                              max={filter.max!}
-                              step={filter.step}
-                              value={[(filters as any)[`${filter.key}Min`], (filters as any)[`${filter.key}Max`]]}
-                              onChange={(range) => handleRangeChange(filter.key, range)}
-                            />
-                          )}
+                          {filter.type === 'range' && (() => {
+                            const rangeValues = getUniqueRangeValues(filter);
+                            if (rangeValues.length === 0) return null;
+
+                            const minValue = Math.min(...rangeValues);
+                            const maxValue = Math.max(...rangeValues);
+                            const stepValue = rangeValues.length > 1 ? Math.min(...rangeValues.slice(1).map((v, i) => v - rangeValues[i])) : 1;
+
+                            return (
+                              <RangeSlider
+                                label={filter.label}
+                                min={minValue}
+                                max={maxValue}
+                                step={stepValue}
+                                value={[(filters as any)[`${filter.key}Min`], (filters as any)[`${filter.key}Max`]]}
+                                onChange={(range) => handleRangeChange(filter.key, range)}
+                              />
+                            );
+                          })()}
                         </div>
                       ))}
                     </div>
@@ -358,13 +438,20 @@ export function Sidebar({
                   {categoryFilters.map(filter => {
                     switch (filter.type) {
                       case 'range':
+                        const rangeValues = getUniqueRangeValues(filter);
+                        if (rangeValues.length === 0) return null;
+
+                        const minValue = Math.min(...rangeValues);
+                        const maxValue = Math.max(...rangeValues);
+                        const stepValue = rangeValues.length > 1 ? Math.min(...rangeValues.slice(1).map((v, i) => v - rangeValues[i])) : 1;
+
                         return (
                           <RangeSlider
                             key={filter.key}
                             label={filter.label}
-                            min={filter.min!}
-                            max={filter.max!}
-                            step={filter.step}
+                            min={minValue}
+                            max={maxValue}
+                            step={stepValue}
                             value={[(filters as any)[`${filter.key}Min`], (filters as any)[`${filter.key}Max`]]}
                             onChange={(range) => handleRangeChange(filter.key, range)}
                           />
