@@ -81,9 +81,9 @@ export function ActiveFilters({ filters, setFilters }: ActiveFiltersProps) {
   if (activeFilters.length === 0) return null;
 
   return (
-    <div className="bg-white rounded-lg shadow-sm border p-4 mb-4">
-      <div className="flex items-start gap-3">
-        <div className="flex items-center gap-2 text-sm text-muted-foreground pt-1">
+    <div className="bg-surface-primary rounded-md shadow-sm border p-2 mb-2">
+      <div className="flex items-start gap-2">
+        <div className="flex items-center gap-2 text-sm text-secondary pt-1">
           <Filter className="h-4 w-4" />
           <span className="font-medium">Active Filters:</span>
         </div>
@@ -92,9 +92,9 @@ export function ActiveFilters({ filters, setFilters }: ActiveFiltersProps) {
             <Badge
               key={`${filter.label}-${filter.value}-${index}`}
               variant="secondary"
-              className="pl-2 pr-1 py-1 flex items-center gap-1 hover:bg-secondary/80 transition-colors"
+              className="pl-2 pr-1 py-0 flex items-center gap-1 hover:bg-interactive-secondary-hover transition-colors"
             >
-              <span className="text-xs text-muted-foreground">{filter.label}:</span>
+              <span className="text-xs text-secondary">{filter.label}:</span>
               <span className="text-xs font-medium">{filter.value}</span>
               <Button
                 variant="ghost"

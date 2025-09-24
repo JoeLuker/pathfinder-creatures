@@ -68,64 +68,9 @@ export function ThemeProvider({
     // Apply CSS custom properties with proper naming
     const themeConfig = themes[theme];
 
-    // Helper function to convert HSL to space-separated format for shadcn/ui
-    const hslToSpaceSeparated = (hslValue: string): string => {
-      // Extract values from hsl(210, 40%, 98%) format
-      const match = hslValue.match(/hsl\((\d+),\s*(\d+)%,\s*(\d+)%\)/);
-      if (match) {
-        const [, h, s, l] = match;
-        return `${h} ${s}% ${l}%`;
-      }
-      // Handle rgba/hsla formats
-      const rgbaMatch = hslValue.match(/hsla?\([^)]+\)/);
-      if (rgbaMatch) {
-        return hslValue.replace('hsl(', '').replace('hsla(', '').replace(')', '').replace(/,\s*/g, ' ');
-      }
-      return hslValue;
-    };
-
     Object.entries(themeConfig.colors).forEach(([key, value]) => {
       // Set semantic properties
       root.style.setProperty(`--${key}`, value);
-    });
-
-    // Complete legacy shadcn/ui mapping with proper HSL conversion
-    const legacyMappings = {
-      // Background and surface
-      'background': hslToSpaceSeparated(themeConfig.colors['color-background']),
-      'card': hslToSpaceSeparated(themeConfig.colors['color-background']),
-      'popover': hslToSpaceSeparated(themeConfig.colors['color-background']),
-
-      // Text colors
-      'foreground': hslToSpaceSeparated(themeConfig.colors['color-text-primary']),
-      'card-foreground': hslToSpaceSeparated(themeConfig.colors['color-text-primary']),
-      'popover-foreground': hslToSpaceSeparated(themeConfig.colors['color-text-primary']),
-      'muted-foreground': hslToSpaceSeparated(themeConfig.colors['color-text-secondary']),
-
-      // Interactive colors
-      'primary': hslToSpaceSeparated(themeConfig.colors['color-interactive-primary']),
-      'primary-foreground': hslToSpaceSeparated(themeConfig.colors['color-text-inverse']),
-
-      // Secondary surfaces
-      'muted': hslToSpaceSeparated(themeConfig.colors['color-surface-secondary']),
-      'secondary': hslToSpaceSeparated(themeConfig.colors['color-surface-secondary']),
-      'secondary-foreground': hslToSpaceSeparated(themeConfig.colors['color-text-primary']),
-      'accent': hslToSpaceSeparated(themeConfig.colors['color-surface-secondary']),
-      'accent-foreground': hslToSpaceSeparated(themeConfig.colors['color-text-primary']),
-
-      // Destructive/danger colors
-      'destructive': hslToSpaceSeparated(themeConfig.colors['color-interactive-danger']),
-      'destructive-foreground': hslToSpaceSeparated(themeConfig.colors['color-text-inverse']),
-
-      // Borders and inputs
-      'border': hslToSpaceSeparated(themeConfig.colors['color-border-primary']),
-      'input': hslToSpaceSeparated(themeConfig.colors['color-border-primary']),
-      'ring': hslToSpaceSeparated(themeConfig.colors['color-border-focus']),
-    };
-
-    // Apply all legacy mappings
-    Object.entries(legacyMappings).forEach(([legacyKey, legacyValue]) => {
-      root.style.setProperty(`--${legacyKey}`, legacyValue);
     });
 
     // Save to localStorage

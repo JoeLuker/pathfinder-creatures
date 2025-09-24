@@ -7,6 +7,35 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Override Tailwind defaults with semantic tokens */
+@layer base {
+  *, ::before, ::after {
+    box-sizing: border-box;
+    border-width: 0;
+    border-style: solid;
+    border-color: var(--color-border-primary);
+  }
+}
+
+/* Custom semantic text utilities to override Tailwind's default text-{color} */
+@layer utilities {
+  .text-primary {
+    color: var(--color-text-primary);
+  }
+  .text-secondary {
+    color: var(--color-text-secondary);
+  }
+  .text-tertiary {
+    color: var(--color-text-tertiary);
+  }
+  .text-inverse {
+    color: var(--color-text-inverse);
+  }
+  .text-disabled {
+    color: var(--color-text-disabled);
+  }
+}
+
 /* Design System CSS Custom Properties */
 @layer base {
   :root {

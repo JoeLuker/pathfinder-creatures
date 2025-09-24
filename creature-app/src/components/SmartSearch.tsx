@@ -104,7 +104,7 @@ export function SmartSearch({ value, onChange, creatures }: SmartSearchProps) {
       {/* Enhanced Command-based Suggestions */}
       {isFocused && (value.length === 0 || suggestions.length > 0) && (
         <div className="absolute top-full mt-1 w-full z-50">
-          <Command className="rounded-lg border shadow-lg bg-white">
+          <Command className="rounded-md border shadow-lg bg-surface-primary">
             <CommandList>
               {value.length === 0 ? (
                 <>
@@ -155,7 +155,7 @@ export function SmartSearch({ value, onChange, creatures }: SmartSearchProps) {
               <CommandEmpty>No results found.</CommandEmpty>
             </CommandList>
 
-            <div className="px-3 py-2 border-t text-xs text-muted-foreground">
+            <div className="px-2 py-0 border-t text-xs text-muted-foreground">
               <div>
                 <span className="font-medium">Fuzzy search enabled!</span> Typos are OK - "dragn" finds "dragon", "lich" finds "lich" and "lichling"
               </div>

@@ -28,7 +28,7 @@ export function CreatureDetailMain({ creature, onBack }: CreatureDetailMainProps
     return (
       <div className="flex-1 flex items-center justify-center text-muted-foreground">
         <div className="text-center">
-          <h2 className="text-xl font-semibold mb-2">Select a creature</h2>
+          <h2 className="text-xl font-semibold text-primary mb-2">Select a creature</h2>
           <p>Choose a creature from the list to view details</p>
         </div>
       </div>
@@ -67,19 +67,18 @@ export function CreatureDetailMain({ creature, onBack }: CreatureDetailMainProps
   return (
     <div className="flex-1 flex flex-col bg-surface-secondary">
       {/* Enhanced Header */}
-      <div className="bg-surface-primary border-b p-4">
+      <div className="bg-surface-primary border-b p-2">
         <div className="flex items-start justify-between">
-          <div className="flex items-start gap-4">
+          <div className="flex items-start gap-2">
             <Button
               onClick={onBack}
               variant="ghost"
               size="sm"
               className="hover:bg-surface-secondary -ml-2 mt-1">
-            >
               <ArrowLeft className="h-4 w-4" />
             </Button>
             <div>
-              <h1 className="text-2xl font-bold">{creature.name}</h1>
+              <h1 className="text-2xl font-bold text-primary">{creature.name}</h1>
               <p className="text-muted-foreground">
                 {creature.alignment && <span>{creature.alignment} </span>}
                 {creature.size} {creature.type}
@@ -93,9 +92,9 @@ export function CreatureDetailMain({ creature, onBack }: CreatureDetailMainProps
             </div>
           </div>
           <div className="text-right">
-            <div className="text-2xl font-bold">
+            <div className="text-2xl font-bold text-primary">
               CR {crDisplay}
-              {creature.mr && <span className="text-lg text-purple-600"> / MR {creature.mr}</span>}
+              {creature.mr && <span className="text-lg text-interactive-primary"> / MR {creature.mr}</span>}
             </div>
             {creature.xp && (
               <div className="text-sm text-muted-foreground">{creature.xp.toLocaleString()} XP</div>
@@ -104,36 +103,36 @@ export function CreatureDetailMain({ creature, onBack }: CreatureDetailMainProps
         </div>
 
         {/* Quick Stats Bar - Always Visible */}
-        <div className="grid grid-cols-6 gap-2 mt-4">
-          <div className="bg-surface-secondary rounded px-3 py-2 text-center">
+        <div className="grid grid-cols-6 gap-2 mt-2">
+          <div className="bg-surface-secondary rounded px-2 py-0 text-center">
             <div className="text-xs text-muted-foreground">HP</div>
-            <div className="font-bold">{creature.hp?.total ?? '-'}</div>
+            <div className="font-bold text-primary">{creature.hp?.total ?? '-'}</div>
           </div>
-          <div className="bg-surface-secondary rounded px-3 py-2 text-center">
+          <div className="bg-surface-secondary rounded px-2 py-0 text-center">
             <div className="text-xs text-muted-foreground">AC</div>
-            <div className="font-bold">{creature.ac?.AC ?? creature.ac ?? '-'}</div>
+            <div className="font-bold text-primary">{creature.ac?.AC ?? creature.ac ?? '-'}</div>
           </div>
-          <div className="bg-surface-secondary rounded px-3 py-2 text-center">
+          <div className="bg-surface-secondary rounded px-2 py-0 text-center">
             <div className="text-xs text-muted-foreground">Fort</div>
-            <div className="font-bold">
+            <div className="font-bold text-primary">
               {creature.saves?.fort !== undefined ? `${creature.saves.fort >= 0 ? '+' : ''}${creature.saves.fort}` : '-'}
             </div>
           </div>
-          <div className="bg-surface-secondary rounded px-3 py-2 text-center">
+          <div className="bg-surface-secondary rounded px-2 py-0 text-center">
             <div className="text-xs text-muted-foreground">Ref</div>
-            <div className="font-bold">
+            <div className="font-bold text-primary">
               {creature.saves?.ref !== undefined ? `${creature.saves.ref >= 0 ? '+' : ''}${creature.saves.ref}` : '-'}
             </div>
           </div>
-          <div className="bg-surface-secondary rounded px-3 py-2 text-center">
+          <div className="bg-surface-secondary rounded px-2 py-0 text-center">
             <div className="text-xs text-muted-foreground">Will</div>
-            <div className="font-bold">
+            <div className="font-bold text-primary">
               {creature.saves?.will !== undefined ? `${creature.saves.will >= 0 ? '+' : ''}${creature.saves.will}` : '-'}
             </div>
           </div>
-          <div className="bg-surface-secondary rounded px-3 py-2 text-center">
+          <div className="bg-surface-secondary rounded px-2 py-0 text-center">
             <div className="text-xs text-muted-foreground">Init</div>
-            <div className="font-bold">
+            <div className="font-bold text-primary">
               {creature.initiative_parsed?.value !== undefined
                 ? `${creature.initiative_parsed.value >= 0 ? '+' : ''}${creature.initiative_parsed.value}`
                 : creature.initiative !== undefined
@@ -145,10 +144,10 @@ export function CreatureDetailMain({ creature, onBack }: CreatureDetailMainProps
       </div>
 
       <ScrollArea className="flex-1">
-        <div className="p-6 space-y-6">
+        <div className="p-2 space-y-0.5">
           {/* Combat Stats Section */}
           <div>
-            <h2 className="text-lg font-semibold mb-4 flex items-center gap-2">
+            <h2 className="text-lg font-semibold text-primary mb-2 flex items-center gap-2">
               <Sword className="h-5 w-5" />
               Combat Statistics
             </h2>
@@ -156,158 +155,151 @@ export function CreatureDetailMain({ creature, onBack }: CreatureDetailMainProps
           </div>
 
           {/* Abilities Section */}
-          <div className="space-y-4">
-            <h2 className="text-lg font-semibold mb-4 flex items-center gap-2 border-t pt-6">
+          <div className="space-y-1">
+            <h2 className="text-lg font-semibold text-primary mb-2 flex items-center gap-2 border-t pt-2">
               <Sparkles className="h-5 w-5" />
               Abilities & Powers
             </h2>
-            {/* Spells */}
+            {/* Spells - Compact */}
             {creature.spells?.entries?.length > 0 && (
-              <div className="bg-gradient-to-br from-purple-50 to-white rounded-xl border border-purple-200 p-4">
-                <h3 className="font-semibold text-sm mb-3 flex items-center gap-2">
-                  <ScrollText className="h-4 w-4 text-purple-600" />
-                  Spells
-                </h3>
-                {creature.spells.sources?.map((source, sidx) => (
-                  <div key={sidx} className="text-xs text-secondary mb-3">
-                    {source.name} {source.type && `(${source.type})`}
-                    {source.concentration && ` • Concentration +${source.concentration}`}
-                  </div>
-                ))}
-                <div className="grid gap-2">
-                  {[9, 8, 7, 6, 5, 4, 3, 2, 1, 0].map(level => {
-                    const levelSpells = creature.spells.entries.filter(s => s.level === level);
-                    if (levelSpells.length === 0) return null;
-                    const defaultDC = getDefaultSpellDC(level);
-                    return (
-                      <div key={level} className="flex flex-wrap items-start gap-2">
-                        <Badge variant="outline" className="text-xs font-semibold min-w-[80px] justify-center">
-                          {level === 0 ? `Cantrip DC ${defaultDC}` : `${level}th DC ${defaultDC}`}
-                        </Badge>
-                        <div className="flex-1 text-sm">
+              <div className="bg-surface-secondary rounded-md border p-1">
+                <div className="text-xs">
+                  <span className="font-semibold text-primary">Spells:</span>
+                  {creature.spells.sources?.map((source, sidx) => (
+                    <span key={sidx} className="text-secondary ml-1">
+                      {source.name}{source.type && ` (${source.type})`}
+                    </span>
+                  ))}
+                  <div className="mt-1 space-y-0.5">
+                    {[9, 8, 7, 6, 5, 4, 3, 2, 1, 0].map(level => {
+                      const levelSpells = creature.spells.entries.filter(s => s.level === level);
+                      if (levelSpells.length === 0) return null;
+                      const defaultDC = getDefaultSpellDC(level);
+                      return (
+                        <div key={level} className="text-primary">
+                          <span className="font-medium text-secondary">
+                            {level === 0 ? `Cantrip (DC ${defaultDC}):` : `${level}th (DC ${defaultDC}):`}
+                          </span>
+                          {' '}
                           {levelSpells.map((spell, idx) => (
                             <span key={idx}>
-                              {idx > 0 && ' • '}
-                              <span className={spell.is_mythic_spell ? 'text-purple-600 font-semibold' : ''}>
+                              {idx > 0 && ', '}
+                              <span className={spell.is_mythic_spell ? 'text-interactive-primary font-semibold' : ''}>
                                 {spell.name}
-                                {spell.DC && (
-                                  <span className="text-xs text-tertiary"> DC {spell.DC}</span>
-                                )}
+                                {spell.DC && spell.DC !== defaultDC && <sup className="text-tertiary">{spell.DC}</sup>}
                               </span>
                             </span>
                           ))}
                         </div>
-                      </div>
-                    );
-                  })}
+                      );
+                    })}
+                  </div>
                 </div>
               </div>
             )}
 
-            {/* Spell-Like Abilities */}
+            {/* Spell-Like Abilities - Compact */}
             {creature.spell_like_abilities?.entries?.length > 0 && (
-              <div className="bg-surface-primary rounded-lg border p-4">
-                <h3 className="font-semibold text-sm mb-3">Spell-Like Abilities</h3>
-                <div className="text-sm space-y-1">
-                  {Object.entries(
-                    creature.spell_like_abilities.entries.reduce((acc, spell) => {
-                      const freq = spell.frequency || 'Other';
-                      if (!acc[freq]) acc[freq] = [];
-                      acc[freq].push(spell);
-                      return acc;
-                    }, {} as Record<string, any[]>)
-                  ).map(([frequency, spells]) => (
-                    <div key={frequency}>
-                      <span className="font-medium">{frequency}:</span>{' '}
-                      {spells.map((spell, idx) => (
-                        <span key={idx}>
-                          {idx > 0 && ', '}
-                          {spell.name}
-                          {spell.DC && ` (DC ${spell.DC})`}
-                        </span>
-                      ))}
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
-
-            {/* Special Abilities */}
-            {creature.special_abilities?._parsed?.length > 0 && (
-              <div className="bg-surface-primary rounded-lg border p-4">
-                <h3 className="font-semibold text-sm mb-3 flex items-center gap-2">
-                  <Sparkles className="h-4 w-4" />
-                  Special Abilities
-                </h3>
-                <div className="space-y-3">
-                  {creature.special_abilities._parsed.map((ability, idx) => (
-                    <div key={idx} className="pb-3 border-b last:border-0 last:pb-0">
-                      <div className="flex items-center gap-2 mb-1">
-                        <span className="font-medium text-sm">{ability.name}</span>
-                        {ability.type && (
-                          <Badge variant="outline" className="text-xs">{ability.type}</Badge>
-                        )}
-                      </div>
-                      <p className="text-sm text-muted-foreground">{ability.description}</p>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
-
-            {/* Feats */}
-            {creature.feats?.length > 0 && (
-              <div className="bg-surface-primary rounded-lg border p-4">
-                <h3 className="font-semibold text-sm mb-3">Feats</h3>
-                <div className="text-sm">{creature.feats.join(', ')}</div>
-              </div>
-            )}
-
-            {/* Skills */}
-            {creature.skills && Object.keys(creature.skills).filter(k => !k.startsWith('_')).length > 0 && (
-              <div className="bg-surface-primary rounded-lg border p-4">
-                <h3 className="font-semibold text-sm mb-3">Skills</h3>
-                <div className="text-sm grid grid-cols-2 gap-2">
-                  {Object.entries(creature.skills)
-                    .filter(([key]) => !key.startsWith('_'))
-                    .map(([skill, value]) => (
-                      <div key={skill}>
-                        <span className="text-muted-foreground">{skill}:</span> +{value}
+              <div className="bg-surface-secondary rounded-md border p-1">
+                <div className="text-xs text-primary">
+                  <span className="font-semibold text-secondary">Spell-Like Abilities:</span>
+                  <div className="mt-0.5 space-y-0.5">
+                    {Object.entries(
+                      creature.spell_like_abilities.entries.reduce((acc, spell) => {
+                        const freq = spell.frequency || 'Other';
+                        if (!acc[freq]) acc[freq] = [];
+                        acc[freq].push(spell);
+                        return acc;
+                      }, {} as Record<string, any[]>)
+                    ).map(([frequency, spells]) => (
+                      <div key={frequency}>
+                        <span className="font-medium text-secondary">{frequency}:</span>{' '}
+                        {spells.map((spell, idx) => (
+                          <span key={idx}>
+                            {idx > 0 && ', '}
+                            {spell.name}{spell.DC && ` (DC ${spell.DC})`}
+                          </span>
+                        ))}
                       </div>
                     ))}
+                  </div>
                 </div>
               </div>
             )}
 
-            {/* Languages */}
-            {creature.languages?.length > 0 && (
-              <div className="bg-surface-primary rounded-lg border p-4">
-                <h3 className="font-semibold text-sm mb-3">Languages</h3>
-                <div className="text-sm">{creature.languages.join(', ')}</div>
+            {/* Special Abilities - Paragraph Flow */}
+            {creature.special_abilities?._parsed?.length > 0 && (
+              <div className="bg-surface-primary rounded-md border p-1">
+                <div className="text-xs">
+                  <span className="font-semibold text-secondary">Special Abilities:</span>
+                  <div className="mt-0.5 text-primary">
+                    {creature.special_abilities._parsed.map((ability, idx) => (
+                      <span key={idx}>
+                        {idx > 0 && ' • '}
+                        <strong>{ability.name}</strong>
+                        {ability.type && <span className="text-tertiary"> ({ability.type})</span>}
+                        : {ability.description}
+                      </span>
+                    ))}
+                  </div>
+                </div>
               </div>
             )}
 
-            {/* Special Qualities */}
+            {/* Feats - Inline */}
+            {creature.feats?.length > 0 && (
+              <div className="bg-surface-secondary rounded-md border p-1">
+                <div className="text-xs text-primary">
+                  <span className="font-semibold text-secondary">Feats:</span> {creature.feats.join(', ')}
+                </div>
+              </div>
+            )}
+
+            {/* Skills - Compact List */}
+            {creature.skills && Object.keys(creature.skills).filter(k => !k.startsWith('_')).length > 0 && (
+              <div className="bg-surface-secondary rounded-md border p-1">
+                <div className="text-xs text-primary">
+                  <span className="font-semibold text-secondary">Skills:</span>
+                  {' '}
+                  {Object.entries(creature.skills)
+                    .filter(([key]) => !key.startsWith('_'))
+                    .map(([skill, value]) => `${skill} +${value}`)
+                    .join(', ')}
+                </div>
+              </div>
+            )}
+
+            {/* Languages - Inline */}
+            {creature.languages?.length > 0 && (
+              <div className="bg-surface-secondary rounded-md border p-1">
+                <div className="text-xs text-primary">
+                  <span className="font-semibold text-secondary">Languages:</span> {creature.languages.join(', ')}
+                </div>
+              </div>
+            )}
+
+            {/* Special Qualities - Inline */}
             {creature.special_qualities_normalized?.length > 0 && (
-              <div className="bg-surface-primary rounded-lg border p-4">
-                <h3 className="font-semibold text-sm mb-3">Special Qualities</h3>
-                <div className="text-sm">{creature.special_qualities_normalized.join(', ')}</div>
+              <div className="bg-surface-secondary rounded-md border p-1">
+                <div className="text-xs text-primary">
+                  <span className="font-semibold text-secondary">Special Qualities:</span> {creature.special_qualities_normalized.join(', ')}
+                </div>
               </div>
             )}
           </div>
 
           {/* Details Section - Lore, ecology, gear, tactics */}
-          <div className="space-y-4">
-            <h2 className="text-lg font-semibold mb-4 flex items-center gap-2 border-t pt-6">
+          <div className="space-y-1">
+            <h2 className="text-lg font-semibold text-primary mb-2 flex items-center gap-2 border-t pt-2">
               <BookOpen className="h-5 w-5" />
               Details & Lore
             </h2>
             {/* Description */}
             {(creature.desc_short || creature.desc_long) && (
-              <div className="bg-surface-primary rounded-lg border p-4">
-                <h3 className="font-semibold mb-3">Description</h3>
+              <div className="bg-surface-primary rounded-md border p-2">
+                <h3 className="font-semibold mb-2 text-primary">Description</h3>
                 {creature.desc_short && (
-                  <p className="text-sm text-muted-foreground italic mb-3">{creature.desc_short}</p>
+                  <p className="text-sm text-muted-foreground italic mb-2">{creature.desc_short}</p>
                 )}
                 {creature.desc_long && (
                   <p className="text-sm whitespace-pre-wrap">{creature.desc_long}</p>
@@ -317,22 +309,22 @@ export function CreatureDetailMain({ creature, onBack }: CreatureDetailMainProps
 
             {/* Ecology */}
             {(creature.environment || creature.ecology?.organization || creature.ecology?.treasure_type) && (
-              <div className="bg-surface-primary rounded-lg border p-4">
-                <h3 className="font-semibold mb-3">Ecology</h3>
-                <div className="space-y-2 text-sm">
+              <div className="bg-surface-primary rounded-md border p-2">
+                <h3 className="font-semibold mb-2 text-primary">Ecology</h3>
+                <div className="space-y-0.5 text-sm">
                   {creature.environment && (
                     <div>
-                      <span className="font-medium">Environment:</span> {creature.environment}
+                      <span className="font-medium text-primary">Environment:</span> {creature.environment}
                     </div>
                   )}
                   {creature.ecology?.organization && (
                     <div>
-                      <span className="font-medium">Organization:</span> {creature.ecology.organization}
+                      <span className="font-medium text-primary">Organization:</span> {creature.ecology.organization}
                     </div>
                   )}
                   {creature.ecology?.treasure_type && (
                     <div>
-                      <span className="font-medium">Treasure:</span> {creature.ecology.treasure_type}
+                      <span className="font-medium text-primary">Treasure:</span> {creature.ecology.treasure_type}
                     </div>
                   )}
                 </div>
@@ -341,29 +333,29 @@ export function CreatureDetailMain({ creature, onBack }: CreatureDetailMainProps
 
             {/* Tactics - Collapsible */}
             {creature.tactics && (
-              <div className="bg-surface-primary rounded-lg border">
+              <div className="bg-surface-primary rounded-md border">
                 <button
                   onClick={() => toggleSection('tactics')}
-                  className="w-full p-4 flex items-center justify-between hover:bg-surface-secondary"
+                  className="w-full p-2 flex items-center justify-between hover:bg-surface-secondary"
                 >
-                  <h3 className="font-semibold text-sm">Combat Tactics</h3>
+                  <h3 className="font-semibold text-sm text-primary">Combat Tactics</h3>
                   {expandedSections.tactics ? <ChevronDown className="h-4 w-4" /> : <ChevronRight className="h-4 w-4" />}
                 </button>
                 {expandedSections.tactics && (
-                  <div className="px-4 pb-4 border-t space-y-2 text-sm">
+                  <div className="px-1 pb-1 border-t space-y-0.5 text-sm">
                     {creature.tactics.before_combat && (
                       <div>
-                        <span className="font-medium">Before Combat:</span> {creature.tactics.before_combat}
+                        <span className="font-medium text-primary">Before Combat:</span> {creature.tactics.before_combat}
                       </div>
                     )}
                     {creature.tactics.during_combat && (
                       <div>
-                        <span className="font-medium">During Combat:</span> {creature.tactics.during_combat}
+                        <span className="font-medium text-primary">During Combat:</span> {creature.tactics.during_combat}
                       </div>
                     )}
                     {creature.tactics.morale && (
                       <div>
-                        <span className="font-medium">Morale:</span> {creature.tactics.morale}
+                        <span className="font-medium text-primary">Morale:</span> {creature.tactics.morale}
                       </div>
                     )}
                   </div>
@@ -373,19 +365,19 @@ export function CreatureDetailMain({ creature, onBack }: CreatureDetailMainProps
 
             {/* Gear - Collapsible */}
             {creature.gear?.gear?.length > 0 && (
-              <div className="bg-surface-primary rounded-lg border">
+              <div className="bg-surface-primary rounded-md border">
                 <button
                   onClick={() => toggleSection('gear')}
-                  className="w-full p-4 flex items-center justify-between hover:bg-surface-secondary"
+                  className="w-full p-2 flex items-center justify-between hover:bg-surface-secondary"
                 >
-                  <h3 className="font-semibold text-sm flex items-center gap-2">
+                  <h3 className="font-semibold text-sm text-primary flex items-center gap-2">
                     <Package className="h-4 w-4" />
                     Equipment & Gear ({creature.gear.gear.length} items)
                   </h3>
                   {expandedSections.gear ? <ChevronDown className="h-4 w-4" /> : <ChevronRight className="h-4 w-4" />}
                 </button>
                 {expandedSections.gear && (
-                  <div className="px-4 pb-4 border-t">
+                  <div className="px-1 pb-1 border-t">
                     <div className="text-sm">{creature.gear.gear.join(', ')}</div>
                   </div>
                 )}
@@ -394,15 +386,15 @@ export function CreatureDetailMain({ creature, onBack }: CreatureDetailMainProps
 
             {/* Sources */}
             {creature.sources?.length > 0 && (
-              <div className="bg-surface-primary rounded-lg border p-4">
-                <h3 className="font-semibold mb-3">Sources</h3>
-                <div className="space-y-2">
+              <div className="bg-surface-primary rounded-md border p-2">
+                <h3 className="font-semibold mb-2 text-primary">Sources</h3>
+                <div className="space-y-0.5">
                   {creature.sources.map((source, idx) => (
                     <div key={idx} className="flex items-center justify-between text-sm">
                       <span>{source.name}, p. {source.page}</span>
                       {source.link && (
                         <a href={source.link} target="_blank" rel="noopener noreferrer"
-                           className="text-blue-600 hover:underline">
+                           className="text-status-info hover:underline">
                           View →
                         </a>
                       )}
@@ -414,13 +406,13 @@ export function CreatureDetailMain({ creature, onBack }: CreatureDetailMainProps
           </div>
 
           {/* Raw JSON Section - Collapsible */}
-          <div className="mt-8 border-t pt-6">
-            <div className="bg-surface-secondary rounded-xl border">
+          <div className="mt-2 border-t pt-2">
+            <div className="bg-surface-secondary rounded-md border">
               <button
                 onClick={() => toggleSection('json')}
-                className="w-full p-4 flex items-center justify-between hover:bg-surface-tertiary rounded-t-xl"
+                className="w-full p-2 flex items-center justify-between hover:bg-surface-tertiary rounded-t-xl"
               >
-                <h2 className="text-lg font-semibold flex items-center gap-2">
+                <h2 className="text-lg font-semibold text-primary flex items-center gap-2">
                   <Code className="h-5 w-5" />
                   Raw JSON Data
                 </h2>
@@ -440,9 +432,9 @@ export function CreatureDetailMain({ creature, onBack }: CreatureDetailMainProps
                 </div>
               </button>
               {expandedSections.json && (
-                <div className="p-4 border-t">
-                  <div className="bg-slate-900 text-inverse rounded-lg p-4 max-h-[600px] overflow-auto">
-                    <pre className="text-xs font-mono whitespace-pre-wrap break-words">
+                <div className="p-2 border-t">
+                  <div className="bg-slate-950 dark:bg-slate-900 border border-slate-800 dark:border-slate-700 rounded-md p-3 max-h-[600px] overflow-auto font-mono text-xs">
+                    <pre className="text-slate-300 dark:text-slate-400 whitespace-pre-wrap break-words leading-relaxed">
                       {JSON.stringify(creature, null, 2)}
                     </pre>
                   </div>

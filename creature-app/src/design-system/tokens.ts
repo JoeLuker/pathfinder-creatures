@@ -330,9 +330,9 @@ export const themes = {
       'color-status-error': designTokens.colors.red[400],
       'color-status-info': designTokens.colors.sapphire[400],
 
-      // Border colors
-      'color-border-primary': designTokens.colors.slate[700],
-      'color-border-secondary': designTokens.colors.slate[800],
+      // Border colors - Back to slate 600 to test
+      'color-border-primary': designTokens.colors.slate[600],
+      'color-border-secondary': designTokens.colors.slate[900],
       'color-border-focus': designTokens.colors.amber[400],
       'color-border-error': designTokens.colors.red[400],
     },

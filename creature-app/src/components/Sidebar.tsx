@@ -197,10 +197,10 @@ export function Sidebar({
   const activeFiltersCount = getActiveFilterCount(filters);
 
   return (
-    <div className="space-y-4 h-full overflow-y-auto">
+    <div className="space-y-1 h-full overflow-y-auto">
       {/* Filters */}
-      <div className="bg-surface-primary rounded-lg shadow-sm border p-4">
-        <div className="flex items-center justify-between mb-3">
+      <div className="bg-surface-primary rounded-md shadow-sm border p-2">
+        <div className="flex items-center justify-between mb-2">
           <div className="flex items-center gap-2">
             <SlidersHorizontal className="h-4 w-4 text-muted-foreground" />
             <span className="font-medium text-sm">Filters</span>
@@ -248,7 +248,7 @@ export function Sidebar({
             const crFilter = categoryFilters.find(f => f.key === 'cr');
             if (crFilter) {
               return (
-                <div key={category} className="border-t pt-3 mt-3">
+                <div key={category} className="border-t pt-3 mt-1">
                   <button
                     className="flex items-center justify-between w-full text-left mb-2"
                     onClick={() => toggleSection(category)}
@@ -264,7 +264,7 @@ export function Sidebar({
                     )}
                   </button>
                   {isExpanded && (
-                    <div className="space-y-3">
+                    <div className="space-y-1">
                       {/* CR Distribution Histogram */}
                       <div className="h-16 flex items-end gap-0.5 px-2">
                         {(() => {
@@ -304,7 +304,7 @@ export function Sidebar({
                       </div>
 
                       {/* Range Slider */}
-                      <div className="px-2 space-y-2">
+                      <div className="px-2 space-y-0.5">
                         <Slider
                           min={crDistribution.minCR}
                           max={crDistribution.maxCR}
@@ -391,7 +391,7 @@ export function Sidebar({
           if (categoryFilters.length === 0) return null;
 
           return (
-            <div key={category} className="border-t pt-3 mt-3">
+            <div key={category} className="border-t pt-3 mt-1">
               <button
                 className="flex items-center justify-between w-full text-left mb-2"
                 onClick={() => toggleSection(category)}
@@ -434,7 +434,7 @@ export function Sidebar({
                 )}
               </button>
               {isExpanded && (
-                <div className="space-y-4">
+                <div className="space-y-1">
                   {categoryFilters.map(filter => {
                     switch (filter.type) {
                       case 'range':
@@ -466,7 +466,7 @@ export function Sidebar({
                         const maxCount = Math.max(...uniqueValues.map(v => v.count));
 
                         return (
-                          <div key={filter.key} className="space-y-2">
+                          <div key={filter.key} className="space-y-0.5">
                             <div className="flex items-center justify-between">
                               <span className="text-xs font-medium text-muted-foreground">{filter.label}</span>
                               {currentValues.length > 0 && filter.excludeMode && (
@@ -503,10 +503,10 @@ export function Sidebar({
                                 return (
                                   <label
                                     key={value}
-                                    className="relative flex items-center justify-between px-2 py-1 hover:bg-surface-secondary rounded cursor-pointer"
+                                    className="relative flex items-center justify-between px-2 py-0 hover:bg-surface-secondary rounded cursor-pointer"
                                   >
                                     <div
-                                      className="absolute inset-0 bg-blue-50 opacity-20 rounded"
+                                      className="absolute inset-0 bg-interactive-primary opacity-20 rounded"
                                       style={{ width: `${percentage}%` }}
                                     />
                                     <div className="relative flex items-center gap-2 flex-1">

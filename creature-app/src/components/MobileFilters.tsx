@@ -43,10 +43,10 @@ export function MobileFilters(props: MobileFiltersProps) {
         </Button>
       </SheetTrigger>
       <SheetContent side="left" className="w-[85vw] sm:w-[385px] p-0">
-        <SheetHeader className="px-6 py-4 border-b">
+        <SheetHeader className="px-2 py-4 border-b">
           <SheetTitle>Filters & Sort</SheetTitle>
         </SheetHeader>
-        <div className="h-[calc(100vh-5rem)] overflow-y-auto px-6 py-4">
+        <div className="h-[calc(100vh-5rem)] overflow-y-auto px-2 py-4">
           <Sidebar
             filters={props.filters}
             setFilters={props.setFilters}
@@ -55,7 +55,7 @@ export function MobileFilters(props: MobileFiltersProps) {
             crDistribution={props.crDistribution}
           />
         </div>
-        <div className="absolute bottom-0 left-0 right-0 p-4 bg-white border-t">
+        <div className="absolute bottom-0 left-0 right-0 p-2 bg-surface-primary border-t">
           <div className="flex gap-2">
             <Button
               variant="outline"

@@ -35,358 +35,273 @@ export function StatBlock({ creature }: StatBlockProps) {
 
   return (
     <TooltipProvider>
-      <div className="space-y-6">
-        {/* Primary Combat Stats - Card Layout */}
-        <div className="grid grid-cols-3 gap-4">
-          {/* HP Card */}
-          <div className="bg-gradient-to-br from-red-50 to-white border border-red-200 rounded-xl p-4">
-            <div className="flex items-center justify-between mb-2">
-              <Heart className="h-5 w-5 text-red-500" />
-              <span className="text-xs font-medium text-red-600">Hit Points</span>
-            </div>
-            <div className="text-2xl font-bold text-gray-900">{creature.hp?.total ?? '—'}</div>
-          {creature.hp?.long && (
-            <div className="text-xs text-gray-600 mt-1">{creature.hp.long}</div>
-          )}
-          {creature.hp?.regeneration && (
-            <div className="text-xs text-red-600 mt-1">Regen {creature.hp.regeneration}</div>
-          )}
-        </div>
+      {/* Multi-Section Layout - Web-Native */}
+      <div className="grid grid-cols-12 gap-2 text-sm">
 
-        {/* AC Card */}
-        <div className="bg-gradient-to-br from-blue-50 to-white border border-blue-200 rounded-xl p-4">
-          <div className="flex items-center justify-between mb-2">
-            <Shield className="h-5 w-5 text-blue-500" />
-            <span className="text-xs font-medium text-blue-600">Armor Class</span>
-          </div>
-          <div className="text-2xl font-bold text-gray-900">{creature.ac?.AC ?? '—'}</div>
-          <div className="text-xs text-gray-600 mt-1">
-            <Tooltip>
-              <TooltipTrigger>Touch {creature.ac?.touch ?? '—'}</TooltipTrigger>
-              <TooltipContent>
-                <p>Touch AC - Ignores armor, natural armor, and shield bonuses</p>
-              </TooltipContent>
-            </Tooltip>
-            {' | '}
-            <Tooltip>
-              <TooltipTrigger>FF {creature.ac?.flat_footed ?? '—'}</TooltipTrigger>
-              <TooltipContent>
-                <p>Flat-Footed AC - When surprised or unable to react (no Dex bonus)</p>
-              </TooltipContent>
-            </Tooltip>
-          </div>
-        </div>
-
-        {/* Initiative Card */}
-        <div className="bg-gradient-to-br from-purple-50 to-white border border-purple-200 rounded-xl p-4">
-          <div className="flex items-center justify-between mb-2">
-            <Zap className="h-5 w-5 text-purple-500" />
-            <span className="text-xs font-medium text-purple-600">Initiative</span>
-          </div>
-          <div className="text-2xl font-bold text-gray-900">
-            {creature.initiative_parsed?.value !== undefined
-              ? `${creature.initiative_parsed.value >= 0 ? '+' : ''}${creature.initiative_parsed.value}`
-              : creature.initiative !== undefined
-              ? `${creature.initiative >= 0 ? '+' : ''}${creature.initiative}`
-              : '—'}
-          </div>
-          <div className="text-xs text-gray-600 mt-1">Roll first</div>
-        </div>
-      </div>
-
-      {/* Saving Throws - Horizontal Bar */}
-      <div className="bg-gradient-to-r from-green-50 via-yellow-50 to-orange-50 rounded-xl p-4 border">
-        <h3 className="text-xs font-semibold text-gray-600 uppercase tracking-wider mb-3">Saving Throws</h3>
-        <div className="grid grid-cols-3 gap-4">
-          <div className="text-center">
-            <div className="text-xs text-gray-600 mb-1">Fortitude</div>
-            <div className="text-xl font-bold">
-              {creature.saves?.fort !== undefined
-                ? `${creature.saves.fort >= 0 ? '+' : ''}${creature.saves.fort}`
-                : '—'}
-            </div>
-          </div>
-          <div className="text-center border-l border-r">
-            <div className="text-xs text-gray-600 mb-1">Reflex</div>
-            <div className="text-xl font-bold">
-              {creature.saves?.ref !== undefined
-                ? `${creature.saves.ref >= 0 ? '+' : ''}${creature.saves.ref}`
-                : '—'}
-            </div>
-          </div>
-          <div className="text-center">
-            <div className="text-xs text-gray-600 mb-1">Will</div>
-            <div className="text-xl font-bold">
-              {creature.saves?.will !== undefined
-                ? `${creature.saves.will >= 0 ? '+' : ''}${creature.saves.will}`
-                : '—'}
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Ability Scores - Visual Enhancement */}
-      <div className="bg-white rounded-xl border p-4">
-        <h3 className="text-xs font-semibold text-gray-600 uppercase tracking-wider mb-3 flex items-center gap-2">
-          <Brain className="h-4 w-4" />
-          Ability Scores
-        </h3>
-        <div className="grid grid-cols-6 gap-2">
-          {['STR', 'DEX', 'CON', 'INT', 'WIS', 'CHA'].map((ability, idx) => {
-            const score = creature.ability_scores[ability as keyof typeof creature.ability_scores];
-            const { score: scoreStr, mod } = formatAbilityScore(score);
-            const colors = [
-              'from-red-100 to-red-50 border-red-200',
-              'from-orange-100 to-orange-50 border-orange-200',
-              'from-yellow-100 to-yellow-50 border-yellow-200',
-              'from-blue-100 to-blue-50 border-blue-200',
-              'from-green-100 to-green-50 border-green-200',
-              'from-purple-100 to-purple-50 border-purple-200'
-            ];
-
-            return (
-              <div key={ability} className={`bg-gradient-to-b ${colors[idx]} border rounded-lg p-3 text-center`}>
-                <div className="text-xs font-semibold text-gray-600">{ability}</div>
-                <div className="text-lg font-bold text-gray-900 mt-1">{scoreStr}</div>
-                <div className="text-xs text-gray-600">{mod}</div>
-              </div>
-            );
-          })}
-        </div>
-      </div>
-
-      {/* Combat Maneuvers & Movement in Two Columns */}
-      <div className="grid grid-cols-2 gap-4">
-        {/* Combat Stats */}
-        <div className="bg-white rounded-xl border p-4">
-          <h3 className="text-xs font-semibold text-gray-600 uppercase tracking-wider mb-3 flex items-center gap-2">
-            <Target className="h-4 w-4" />
-            Combat Maneuvers
-          </h3>
-          <div className="space-y-2">
-            <div className="flex justify-between items-center py-1 border-b">
+        {/* Left Column: Core Combat (5 cols) */}
+        <div className="col-span-5 space-y-1">
+          {/* Vitals Section */}
+          <div className="bg-surface-primary rounded-md border p-2">
+            <div className="grid grid-cols-2 gap-3">
               <Tooltip>
                 <TooltipTrigger>
-                  <span className="text-sm text-gray-600">Base Attack</span>
-                </TooltipTrigger>
-                <TooltipContent>
-                  <p>Base Attack Bonus - Added to all attack rolls</p>
-                </TooltipContent>
-              </Tooltip>
-              <span className="font-semibold">+{creature.bab ?? 0}</span>
-            </div>
-            <div className="flex justify-between items-center py-1 border-b">
-              <Tooltip>
-                <TooltipTrigger>
-                  <span className="text-sm text-gray-600">CMB</span>
-                </TooltipTrigger>
-                <TooltipContent>
-                  <p>Combat Maneuver Bonus - For grapple, trip, disarm, etc.</p>
-                </TooltipContent>
-              </Tooltip>
-              <span className="font-semibold">
-                +{creature.cmb ?? 0}
-                {creature.cmb_other && <span className="text-xs text-gray-500 ml-1">({creature.cmb_other})</span>}
-              </span>
-            </div>
-            <div className="flex justify-between items-center py-1">
-              <Tooltip>
-                <TooltipTrigger>
-                  <span className="text-sm text-gray-600">CMD</span>
-                </TooltipTrigger>
-                <TooltipContent>
-                  <p>Combat Maneuver Defense - Against combat maneuvers</p>
-                </TooltipContent>
-              </Tooltip>
-              <span className="font-semibold">
-                {creature.cmd ?? 10}
-                {creature.cmd_other && <span className="text-xs text-gray-500 ml-1">({creature.cmd_other})</span>}
-              </span>
-            </div>
-          </div>
-        </div>
-
-        {/* Movement */}
-        <div className="bg-white rounded-xl border p-4">
-          <h3 className="text-xs font-semibold text-gray-600 uppercase tracking-wider mb-3 flex items-center gap-2">
-            <Footprints className="h-4 w-4" />
-            Movement & Reach
-          </h3>
-          <div className="space-y-2">
-            <div className="flex justify-between items-center py-1 border-b">
-              <span className="text-sm text-gray-600">Speed</span>
-              <span className="font-semibold">{creature.speeds?.base ?? 30} ft.</span>
-            </div>
-            {creature.speeds?.fly && (
-              <div className="flex justify-between items-center py-1 border-b">
-                <span className="text-sm text-gray-600">Fly</span>
-                <span className="font-semibold">{creature.speeds.fly} ft.</span>
-              </div>
-            )}
-            {creature.speeds?.swim && (
-              <div className="flex justify-between items-center py-1 border-b">
-                <span className="text-sm text-gray-600">Swim</span>
-                <span className="font-semibold">{creature.speeds.swim} ft.</span>
-              </div>
-            )}
-            {creature.speeds?.climb && (
-              <div className="flex justify-between items-center py-1 border-b">
-                <span className="text-sm text-gray-600">Climb</span>
-                <span className="font-semibold">{creature.speeds.climb} ft.</span>
-              </div>
-            )}
-            {creature.speeds?.burrow && (
-              <div className="flex justify-between items-center py-1 border-b">
-                <span className="text-sm text-gray-600">Burrow</span>
-                <span className="font-semibold">{creature.speeds.burrow} ft.</span>
-              </div>
-            )}
-            <div className="flex justify-between items-center py-1">
-              <span className="text-sm text-gray-600">Space/Reach</span>
-              <span className="font-semibold">{creature.space ?? 5}/{creature.reach ?? 5} ft.</span>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Attacks - Enhanced Display */}
-      {(creature.attacks?.melee?.length > 0 || creature.attacks?.ranged?.length > 0) && (
-        <div className="bg-white rounded-xl border p-4">
-          <h3 className="text-xs font-semibold text-gray-600 uppercase tracking-wider mb-3 flex items-center gap-2">
-            <Swords className="h-4 w-4" />
-            Attacks
-          </h3>
-          <div className="space-y-3">
-            {creature.attacks.melee?.length > 0 && (
-              <div>
-                <div className="text-xs font-medium text-gray-500 mb-1">MELEE</div>
-                {creature.attacks.melee.map((attack, idx) => (
-                  <div key={idx} className="text-sm bg-gray-50 rounded px-3 py-2 mb-1">
-                    {attack}
+                  <div className="hover:bg-surface-secondary rounded p-1 cursor-help">
+                    <Heart className="inline h-3 w-3 mr-1 text-status-error" />
+                    <div className="font-semibold text-primary">{creature.hp?.total ?? '—'}</div>
+                    <div className="text-xs text-secondary">Hit Points</div>
+                    {creature.hp?.regeneration && <div className="text-xs text-status-error">Regen {creature.hp.regeneration}</div>}
                   </div>
-                ))}
+                </TooltipTrigger>
+                <TooltipContent>
+                  <div className="space-y-1">
+                    {creature.hp?.long && <p><strong>Formula:</strong> {creature.hp.long}</p>}
+                    {creature.hp?.regeneration && <p><strong>Regeneration:</strong> {creature.hp.regeneration}</p>}
+                  </div>
+                </TooltipContent>
+              </Tooltip>
+
+              <Tooltip>
+                <TooltipTrigger>
+                  <div className="hover:bg-surface-secondary rounded p-1 cursor-help">
+                    <Zap className="inline h-3 w-3 mr-1 text-interactive-primary" />
+                    <div className="font-semibold text-primary">
+                      {creature.initiative_parsed?.value !== undefined
+                        ? `${creature.initiative_parsed.value >= 0 ? '+' : ''}${creature.initiative_parsed.value}`
+                        : creature.initiative !== undefined
+                        ? `${creature.initiative >= 0 ? '+' : ''}${creature.initiative}`
+                        : '—'}
+                    </div>
+                    <div className="text-xs text-secondary">Initiative</div>
+                  </div>
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p>Roll initiative at start of combat</p>
+                </TooltipContent>
+              </Tooltip>
+            </div>
+          </div>
+
+          {/* Combat Stats Grid */}
+          <div className="bg-surface-secondary rounded-md border p-2">
+            <div className="text-xs font-medium text-secondary mb-1">Combat</div>
+            <div className="grid grid-cols-3 gap-2 text-xs">
+              <Tooltip>
+                <TooltipTrigger>
+                  <div className="text-center hover:bg-surface-primary rounded p-1">
+                    <div className="font-bold text-primary">+{creature.bab ?? 0}</div>
+                    <div className="text-tertiary">BAB</div>
+                  </div>
+                </TooltipTrigger>
+                <TooltipContent><p>Base Attack Bonus</p></TooltipContent>
+              </Tooltip>
+
+              <Tooltip>
+                <TooltipTrigger>
+                  <div className="text-center hover:bg-surface-primary rounded p-1">
+                    <div className="font-bold text-primary">+{creature.cmb ?? 0}</div>
+                    <div className="text-tertiary">CMB</div>
+                    {creature.cmb_other && <div className="text-xs text-tertiary">({creature.cmb_other})</div>}
+                  </div>
+                </TooltipTrigger>
+                <TooltipContent><p>Combat Maneuver Bonus</p></TooltipContent>
+              </Tooltip>
+
+              <Tooltip>
+                <TooltipTrigger>
+                  <div className="text-center hover:bg-surface-primary rounded p-1">
+                    <div className="font-bold text-primary">{creature.cmd ?? 10}</div>
+                    <div className="text-tertiary">CMD</div>
+                    {creature.cmd_other && <div className="text-xs text-tertiary">({creature.cmd_other})</div>}
+                  </div>
+                </TooltipTrigger>
+                <TooltipContent><p>Combat Maneuver Defense</p></TooltipContent>
+              </Tooltip>
+            </div>
+          </div>
+        </div>
+
+        {/* Center Column: Defenses (4 cols) */}
+        <div className="col-span-4 space-y-1">
+          {/* AC Section */}
+          <div className="bg-surface-primary rounded-md border p-2">
+            <Tooltip>
+              <TooltipTrigger>
+                <div className="hover:bg-surface-secondary rounded p-1 cursor-help">
+                  <Shield className="inline h-3 w-3 mr-1 text-status-info" />
+                  <div className="font-semibold text-primary text-lg">{creature.ac?.AC ?? '—'}</div>
+                  <div className="text-xs text-secondary mb-1">Armor Class</div>
+                  <div className="flex justify-between text-xs text-tertiary">
+                    <span>Touch {creature.ac?.touch ?? '—'}</span>
+                    <span>FF {creature.ac?.flat_footed ?? '—'}</span>
+                  </div>
+                </div>
+              </TooltipTrigger>
+              <TooltipContent>
+                <div className="space-y-1">
+                  <p><strong>Normal AC:</strong> {creature.ac?.AC ?? '—'}</p>
+                  <p><strong>Touch AC:</strong> {creature.ac?.touch ?? '—'} (ignores armor/shield)</p>
+                  <p><strong>Flat-footed AC:</strong> {creature.ac?.flat_footed ?? '—'} (no Dex bonus)</p>
+                </div>
+              </TooltipContent>
+            </Tooltip>
+          </div>
+
+          {/* Saves Section */}
+          <div className="bg-surface-secondary rounded-md border p-2">
+            <div className="text-xs font-medium text-secondary mb-1">Saving Throws</div>
+            <div className="grid grid-cols-3 gap-1 text-xs">
+              <Tooltip>
+                <TooltipTrigger>
+                  <div className="text-center hover:bg-surface-primary rounded p-1">
+                    <div className="font-bold text-primary">
+                      {creature.saves?.fort !== undefined ? `${creature.saves.fort >= 0 ? '+' : ''}${creature.saves.fort}` : '—'}
+                    </div>
+                    <div className="text-tertiary">Fort</div>
+                  </div>
+                </TooltipTrigger>
+                <TooltipContent><p>Fortitude vs poison, disease</p></TooltipContent>
+              </Tooltip>
+
+              <Tooltip>
+                <TooltipTrigger>
+                  <div className="text-center hover:bg-surface-primary rounded p-1">
+                    <div className="font-bold text-primary">
+                      {creature.saves?.ref !== undefined ? `${creature.saves.ref >= 0 ? '+' : ''}${creature.saves.ref}` : '—'}
+                    </div>
+                    <div className="text-tertiary">Ref</div>
+                  </div>
+                </TooltipTrigger>
+                <TooltipContent><p>Reflex vs area effects</p></TooltipContent>
+              </Tooltip>
+
+              <Tooltip>
+                <TooltipTrigger>
+                  <div className="text-center hover:bg-surface-primary rounded p-1">
+                    <div className="font-bold text-primary">
+                      {creature.saves?.will !== undefined ? `${creature.saves.will >= 0 ? '+' : ''}${creature.saves.will}` : '—'}
+                    </div>
+                    <div className="text-tertiary">Will</div>
+                  </div>
+                </TooltipTrigger>
+                <TooltipContent><p>Will vs mental effects</p></TooltipContent>
+              </Tooltip>
+            </div>
+          </div>
+        </div>
+
+        {/* Right Column: Movement & Physical (3 cols) */}
+        <div className="col-span-3 space-y-1">
+          {/* Movement Section */}
+          <div className="bg-surface-primary rounded-md border p-2">
+            <div className="text-xs font-medium text-secondary mb-1">Movement</div>
+            <div className="text-xs text-primary space-y-0.5">
+              <div className="font-semibold">{creature.speeds?.base ?? 30} ft</div>
+              {creature.speeds?.fly && <div className="text-tertiary">Fly {creature.speeds.fly}ft</div>}
+              {creature.speeds?.swim && <div className="text-tertiary">Swim {creature.speeds.swim}ft</div>}
+              {creature.speeds?.climb && <div className="text-tertiary">Climb {creature.speeds.climb}ft</div>}
+              {creature.speeds?.burrow && <div className="text-tertiary">Burrow {creature.speeds.burrow}ft</div>}
+            </div>
+          </div>
+
+          {/* Space/Reach */}
+          <div className="bg-surface-secondary rounded-md border p-2">
+            <div className="text-xs font-medium text-secondary mb-1">Reach</div>
+            <div className="text-xs text-primary">
+              <div>{creature.space ?? 5}ft space</div>
+              <div>{creature.reach ?? 5}ft reach</div>
+            </div>
+          </div>
+        </div>
+
+        {/* Full-Width Ability Scores */}
+        <div className="col-span-12">
+          <div className="bg-surface-primary rounded-md border p-2">
+            <div className="grid grid-cols-6 gap-2 text-xs">
+              {['STR', 'DEX', 'CON', 'INT', 'WIS', 'CHA'].map((ability) => {
+                const score = creature.ability_scores[ability as keyof typeof creature.ability_scores];
+                const { score: scoreStr, mod } = formatAbilityScore(score);
+                return (
+                  <Tooltip key={ability}>
+                    <TooltipTrigger>
+                      <div className="text-center hover:bg-surface-secondary rounded p-1 border border-transparent hover:border-border">
+                        <div className="font-medium text-secondary">{ability}</div>
+                        <div className="text-lg font-bold text-primary">{scoreStr}</div>
+                        <div className="text-tertiary">{mod}</div>
+                      </div>
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      <p><strong>{ability}:</strong> {scoreStr} (modifier {mod})</p>
+                    </TooltipContent>
+                  </Tooltip>
+                );
+              })}
+            </div>
+          </div>
+        </div>
+      </div>
+
+
+      {/* Attacks - Compact List */}
+      {(creature.attacks?.melee?.length > 0 || creature.attacks?.ranged?.length > 0) && (
+        <div className="bg-surface-secondary rounded-md border p-2 mt-1">
+          <div className="text-xs text-primary">
+            {creature.attacks.melee?.length > 0 && (
+              <div className="mb-1">
+                <span className="font-semibold text-secondary mr-2">Melee:</span>
+                {creature.attacks.melee.join('; ')}
               </div>
             )}
             {creature.attacks.ranged?.length > 0 && (
-              <div>
-                <div className="text-xs font-medium text-gray-500 mb-1">RANGED</div>
-                {creature.attacks.ranged.map((attack, idx) => (
-                  <div key={idx} className="text-sm bg-gray-50 rounded px-3 py-2 mb-1">
-                    {attack}
-                  </div>
-                ))}
+              <div className="mb-1">
+                <span className="font-semibold text-secondary mr-2">Ranged:</span>
+                {creature.attacks.ranged.join('; ')}
               </div>
             )}
             {creature.attacks.special?.length > 0 && (
               <div>
-                <div className="text-xs font-medium text-gray-500 mb-1">SPECIAL</div>
-                <div className="flex flex-wrap gap-2">
-                  {creature.attacks.special.map((attack, idx) => (
-                    <Badge key={idx} variant="secondary" className="text-xs">
-                      {attack}
-                    </Badge>
-                  ))}
-                </div>
+                <span className="font-semibold text-secondary mr-2">Special:</span>
+                {creature.attacks.special.join(', ')}
               </div>
             )}
           </div>
         </div>
       )}
 
-      {/* Defenses - Visual Cards */}
+      {/* Defenses - Compact List */}
       {(creature.sr || creature.dr?.length > 0 || creature.resistances ||
         creature.immunities_normalized?.length > 0 || creature.weaknesses_normalized?.length > 0) && (
-        <div className="bg-white rounded-xl border p-4">
-          <h3 className="text-xs font-semibold text-gray-600 uppercase tracking-wider mb-3 flex items-center gap-2">
-            <ShieldCheck className="h-4 w-4" />
-            Defenses
-          </h3>
-          <div className="grid grid-cols-2 gap-3">
+        <div className="bg-surface-secondary rounded-md border p-2 mt-1">
+          <div className="text-xs text-primary space-y-0.5">
             {creature.sr && (
-              <div className="bg-purple-50 border border-purple-200 rounded-lg p-3">
-                <Tooltip>
-                  <TooltipTrigger>
-                    <div className="text-xs font-medium text-purple-600 mb-1">Spell Resistance</div>
-                  </TooltipTrigger>
-                  <TooltipContent>
-                    <p>SR - Roll 1d20 + caster level to overcome</p>
-                  </TooltipContent>
-                </Tooltip>
-                <div className="text-lg font-bold">{creature.sr}</div>
-              </div>
+              <div><span className="font-semibold text-secondary">SR:</span> {creature.sr}</div>
             )}
             {creature.dr?.length > 0 && (
-              <div className="bg-gray-50 border border-gray-200 rounded-lg p-3">
-                <Tooltip>
-                  <TooltipTrigger>
-                    <div className="text-xs font-medium text-gray-600 mb-1">Damage Reduction</div>
-                  </TooltipTrigger>
-                  <TooltipContent>
-                    <p>DR - Reduces damage from attacks (amount/type needed to bypass)</p>
-                  </TooltipContent>
-                </Tooltip>
-                <div className="text-sm font-semibold">
-                  {creature.dr.map(dr => `${dr.amount}/${dr.weakness}`).join(', ')}
-                </div>
-              </div>
+              <div><span className="font-semibold text-secondary">DR:</span> {creature.dr.map(dr => `${dr.amount}/${dr.weakness}`).join(', ')}</div>
             )}
             {creature.resistances && Object.keys(creature.resistances).length > 0 && (
-              <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 col-span-2">
-                <div className="text-xs font-medium text-blue-600 mb-1">Resistances</div>
-                <div className="flex flex-wrap gap-2">
-                  {Object.entries(creature.resistances).map(([type, value]) => (
-                    <Badge key={type} variant="outline" className="text-xs">
-                      {type} {value}
-                    </Badge>
-                  ))}
-                </div>
-              </div>
+              <div><span className="font-semibold text-secondary">Resistances:</span> {Object.entries(creature.resistances).map(([type, value]) => `${type} ${value}`).join(', ')}</div>
             )}
             {creature.immunities_normalized?.length > 0 && (
-              <div className="bg-green-50 border border-green-200 rounded-lg p-3 col-span-2">
-                <div className="text-xs font-medium text-green-600 mb-1">Immunities</div>
-                <div className="flex flex-wrap gap-2">
-                  {creature.immunities_normalized.map((immunity, idx) => (
-                    <Badge key={idx} variant="outline" className="text-xs border-green-300 text-green-700">
-                      {immunity}
-                    </Badge>
-                  ))}
-                </div>
-              </div>
+              <div><span className="font-semibold text-secondary">Immunities:</span> {creature.immunities_normalized.join(', ')}</div>
             )}
             {creature.weaknesses_normalized?.length > 0 && (
-              <div className="bg-red-50 border border-red-200 rounded-lg p-3 col-span-2">
-                <div className="text-xs font-medium text-red-600 mb-1">Weaknesses</div>
-                <div className="flex flex-wrap gap-2">
-                  {creature.weaknesses_normalized.map((weakness, idx) => (
-                    <Badge key={idx} variant="outline" className="text-xs border-red-300 text-red-700">
-                      {weakness}
-                    </Badge>
-                  ))}
-                </div>
-              </div>
+              <div><span className="font-semibold text-secondary">Weaknesses:</span> {creature.weaknesses_normalized.join(', ')}</div>
             )}
           </div>
         </div>
       )}
 
-      {/* Senses */}
+      {/* Senses - Inline */}
       {creature.senses && Object.keys(creature.senses).length > 0 && (
-        <div className="bg-white rounded-xl border p-4">
-          <h3 className="text-xs font-semibold text-gray-600 uppercase tracking-wider mb-3 flex items-center gap-2">
-            <Eye className="h-4 w-4" />
-            Senses
-          </h3>
-          <div className="flex flex-wrap gap-2">
-            {Object.entries(creature.senses).map(([sense, value]) => (
-              <Badge key={sense} variant="secondary" className="text-sm">
-                {sense}{typeof value === 'number' ? ` ${value} ft.` : ''}
-              </Badge>
-            ))}
+        <div className="bg-surface-secondary rounded-md border p-2 mt-1">
+          <div className="text-xs text-primary">
+            <span className="font-semibold text-secondary mr-2">Senses:</span>
+            {Object.entries(creature.senses).map(([sense, value]) =>
+              `${sense}${typeof value === 'number' ? ` ${value} ft` : ''}`
+            ).join(', ')}
           </div>
         </div>
       )}
-      </div>
     </TooltipProvider>
   );
 }

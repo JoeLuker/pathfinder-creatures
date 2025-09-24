@@ -77,7 +77,7 @@ function App() {
       <div className="min-h-screen bg-surface-secondary flex flex-col">
         {/* Mobile Header */}
         <header className="bg-surface-primary border-border border-b sticky top-0 z-40">
-          <div className="px-4 py-3">
+          <div className="px-1 py-0.5">
             <div className="flex items-center justify-between">
               <h1 className="text-lg font-display font-semibold text-text-primary">Pathfinder Creatures</h1>
               <div className="flex items-center gap-2">
@@ -108,19 +108,19 @@ function App() {
             onBack={() => setSelectedCreature(null)}
           />
         ) : (
-          <div className="flex-1 p-4">
+          <div className="flex-1 p-2">
             <SmartSearch
               value={filters.search}
               onChange={(value) => setFilters(prev => ({ ...prev, search: value }))}
               creatures={creatures}
             />
             <ActiveFilters filters={filters} setFilters={setFilters} />
-            <div className="space-y-2 mt-4">
+            <div className="space-y-0.5 mt-2">
               {creatures.map((creature) => (
                 <div
                   key={creature.url}
                   onClick={() => handleCreatureClick(creature)}
-                  className="bg-surface-primary rounded-lg shadow-sm border p-4 hover:shadow-md transition-shadow cursor-pointer"
+                  className="bg-surface-primary rounded-md shadow-sm border p-2 hover:shadow-md transition-shadow cursor-pointer"
                 >
                   <div className="flex items-center justify-between">
                     <div>
@@ -149,7 +149,7 @@ function App() {
       {/* Sidebar with Filters */}
       <aside className={`${showFilters ? 'w-80' : 'w-12'} transition-all duration-300 border-r border-border bg-surface-primary flex-shrink-0 relative`}>
         <div className={`h-full flex flex-col ${showFilters ? '' : 'opacity-0 pointer-events-none'}`}>
-          <div className="p-4 border-b border-border flex flex-col gap-3">
+          <div className="p-2 border-b border-border flex flex-col gap-2">
             <div className="flex items-center justify-between">
               <h2 className="text-lg font-display font-semibold text-text-primary">Pathfinder Creatures</h2>
               <ThemeToggle />
@@ -161,7 +161,7 @@ function App() {
             />
           </div>
           <ScrollArea className="flex-1">
-            <div className="p-4">
+            <div className="p-2">
               <Sidebar
                 filters={filters}
                 setFilters={setFilters}
@@ -172,15 +172,15 @@ function App() {
             </div>
           </ScrollArea>
         </div>
-        {/* Collapse/Expand Tab */}
+        {/* Collapse/Expand Tab - Contained within sidebar */}
         <Button
           variant="ghost"
           size="sm"
           onClick={() => setShowFilters(!showFilters)}
-          className="absolute -right-6 top-1/2 -translate-y-1/2 h-20 w-6 p-0 bg-surface-primary border border-l-0 rounded-r-md hover:bg-interactive-secondary z-10 shadow-md"
+          className="absolute right-0 top-1/2 -translate-y-1/2 h-20 w-4 p-0 bg-surface-secondary border-l hover:bg-interactive-secondary z-10 rounded-l-md"
           title={showFilters ? "Hide filters" : "Show filters"}
         >
-          {showFilters ? <ChevronLeft className="h-4 w-4" /> : <ChevronRight className="h-4 w-4" />}
+          {showFilters ? <ChevronLeft className="h-3 w-3" /> : <ChevronRight className="h-3 w-3" />}
         </Button>
       </aside>
 
@@ -190,8 +190,8 @@ function App() {
         <div className={`${showCreatureList ? 'w-96' : 'w-12'} transition-all duration-300 border-r bg-surface-primary flex-shrink-0 relative`}>
           <div className={`flex flex-col h-full ${showCreatureList ? '' : 'opacity-0 pointer-events-none'}`}>
             {/* List Header */}
-            <div className="p-4 border-b">
-              <div className="flex items-center justify-between mb-3">
+            <div className="p-2 border-b">
+              <div className="flex items-center justify-between mb-2">
                 <span className="text-sm font-medium">
                   {filteredCount} of {totalCreatures} creatures
                 </span>
@@ -200,7 +200,7 @@ function App() {
                   <select
                     value={sortField}
                     onChange={(e) => setSortField(e.target.value as any)}
-                    className="text-xs px-2 py-1 border rounded"
+                    className="text-xs px-2 py-0 border rounded bg-surface-primary text-primary border-primary"
                   >
                     <option value="name">Name</option>
                     <option value="cr">CR</option>
@@ -209,7 +209,7 @@ function App() {
                   </select>
                   <button
                     onClick={() => setSortDirection(sortDirection === 'asc' ? 'desc' : 'asc')}
-                    className="text-xs px-2 py-1 border rounded hover:bg-surface-secondary"
+                    className="text-xs px-2 py-0 border rounded hover:bg-surface-secondary bg-surface-primary text-primary border-primary"
                     title={`Sort ${sortDirection === 'asc' ? 'Descending' : 'Ascending'}`}
                   >
                     {sortDirection === 'asc' ? '↑' : '↓'}
@@ -221,12 +221,12 @@ function App() {
 
             {/* Creature List Content */}
             <ScrollArea className="flex-1">
-            <div className="p-4">
+            <div className="p-2">
               {creatures.length === 0 ? (
-                <div className="text-center py-12">
+                <div className="text-center py-02">
                   <p className="text-muted-foreground">No creatures found</p>
                   <Button
-                    className="mt-4"
+                    className="mt-2"
                     variant="outline"
                     size="sm"
                     onClick={() => setFilters({
@@ -356,12 +356,12 @@ function App() {
                   </Button>
                 </div>
               ) : (
-                <div className="space-y-2">
+                <div className="space-y-0.5">
                   {creatures.map((creature) => (
                     <div
                       key={creature.url}
                       onClick={() => handleCreatureClick(creature)}
-                      className={`cursor-pointer rounded-lg border p-3 hover:shadow-md transition-all ${
+                      className={`cursor-pointer rounded-md border p-2 hover:shadow-md transition-all bg-surface-primary ${
                         selectedCreature?.url === creature.url ? 'border-primary shadow-md' : ''
                       }`}
                     >
@@ -386,7 +386,7 @@ function App() {
 
               {/* Pagination */}
               {totalPages > 1 && (
-                <div className="mt-6 flex items-center justify-center gap-2">
+                <div className="mt-1 flex items-center justify-center gap-2">
                   <Button
                     variant="outline"
                     size="sm"
@@ -411,15 +411,15 @@ function App() {
             </div>
             </ScrollArea>
           </div>
-          {/* Collapse/Expand Tab */}
+          {/* Collapse/Expand Tab - Contained within list */}
           <Button
             variant="ghost"
             size="sm"
             onClick={() => setShowCreatureList(!showCreatureList)}
-            className="absolute -right-6 top-1/2 -translate-y-1/2 h-20 w-6 p-0 bg-surface-primary border border-l-0 rounded-r-md hover:bg-interactive-secondary z-10 shadow-md"
+            className="absolute right-0 top-1/2 -translate-y-1/2 h-20 w-4 p-0 bg-surface-secondary border-l hover:bg-interactive-secondary z-10 rounded-l-md"
             title={showCreatureList ? "Hide creature list" : "Show creature list"}
           >
-            {showCreatureList ? <ChevronLeft className="h-4 w-4" /> : <ChevronRight className="h-4 w-4" />}
+            {showCreatureList ? <ChevronLeft className="h-3 w-3" /> : <ChevronRight className="h-3 w-3" />}
           </Button>
         </div>
 

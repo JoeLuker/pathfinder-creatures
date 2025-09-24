@@ -51,7 +51,7 @@ export function ThemeDebug() {
   };
 
   return (
-    <div className="fixed bottom-4 right-4 p-4 bg-surface-primary border border-border rounded-lg shadow-lg z-50">
+    <div className="fixed bottom-4 right-4 p-1 bg-surface-primary border border-border rounded-lg shadow-lg z-50">
       <div className="flex items-center gap-2 text-sm">
         <span>Theme: {theme}</span>
         <span className={`w-3 h-3 rounded-full ${isDark ? 'bg-amber-400' : 'bg-slate-900'}`} />

@@ -39,7 +39,7 @@ export function RangeSlider({
   };
 
   return (
-    <div className={`space-y-3 ${className}`}>
+    <div className={`space-y-1 ${className}`}>
       <Label className="text-sm font-medium">{label}</Label>
 
       <div className="px-2">
