@@ -1,4 +1,5 @@
 import { useState, useEffect, useMemo } from 'react';
+import Fuse from 'fuse.js';
 import type { CreatureEnriched } from '@/types/creature-complete';
 
 export interface Filters {
@@ -66,45 +67,40 @@ export function useCreatures() {
       });
   }, []);
 
+  // Set up Fuse.js for fuzzy search
+  const fuse = useMemo(() => {
+    return new Fuse(creatures, {
+      keys: [
+        { name: 'name', weight: 2 },  // Name gets higher weight
+        'type',
+        'alignment',
+        'size',
+        'environment',
+        'desc_short',
+        'subtypes_normalized',
+        'special_abilities._parsed.name',
+        'defensive_abilities_normalized',
+        'immunities_normalized',
+        'languages_normalized',
+        'feats'
+      ],
+      threshold: 0.3,  // 0 = exact match, 1 = match anything
+      includeScore: true,
+      ignoreLocation: true,  // Don't care where in the string the match is
+      minMatchCharLength: 2
+    });
+  }, [creatures]);
+
   const filteredCreatures = useMemo(() => {
-    return creatures.filter(creature => {
-      // Full-text search across all relevant fields
-      if (filters.search) {
-        const searchLower = filters.search.toLowerCase();
+    // First apply fuzzy search if there's a search term
+    let searchResults = creatures;
+    if (filters.search && filters.search.trim().length > 0) {
+      const results = fuse.search(filters.search);
+      searchResults = results.map(result => result.item);
+    }
 
-        // Build comprehensive search text
-        const searchableText = [
-          creature.name,
-          creature.type,
-          creature.alignment,
-          creature.size,
-          creature.environment,
-          creature.desc_short,
-          creature.desc_long,
-          // Add subtypes
-          ...(creature.subtypes_normalized || []),
-          // Add special abilities names
-          ...(creature.special_abilities?._parsed?.map(a => a.name) || []),
-          // Add defensive abilities
-          ...(creature.defensive_abilities_normalized || []),
-          // Add immunities
-          ...(creature.immunities_normalized || []),
-          // Add languages
-          ...(creature.languages_normalized || []),
-          // Add CR as text
-          `cr ${creature.cr_parsed?.value ?? creature.cr}`,
-          `cr${creature.cr_parsed?.value ?? creature.cr}`,
-          // Add movement types
-          creature.speeds?._parsed?.fly ? 'fly flying flight' : '',
-          creature.speeds?._parsed?.swim ? 'swim swimming aquatic' : '',
-          creature.speeds?._parsed?.burrow ? 'burrow burrowing' : '',
-          creature.speeds?._parsed?.climb ? 'climb climbing' : '',
-        ].filter(Boolean).join(' ').toLowerCase();
-
-        if (!searchableText.includes(searchLower)) {
-          return false;
-        }
-      }
+    // Then apply other filters
+    return searchResults.filter(creature => {
       // Types filter (multi-select with exclude mode)
       if (filters.types.length > 0 && creature.type) {
         const matches = filters.types.includes(creature.type);

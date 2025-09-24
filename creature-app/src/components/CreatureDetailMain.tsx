@@ -1,8 +1,8 @@
 import type { CreatureEnriched } from '@/types/creature-complete';
 import { Badge } from '@/components/ui/badge';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
+import { StatBlock } from './StatBlock';
 import {
   Sword, Shield, Heart, Zap, Brain, Eye, MessageSquare, Footprints,
   Sparkles, ShieldCheck, AlertTriangle, Target, Activity, Globe,
@@ -19,9 +19,9 @@ interface CreatureDetailMainProps {
 export function CreatureDetailMain({ creature, onBack }: CreatureDetailMainProps) {
   const [jsonCopied, setJsonCopied] = useState(false);
   const [expandedSections, setExpandedSections] = useState<Record<string, boolean>>({
-    spells: false,
     gear: false,
     tactics: false,
+    json: false
   });
 
   if (!creature) {
@@ -38,23 +38,6 @@ export function CreatureDetailMain({ creature, onBack }: CreatureDetailMainProps
   // Use the display value from cr_parsed if available, otherwise use the cr value
   const crDisplay = creature.cr_parsed?.display ?? creature.cr?.toString() ?? '-';
 
-  // Stat modifier calculation
-  const getModifier = (score: number | null | undefined) => {
-    if (!score) return '+0';
-    const mod = Math.floor((score - 10) / 2);
-    return mod >= 0 ? `+${mod}` : `${mod}`;
-  };
-
-  // Format HP display
-  const formatHP = () => {
-    if (!creature.hp) return 'Unknown';
-    const { total, long: longHP } = creature.hp;
-    if (total && longHP) {
-      return `${total} (${longHP})`;
-    }
-    return total || longHP || 'Unknown';
-  };
-
   const handleCopyJson = () => {
     navigator.clipboard.writeText(JSON.stringify(creature, null, 2));
     setJsonCopied(true);
@@ -66,6 +49,19 @@ export function CreatureDetailMain({ creature, onBack }: CreatureDetailMainProps
       ...prev,
       [section]: !prev[section]
     }));
+  };
+
+  // Helper function to calculate default spell DC for a given level
+  const getDefaultSpellDC = (spellLevel: number) => {
+    // Calculate default DC: 10 + spell level + casting ability modifier
+    const intMod = Math.floor(((creature.ability_scores.INT ?? 10) - 10) / 2);
+    const wisMod = Math.floor(((creature.ability_scores.WIS ?? 10) - 10) / 2);
+    const chaMod = Math.floor(((creature.ability_scores.CHA ?? 10) - 10) / 2);
+
+    // Use the highest mental ability modifier as default
+    const abilityModifier = Math.max(intMod, wisMod, chaMod);
+
+    return 10 + spellLevel + abilityModifier;
   };
 
   return (
@@ -148,293 +144,63 @@ export function CreatureDetailMain({ creature, onBack }: CreatureDetailMainProps
         </div>
       </div>
 
-      <Tabs defaultValue="combat" className="flex-1 flex flex-col">
-        <div className="bg-white border-b">
-          <TabsList className="w-full justify-start rounded-none bg-transparent h-auto p-0 px-6">
-            <TabsTrigger value="combat" className="rounded-none border-b-2 border-transparent data-[state=active]:border-primary">
-              <Sword className="h-4 w-4 mr-2" />
-              Combat
-            </TabsTrigger>
-            <TabsTrigger value="abilities" className="rounded-none border-b-2 border-transparent data-[state=active]:border-primary">
-              <Sparkles className="h-4 w-4 mr-2" />
-              Abilities
-            </TabsTrigger>
-            <TabsTrigger value="details" className="rounded-none border-b-2 border-transparent data-[state=active]:border-primary">
-              <BookOpen className="h-4 w-4 mr-2" />
-              Details
-            </TabsTrigger>
-            <TabsTrigger value="json" className="rounded-none border-b-2 border-transparent data-[state=active]:border-primary">
-              <Code className="h-4 w-4 mr-2" />
-              JSON
-            </TabsTrigger>
-          </TabsList>
-        </div>
+      <ScrollArea className="flex-1">
+        <div className="p-6 space-y-6">
+          {/* Combat Stats Section */}
+          <div>
+            <h2 className="text-lg font-semibold mb-4 flex items-center gap-2">
+              <Sword className="h-5 w-5" />
+              Combat Statistics
+            </h2>
+            <StatBlock creature={creature} />
+          </div>
 
-        <ScrollArea className="flex-1">
-          {/* Combat Tab - Essential combat information */}
-          <TabsContent value="combat" className="p-6 space-y-4 mt-0">
-            <div className="grid grid-cols-2 gap-4">
-              {/* Left Column - Offense */}
-              <div className="space-y-4">
-                {/* Movement */}
-                {creature.speeds && (
-                  <div className="bg-white rounded-lg border p-4">
-                    <h3 className="font-semibold text-sm mb-3 flex items-center gap-2">
-                      <Footprints className="h-4 w-4" />
-                      Movement
-                    </h3>
-                    <div className="flex flex-wrap gap-3">
-                      {creature.speeds.base && (
-                        <span className="text-sm">
-                          <span className="text-muted-foreground">Base:</span> {creature.speeds.base} ft.
-                        </span>
-                      )}
-                      {creature.speeds.fly && (
-                        <span className="text-sm">
-                          <span className="text-muted-foreground">Fly:</span> {creature.speeds.fly} ft.
-                        </span>
-                      )}
-                      {creature.speeds.swim && (
-                        <span className="text-sm">
-                          <span className="text-muted-foreground">Swim:</span> {creature.speeds.swim} ft.
-                        </span>
-                      )}
-                      {creature.speeds.burrow && (
-                        <span className="text-sm">
-                          <span className="text-muted-foreground">Burrow:</span> {creature.speeds.burrow} ft.
-                        </span>
-                      )}
-                      {creature.speeds.climb && (
-                        <span className="text-sm">
-                          <span className="text-muted-foreground">Climb:</span> {creature.speeds.climb} ft.
-                        </span>
-                      )}
-                    </div>
-                  </div>
-                )}
-
-                {/* Attacks */}
-                {(creature.attacks?.melee?.length > 0 || creature.attacks?.ranged?.length > 0 || creature.attacks?.special?.length > 0) && (
-                  <div className="bg-white rounded-lg border p-4">
-                    <h3 className="font-semibold text-sm mb-3 flex items-center gap-2">
-                      <Swords className="h-4 w-4" />
-                      Attacks
-                    </h3>
-                    {creature.attacks.melee?.length > 0 && (
-                      <div className="mb-3">
-                        <h4 className="text-xs font-medium text-muted-foreground mb-1">Melee</h4>
-                        {creature.attacks.melee.map((attack, idx) => (
-                          <div key={idx} className="text-sm mb-1">{attack}</div>
-                        ))}
-                      </div>
-                    )}
-                    {creature.attacks.ranged?.length > 0 && (
-                      <div className="mb-3">
-                        <h4 className="text-xs font-medium text-muted-foreground mb-1">Ranged</h4>
-                        {creature.attacks.ranged.map((attack, idx) => (
-                          <div key={idx} className="text-sm mb-1">{attack}</div>
-                        ))}
-                      </div>
-                    )}
-                    {creature.attacks.special?.length > 0 && (
-                      <div>
-                        <h4 className="text-xs font-medium text-muted-foreground mb-1">Special</h4>
-                        {creature.attacks.special.map((attack, idx) => (
-                          <div key={idx} className="text-sm mb-1">{attack}</div>
-                        ))}
-                      </div>
-                    )}
-                  </div>
-                )}
-
-                {/* Combat Maneuvers & Space/Reach */}
-                <div className="bg-white rounded-lg border p-4">
-                  <h3 className="font-semibold text-sm mb-3">Combat Stats</h3>
-                  <div className="grid grid-cols-2 gap-3 text-sm">
-                    <div>
-                      <span className="text-muted-foreground">BAB:</span> +{creature.bab ?? 0}
-                    </div>
-                    <div>
-                      <span className="text-muted-foreground">CMB:</span> +{creature.cmb ?? 0}
-                      {creature.cmb_other && <span className="text-xs"> ({creature.cmb_other})</span>}
-                    </div>
-                    <div>
-                      <span className="text-muted-foreground">CMD:</span> {creature.cmd ?? 10}
-                      {creature.cmd_other && <span className="text-xs"> ({creature.cmd_other})</span>}
-                    </div>
-                    <div>
-                      <span className="text-muted-foreground">Space/Reach:</span> {creature.space ?? 5}/{creature.reach ?? 5} ft.
-                    </div>
-                  </div>
-                </div>
-
-                {/* Senses */}
-                {creature.senses && (
-                  <div className="bg-white rounded-lg border p-4">
-                    <h3 className="font-semibold text-sm mb-3 flex items-center gap-2">
-                      <Eye className="h-4 w-4" />
-                      Senses
-                    </h3>
-                    <div className="text-sm">
-                      {Object.entries(creature.senses)
-                        .map(([sense, value]) => {
-                          if (value === true) return sense;
-                          if (typeof value === 'number') return `${sense} ${value} ft.`;
-                          return null;
-                        })
-                        .filter(Boolean)
-                        .join(', ')}
-                    </div>
-                  </div>
-                )}
-              </div>
-
-              {/* Right Column - Defense */}
-              <div className="space-y-4">
-                {/* AC Details */}
-                <div className="bg-white rounded-lg border p-4">
-                  <h3 className="font-semibold text-sm mb-3 flex items-center gap-2">
-                    <Shield className="h-4 w-4" />
-                    Armor Class
-                  </h3>
-                  <div className="space-y-2">
-                    <div className="text-sm">
-                      <span className="font-medium">AC:</span> {creature.ac?.AC ?? '-'}
-                      {creature.ac?.components && Object.keys(creature.ac.components).length > 0 && (
-                        <span className="text-xs text-muted-foreground ml-2">
-                          ({Object.entries(creature.ac.components)
-                            .map(([type, value]) => `${value >= 0 ? '+' : ''}${value} ${type}`)
-                            .join(', ')})
-                        </span>
-                      )}
-                    </div>
-                    <div className="text-sm">
-                      <span className="font-medium">Touch:</span> {creature.ac?.touch ?? '-'} •
-                      <span className="font-medium ml-2">Flat-footed:</span> {creature.ac?.flat_footed ?? '-'}
-                    </div>
-                  </div>
-                </div>
-
-                {/* Defenses */}
-                {(creature.dr?.length > 0 || creature.sr || creature.resistances ||
-                  creature.immunities_normalized?.length > 0 || creature.weaknesses_normalized?.length > 0) && (
-                  <div className="bg-white rounded-lg border p-4">
-                    <h3 className="font-semibold text-sm mb-3 flex items-center gap-2">
-                      <ShieldCheck className="h-4 w-4" />
-                      Defenses
-                    </h3>
-                    <div className="space-y-2 text-sm">
-                      {creature.sr && (
-                        <div><span className="font-medium">SR:</span> {creature.sr}</div>
-                      )}
-                      {creature.dr?.length > 0 && (
-                        <div>
-                          <span className="font-medium">DR:</span> {
-                            creature.dr.map(dr => `${dr.amount}/${dr.weakness}`).join(', ')
-                          }
-                        </div>
-                      )}
-                      {creature.resistances && Object.keys(creature.resistances).length > 0 && (
-                        <div>
-                          <span className="font-medium">Resist:</span> {
-                            Object.entries(creature.resistances)
-                              .map(([type, value]) => `${type} ${value}`)
-                              .join(', ')
-                          }
-                        </div>
-                      )}
-                      {creature.immunities_normalized?.length > 0 && (
-                        <div>
-                          <span className="font-medium">Immune:</span> {creature.immunities_normalized.join(', ')}
-                        </div>
-                      )}
-                      {creature.weaknesses_normalized?.length > 0 && (
-                        <div>
-                          <span className="font-medium">Weak:</span> {creature.weaknesses_normalized.join(', ')}
-                        </div>
-                      )}
-                    </div>
-                  </div>
-                )}
-
-                {/* Ability Scores */}
-                <div className="bg-white rounded-lg border p-4">
-                  <h3 className="font-semibold text-sm mb-3 flex items-center gap-2">
-                    <Brain className="h-4 w-4" />
-                    Ability Scores
-                  </h3>
-                  <div className="grid grid-cols-3 gap-3">
-                    {['STR', 'DEX', 'CON', 'INT', 'WIS', 'CHA'].map(ability => {
-                      const score = creature.ability_scores[ability as keyof typeof creature.ability_scores];
-                      return (
-                        <div key={ability} className="text-center">
-                          <div className="text-xs text-muted-foreground">{ability}</div>
-                          <div className="font-bold">{score ?? '—'}</div>
-                          <div className="text-xs text-muted-foreground">{getModifier(score)}</div>
-                        </div>
-                      );
-                    })}
-                  </div>
-                </div>
-
-                {/* Auras */}
-                {creature.auras_normalized?.length > 0 && (
-                  <div className="bg-white rounded-lg border p-4">
-                    <h3 className="font-semibold text-sm mb-3">Auras</h3>
-                    <div className="text-sm">{creature.auras_normalized.join(', ')}</div>
-                  </div>
-                )}
-              </div>
-            </div>
-          </TabsContent>
-
-          {/* Abilities Tab - Spells, special abilities, feats, skills */}
-          <TabsContent value="abilities" className="p-6 space-y-4 mt-0">
-            {/* Spells - Collapsible */}
+          {/* Abilities Section */}
+          <div className="space-y-4">
+            <h2 className="text-lg font-semibold mb-4 flex items-center gap-2 border-t pt-6">
+              <Sparkles className="h-5 w-5" />
+              Abilities & Powers
+            </h2>
+            {/* Spells */}
             {creature.spells?.entries?.length > 0 && (
-              <div className="bg-white rounded-lg border">
-                <button
-                  onClick={() => toggleSection('spells')}
-                  className="w-full p-4 flex items-center justify-between hover:bg-gray-50"
-                >
-                  <h3 className="font-semibold text-sm flex items-center gap-2">
-                    <ScrollText className="h-4 w-4" />
-                    Spells ({creature.spells.entries.length} known)
-                  </h3>
-                  {expandedSections.spells ? <ChevronDown className="h-4 w-4" /> : <ChevronRight className="h-4 w-4" />}
-                </button>
-                {expandedSections.spells && (
-                  <div className="px-4 pb-4 border-t">
-                    {creature.spells.sources?.map((source, sidx) => (
-                      <div key={sidx} className="text-xs text-muted-foreground mt-3 mb-2">
-                        {source.name} {source.type && `(${source.type})`}
-                        {source.concentration && ` • Concentration +${source.concentration}`}
-                      </div>
-                    ))}
-                    <div className="space-y-2">
-                      {[9, 8, 7, 6, 5, 4, 3, 2, 1, 0].map(level => {
-                        const levelSpells = creature.spells.entries.filter(s => s.level === level);
-                        if (levelSpells.length === 0) return null;
-                        return (
-                          <div key={level} className="text-sm">
-                            <span className="font-medium">
-                              {level === 0 ? 'Cantrips' : `Level ${level}`}:
-                            </span>{' '}
-                            {levelSpells.map((spell, idx) => (
-                              <span key={idx}>
-                                {idx > 0 && ', '}
-                                <span className={spell.is_mythic_spell ? 'text-purple-600 font-medium' : ''}>
-                                  {spell.name}
-                                  {spell.DC && ` (DC ${spell.DC})`}
-                                </span>
-                              </span>
-                            ))}
-                          </div>
-                        );
-                      })}
-                    </div>
+              <div className="bg-gradient-to-br from-purple-50 to-white rounded-xl border border-purple-200 p-4">
+                <h3 className="font-semibold text-sm mb-3 flex items-center gap-2">
+                  <ScrollText className="h-4 w-4 text-purple-600" />
+                  Spells
+                </h3>
+                {creature.spells.sources?.map((source, sidx) => (
+                  <div key={sidx} className="text-xs text-gray-600 mb-3">
+                    {source.name} {source.type && `(${source.type})`}
+                    {source.concentration && ` • Concentration +${source.concentration}`}
                   </div>
-                )}
+                ))}
+                <div className="grid gap-2">
+                  {[9, 8, 7, 6, 5, 4, 3, 2, 1, 0].map(level => {
+                    const levelSpells = creature.spells.entries.filter(s => s.level === level);
+                    if (levelSpells.length === 0) return null;
+                    const defaultDC = getDefaultSpellDC(level);
+                    return (
+                      <div key={level} className="flex flex-wrap items-start gap-2">
+                        <Badge variant="outline" className="text-xs font-semibold min-w-[80px] justify-center">
+                          {level === 0 ? `Cantrip DC ${defaultDC}` : `${level}th DC ${defaultDC}`}
+                        </Badge>
+                        <div className="flex-1 text-sm">
+                          {levelSpells.map((spell, idx) => (
+                            <span key={idx}>
+                              {idx > 0 && ' • '}
+                              <span className={spell.is_mythic_spell ? 'text-purple-600 font-semibold' : ''}>
+                                {spell.name}
+                                {spell.DC && (
+                                  <span className="text-xs text-gray-500"> DC {spell.DC}</span>
+                                )}
+                              </span>
+                            </span>
+                          ))}
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
               </div>
             )}
 
@@ -528,10 +294,14 @@ export function CreatureDetailMain({ creature, onBack }: CreatureDetailMainProps
                 <div className="text-sm">{creature.special_qualities_normalized.join(', ')}</div>
               </div>
             )}
-          </TabsContent>
+          </div>
 
-          {/* Details Tab - Lore, ecology, gear, tactics */}
-          <TabsContent value="details" className="p-6 space-y-4 mt-0">
+          {/* Details Section - Lore, ecology, gear, tactics */}
+          <div className="space-y-4">
+            <h2 className="text-lg font-semibold mb-4 flex items-center gap-2 border-t pt-6">
+              <BookOpen className="h-5 w-5" />
+              Details & Lore
+            </h2>
             {/* Description */}
             {(creature.desc_short || creature.desc_long) && (
               <div className="bg-white rounded-lg border p-4">
@@ -641,31 +411,47 @@ export function CreatureDetailMain({ creature, onBack }: CreatureDetailMainProps
                 </div>
               </div>
             )}
-          </TabsContent>
+          </div>
 
-          {/* JSON Tab */}
-          <TabsContent value="json" className="p-6 mt-0">
-            <div className="space-y-4">
-              <div className="flex items-center justify-between">
-                <h3 className="font-semibold">Raw JSON Data</h3>
-                <Button
-                  onClick={handleCopyJson}
-                  variant="outline"
-                  size="sm"
-                >
-                  <Copy className="h-4 w-4 mr-2" />
-                  {jsonCopied ? 'Copied!' : 'Copy'}
-                </Button>
-              </div>
-              <div className="bg-slate-900 text-slate-100 rounded-lg p-4 max-h-[600px] overflow-auto">
-                <pre className="text-xs font-mono whitespace-pre-wrap break-words">
-                  {JSON.stringify(creature, null, 2)}
-                </pre>
-              </div>
+          {/* Raw JSON Section - Collapsible */}
+          <div className="mt-8 border-t pt-6">
+            <div className="bg-gray-50 rounded-xl border">
+              <button
+                onClick={() => toggleSection('json')}
+                className="w-full p-4 flex items-center justify-between hover:bg-gray-100 rounded-t-xl"
+              >
+                <h2 className="text-lg font-semibold flex items-center gap-2">
+                  <Code className="h-5 w-5" />
+                  Raw JSON Data
+                </h2>
+                <div className="flex items-center gap-2">
+                  <Button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleCopyJson();
+                    }}
+                    variant="outline"
+                    size="sm"
+                  >
+                    <Copy className="h-4 w-4 mr-2" />
+                    {jsonCopied ? 'Copied!' : 'Copy'}
+                  </Button>
+                  {expandedSections.json ? <ChevronDown className="h-4 w-4" /> : <ChevronRight className="h-4 w-4" />}
+                </div>
+              </button>
+              {expandedSections.json && (
+                <div className="p-4 border-t">
+                  <div className="bg-slate-900 text-slate-100 rounded-lg p-4 max-h-[600px] overflow-auto">
+                    <pre className="text-xs font-mono whitespace-pre-wrap break-words">
+                      {JSON.stringify(creature, null, 2)}
+                    </pre>
+                  </div>
+                </div>
+              )}
             </div>
-          </TabsContent>
-        </ScrollArea>
-      </Tabs>
+          </div>
+        </div>
+      </ScrollArea>
     </div>
   );
 }

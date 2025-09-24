@@ -403,7 +403,7 @@ export const EcologySchema = z.object({
   organization: z.string().optional(),
   treasure: z.string().optional(),
   treasure_type: z.string().optional(),
-  advancement_3.5: z.string().optional(),
+  "advancement_3.5": z.string().optional(),
 });
 
 // Psychic Magic schema

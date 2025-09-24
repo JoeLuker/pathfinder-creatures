@@ -71,7 +71,7 @@ export function SmartSearch({ value, onChange, creatures }: SmartSearchProps) {
         <Input
           ref={inputRef}
           type="text"
-          placeholder="Search by name, type, or ability..."
+          placeholder="Fuzzy search creatures (try 'dragn' or 'lich')..."
           value={value}
           onChange={(e) => onChange(e.target.value)}
           onFocus={() => setIsFocused(true)}
@@ -147,7 +147,7 @@ export function SmartSearch({ value, onChange, creatures }: SmartSearchProps) {
 
           <div className="px-3 pt-2 mt-2 border-t">
             <div className="text-xs text-muted-foreground">
-              <span className="font-medium">Full-text search enabled!</span> Search across names, descriptions, abilities, subtypes, and more.
+              <span className="font-medium">Fuzzy search enabled!</span> Typos are OK - "dragn" finds "dragon", "lich" finds "lich" and "lichling"
             </div>
             <div className="text-xs text-muted-foreground mt-1">
               <span className="font-medium">Examples:</span> "telepathy", "regeneration", "damage reduction", "CR 10", "flying demon"

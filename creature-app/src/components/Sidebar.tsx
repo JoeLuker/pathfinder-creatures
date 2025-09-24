@@ -74,6 +74,12 @@ export function Sidebar({
     sort: false,
   });
 
+  // Search states for different filter sections
+  const [typeSearch, setTypeSearch] = useState('');
+  const [subtypeSearch, setSubtypeSearch] = useState('');
+  const [abilitySearch, setAbilitySearch] = useState('');
+  const [defensiveSearch, setDefensiveSearch] = useState('');
+
   const toggleSection = (section: keyof typeof expandedSections) => {
     setExpandedSections(prev => ({ ...prev, [section]: !prev[section] }));
   };
@@ -240,27 +246,92 @@ export function Sidebar({
             </div>
           </div>
           {expandedSections.type && (
-            <div className="space-y-1 max-h-48 overflow-y-auto">
-              {(uniqueTypesWithCounts || uniqueTypes.map(t => ({ value: t, count: 0 }))).map(({ value: type, count }) => (
-                <label
-                  key={type}
-                  className={`flex items-center justify-between px-2 py-1 hover:bg-gray-50 rounded cursor-pointer ${
-                    !filters.types.includes(type) && count === 0 ? 'opacity-50' : ''
-                  }`}
-                >
-                  <div className="flex items-center gap-2">
-                    <input
-                      type="checkbox"
-                      checked={filters.types.includes(type)}
-                      onChange={() => handleTypeToggle(type)}
-                      className="rounded border-gray-300"
-                      disabled={!filters.types.includes(type) && count === 0}
-                    />
-                    <span className={`text-sm capitalize ${count === 0 && !filters.types.includes(type) ? 'text-gray-400' : ''}`}>{type}</span>
-                  </div>
-                  <span className="text-xs text-muted-foreground">{count}</span>
-                </label>
-              ))}
+            <div className="space-y-2">
+              {/* Search and bulk actions */}
+              <div className="flex gap-2">
+                <Input
+                  type="text"
+                  placeholder="Search types..."
+                  value={typeSearch}
+                  onChange={(e) => setTypeSearch(e.target.value)}
+                  className="flex-1 h-7 text-xs"
+                />
+                <div className="flex gap-1">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="h-7 px-2 text-xs"
+                    onClick={() => {
+                      const visibleTypes = (uniqueTypesWithCounts || uniqueTypes.map(t => ({ value: t, count: 0 })))
+                        .filter(({ value, count }) =>
+                          value.toLowerCase().includes(typeSearch.toLowerCase()) && count > 0
+                        )
+                        .map(({ value }) => value);
+                      setFilters(prev => ({ ...prev, types: visibleTypes }));
+                    }}
+                  >
+                    All
+                  </Button>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="h-7 px-2 text-xs"
+                    onClick={() => setFilters(prev => ({ ...prev, types: [] }))}
+                  >
+                    None
+                  </Button>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="h-7 px-2 text-xs"
+                    onClick={() => {
+                      const visibleTypes = (uniqueTypesWithCounts || uniqueTypes.map(t => ({ value: t, count: 0 })))
+                        .filter(({ value, count }) =>
+                          value.toLowerCase().includes(typeSearch.toLowerCase()) && count > 0
+                        )
+                        .map(({ value }) => value);
+                      const inverted = visibleTypes.filter(t => !filters.types.includes(t));
+                      setFilters(prev => ({ ...prev, types: inverted }));
+                    }}
+                  >
+                    Invert
+                  </Button>
+                </div>
+              </div>
+              <div className="space-y-1 max-h-48 overflow-y-auto">
+                {(uniqueTypesWithCounts || uniqueTypes.map(t => ({ value: t, count: 0 })))
+                  .filter(({ value }) => value.toLowerCase().includes(typeSearch.toLowerCase()))
+                  .map(({ value: type, count }) => {
+                  const maxCount = Math.max(...(uniqueTypesWithCounts || []).map(t => t.count));
+                  const percentage = maxCount > 0 ? (count / maxCount) * 100 : 0;
+
+                  return (
+                    <label
+                      key={type}
+                      className={`relative flex items-center justify-between px-2 py-1 hover:bg-gray-50 rounded cursor-pointer ${
+                        !filters.types.includes(type) && count === 0 ? 'opacity-50' : ''
+                      }`}
+                    >
+                      {/* Data density bar */}
+                      <div
+                        className="absolute inset-0 bg-blue-50 opacity-30 rounded"
+                        style={{ width: `${percentage}%` }}
+                      />
+                      <div className="relative flex items-center gap-2 flex-1">
+                        <input
+                          type="checkbox"
+                          checked={filters.types.includes(type)}
+                          onChange={() => handleTypeToggle(type)}
+                          className="rounded border-gray-300"
+                          disabled={!filters.types.includes(type) && count === 0}
+                        />
+                        <span className={`text-sm capitalize ${count === 0 && !filters.types.includes(type) ? 'text-gray-400' : ''}`}>{type}</span>
+                      </div>
+                      <span className="relative text-xs text-muted-foreground font-medium">{count}</span>
+                    </label>
+                  );
+                })}
+              </div>
             </div>
           )}
         </div>
@@ -307,27 +378,77 @@ export function Sidebar({
             </div>
           </div>
           {expandedSections.size && (
-            <div className="space-y-1">
-              {(uniqueSizesWithCounts || uniqueSizes.map(s => ({ value: s, count: 0 }))).map(({ value: size, count }) => (
-                <label
-                  key={size}
-                  className={`flex items-center justify-between px-2 py-1 hover:bg-gray-50 rounded cursor-pointer ${
-                    !filters.sizes.includes(size) && count === 0 ? 'opacity-50' : ''
-                  }`}
+            <div className="space-y-2">
+              {/* Bulk actions for sizes */}
+              <div className="flex gap-1">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="h-7 px-2 text-xs flex-1"
+                  onClick={() => {
+                    const allSizes = (uniqueSizesWithCounts || uniqueSizes.map(s => ({ value: s, count: 0 })))
+                      .filter(({ count }) => count > 0)
+                      .map(({ value }) => value);
+                    setFilters(prev => ({ ...prev, sizes: allSizes }));
+                  }}
                 >
-                  <div className="flex items-center gap-2">
-                    <input
-                      type="checkbox"
-                      checked={filters.sizes.includes(size)}
-                      onChange={() => handleSizeToggle(size)}
-                      className="rounded border-gray-300"
-                      disabled={!filters.sizes.includes(size) && count === 0}
-                    />
-                    <span className={`text-sm ${count === 0 && !filters.sizes.includes(size) ? 'text-gray-400' : ''}`}>{size}</span>
-                  </div>
-                  <span className="text-xs text-muted-foreground">{count}</span>
-                </label>
-              ))}
+                  All
+                </Button>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="h-7 px-2 text-xs flex-1"
+                  onClick={() => setFilters(prev => ({ ...prev, sizes: [] }))}
+                >
+                  None
+                </Button>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="h-7 px-2 text-xs flex-1"
+                  onClick={() => {
+                    const allSizes = (uniqueSizesWithCounts || uniqueSizes.map(s => ({ value: s, count: 0 })))
+                      .filter(({ count }) => count > 0)
+                      .map(({ value }) => value);
+                    const inverted = allSizes.filter(s => !filters.sizes.includes(s));
+                    setFilters(prev => ({ ...prev, sizes: inverted }));
+                  }}
+                >
+                  Invert
+                </Button>
+              </div>
+              <div className="space-y-1">
+                {(uniqueSizesWithCounts || uniqueSizes.map(s => ({ value: s, count: 0 }))).map(({ value: size, count }) => {
+                  const maxCount = Math.max(...(uniqueSizesWithCounts || []).map(s => s.count));
+                  const percentage = maxCount > 0 ? (count / maxCount) * 100 : 0;
+
+                  return (
+                    <label
+                      key={size}
+                      className={`relative flex items-center justify-between px-2 py-1 hover:bg-gray-50 rounded cursor-pointer ${
+                        !filters.sizes.includes(size) && count === 0 ? 'opacity-50' : ''
+                      }`}
+                    >
+                      {/* Data density bar */}
+                      <div
+                        className="absolute inset-0 bg-green-50 opacity-30 rounded"
+                        style={{ width: `${percentage}%` }}
+                      />
+                      <div className="relative flex items-center gap-2 flex-1">
+                        <input
+                          type="checkbox"
+                          checked={filters.sizes.includes(size)}
+                          onChange={() => handleSizeToggle(size)}
+                          className="rounded border-gray-300"
+                          disabled={!filters.sizes.includes(size) && count === 0}
+                        />
+                        <span className={`text-sm ${count === 0 && !filters.sizes.includes(size) ? 'text-gray-400' : ''}`}>{size}</span>
+                      </div>
+                      <span className="relative text-xs text-muted-foreground font-medium">{count}</span>
+                    </label>
+                  );
+                })}
+              </div>
             </div>
           )}
         </div>
@@ -493,6 +614,11 @@ export function Sidebar({
             <div className="flex items-center gap-2">
               <Shield className="h-4 w-4" />
               <span className="text-sm font-medium">Subtypes</span>
+              {filters.subtypes.length > 0 && (
+                <Badge variant="secondary" className="text-xs h-5">
+                  {filters.subtypes.length}
+                </Badge>
+              )}
             </div>
             {expandedSections.subtypes ? (
               <ChevronUp className="h-4 w-4" />
@@ -501,24 +627,73 @@ export function Sidebar({
             )}
           </button>
           {expandedSections.subtypes && (
-            <div className="space-y-1 max-h-48 overflow-y-auto">
-              {(uniqueSubtypesWithCounts || uniqueSubtypes.map(s => ({ value: s, count: 0 }))).slice(0, 30).map(({ value: subtype, count }) => (
-                <label
-                  key={subtype}
-                  className="flex items-center justify-between px-2 py-1 hover:bg-gray-50 rounded cursor-pointer"
-                >
-                  <div className="flex items-center gap-2">
-                    <input
-                      type="checkbox"
-                      checked={filters.subtypes.includes(subtype)}
-                      onChange={() => handleSubtypeToggle(subtype)}
-                      className="rounded border-gray-300"
-                    />
-                    <span className="text-sm">{subtype}</span>
-                  </div>
-                  <span className="text-xs text-muted-foreground">{count}</span>
-                </label>
-              ))}
+            <div className="space-y-2">
+              {/* Search and bulk actions */}
+              <div className="flex gap-2">
+                <Input
+                  type="text"
+                  placeholder="Search subtypes..."
+                  value={subtypeSearch}
+                  onChange={(e) => setSubtypeSearch(e.target.value)}
+                  className="flex-1 h-7 text-xs"
+                />
+                <div className="flex gap-1">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="h-7 px-2 text-xs"
+                    onClick={() => {
+                      const visibleSubtypes = (uniqueSubtypesWithCounts || uniqueSubtypes.map(s => ({ value: s, count: 0 })))
+                        .filter(({ value, count }) =>
+                          value.toLowerCase().includes(subtypeSearch.toLowerCase()) && count > 0
+                        )
+                        .map(({ value }) => value);
+                      setFilters(prev => ({ ...prev, subtypes: visibleSubtypes }));
+                    }}
+                  >
+                    All
+                  </Button>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="h-7 px-2 text-xs"
+                    onClick={() => setFilters(prev => ({ ...prev, subtypes: [] }))}
+                  >
+                    None
+                  </Button>
+                </div>
+              </div>
+              <div className="space-y-1 max-h-48 overflow-y-auto">
+                {(uniqueSubtypesWithCounts || uniqueSubtypes.map(s => ({ value: s, count: 0 })))
+                  .filter(({ value }) => value.toLowerCase().includes(subtypeSearch.toLowerCase()))
+                  .slice(0, 50).map(({ value: subtype, count }) => {
+                  const maxCount = Math.max(...(uniqueSubtypesWithCounts || []).map(s => s.count));
+                  const percentage = maxCount > 0 ? (count / maxCount) * 100 : 0;
+
+                  return (
+                    <label
+                      key={subtype}
+                      className="relative flex items-center justify-between px-2 py-1 hover:bg-gray-50 rounded cursor-pointer"
+                    >
+                      {/* Data density bar */}
+                      <div
+                        className="absolute inset-0 bg-purple-50 opacity-30 rounded"
+                        style={{ width: `${percentage}%` }}
+                      />
+                      <div className="relative flex items-center gap-2 flex-1">
+                        <input
+                          type="checkbox"
+                          checked={filters.subtypes.includes(subtype)}
+                          onChange={() => handleSubtypeToggle(subtype)}
+                          className="rounded border-gray-300"
+                        />
+                        <span className="text-sm">{subtype}</span>
+                      </div>
+                      <span className="relative text-xs text-muted-foreground font-medium">{count}</span>
+                    </label>
+                  );
+                })}
+              </div>
             </div>
           )}
         </div>
@@ -532,6 +707,11 @@ export function Sidebar({
             <div className="flex items-center gap-2">
               <Sparkles className="h-4 w-4" />
               <span className="text-sm font-medium">Special Abilities</span>
+              {filters.specialAbilities.length > 0 && (
+                <Badge variant="secondary" className="text-xs h-5">
+                  {filters.specialAbilities.length}
+                </Badge>
+              )}
             </div>
             {expandedSections.abilities ? (
               <ChevronUp className="h-4 w-4" />
@@ -540,48 +720,73 @@ export function Sidebar({
             )}
           </button>
           {expandedSections.abilities && (
-            <div className="space-y-1 max-h-48 overflow-y-auto">
-              <Input
-                type="text"
-                placeholder="Search abilities..."
-                className="mb-2 text-xs"
-                onChange={(e) => {
-                  const searchTerm = e.target.value.toLowerCase();
-                  const filtered = uniqueSpecialAbilities.filter(a =>
-                    a.toLowerCase().includes(searchTerm)
+            <div className="space-y-2">
+              {/* Search and bulk actions */}
+              <div className="flex gap-2">
+                <Input
+                  type="text"
+                  placeholder="Search abilities..."
+                  value={abilitySearch}
+                  onChange={(e) => setAbilitySearch(e.target.value)}
+                  className="flex-1 h-7 text-xs"
+                />
+                <div className="flex gap-1">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="h-7 px-2 text-xs"
+                    onClick={() => {
+                      const visibleAbilities = (uniqueSpecialAbilitiesWithCounts || uniqueSpecialAbilities.map(s => ({ value: s, count: 0 })))
+                        .filter(({ value, count }) =>
+                          value.toLowerCase().includes(abilitySearch.toLowerCase()) && count > 0
+                        )
+                        .map(({ value }) => value);
+                      setFilters(prev => ({ ...prev, specialAbilities: visibleAbilities }));
+                    }}
+                  >
+                    All
+                  </Button>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="h-7 px-2 text-xs"
+                    onClick={() => setFilters(prev => ({ ...prev, specialAbilities: [] }))}
+                  >
+                    None
+                  </Button>
+                </div>
+              </div>
+              <div className="space-y-1 max-h-48 overflow-y-auto">
+                {(uniqueSpecialAbilitiesWithCounts || uniqueSpecialAbilities.map(s => ({ value: s, count: 0 })))
+                  .filter(({ value }) => value.toLowerCase().includes(abilitySearch.toLowerCase()))
+                  .map(({ value: ability, count }) => {
+                  const maxCount = Math.max(...(uniqueSpecialAbilitiesWithCounts || []).map(s => s.count));
+                  const percentage = maxCount > 0 ? (count / maxCount) * 100 : 0;
+
+                  return (
+                    <label
+                      key={ability}
+                      className="relative flex items-center justify-between px-2 py-1 hover:bg-gray-50 rounded cursor-pointer"
+                    >
+                      {/* Data density bar */}
+                      <div
+                        className="absolute inset-0 bg-yellow-50 opacity-30 rounded"
+                        style={{ width: `${percentage}%` }}
+                      />
+                      <div className="relative flex items-center gap-2 flex-1">
+                        <input
+                          type="checkbox"
+                          checked={filters.specialAbilities.includes(ability)}
+                          onChange={() => handleSpecialAbilityToggle(ability)}
+                          className="rounded border-gray-300"
+                        />
+                        <span className="text-sm">{ability}</span>
+                      </div>
+                      <span className="relative text-xs text-muted-foreground font-medium">{count}</span>
+                    </label>
                   );
-                  // Just for visual filtering - actual toggle still uses full list
-                  const container = e.target.parentElement;
-                  if (container) {
-                    const labels = container.querySelectorAll('label');
-                    labels.forEach(label => {
-                      const text = label.textContent?.toLowerCase() || '';
-                      if (searchTerm && !text.includes(searchTerm)) {
-                        label.style.display = 'none';
-                      } else {
-                        label.style.display = '';
-                      }
-                    });
-                  }
-                }}
-              />
-              {(uniqueSpecialAbilitiesWithCounts || uniqueSpecialAbilities.map(s => ({ value: s, count: 0 }))).map(({ value: ability, count }) => (
-                <label
-                  key={ability}
-                  className="flex items-center justify-between px-2 py-1 hover:bg-gray-50 rounded cursor-pointer"
-                >
-                  <div className="flex items-center gap-2">
-                    <input
-                      type="checkbox"
-                      checked={filters.specialAbilities.includes(ability)}
-                      onChange={() => handleSpecialAbilityToggle(ability)}
-                      className="rounded border-gray-300"
-                    />
-                    <span className="text-sm">{ability}</span>
-                  </div>
-                  <span className="text-xs text-muted-foreground">{count}</span>
-                </label>
-              ))}
+                })}
+              </div>
             </div>
           )}
         </div>
@@ -595,6 +800,11 @@ export function Sidebar({
             <div className="flex items-center gap-2">
               <ShieldCheck className="h-4 w-4" />
               <span className="text-sm font-medium">Defensive Abilities</span>
+              {filters.defensiveAbilities.length > 0 && (
+                <Badge variant="secondary" className="text-xs h-5">
+                  {filters.defensiveAbilities.length}
+                </Badge>
+              )}
             </div>
             {expandedSections.defensive ? (
               <ChevronUp className="h-4 w-4" />
@@ -603,24 +813,73 @@ export function Sidebar({
             )}
           </button>
           {expandedSections.defensive && (
-            <div className="space-y-1 max-h-48 overflow-y-auto">
-              {(uniqueDefensiveAbilitiesWithCounts || uniqueDefensiveAbilities.map(d => ({ value: d, count: 0 }))).map(({ value: ability, count }) => (
-                <label
-                  key={ability}
-                  className="flex items-center justify-between px-2 py-1 hover:bg-gray-50 rounded cursor-pointer"
-                >
-                  <div className="flex items-center gap-2">
-                    <input
-                      type="checkbox"
-                      checked={filters.defensiveAbilities.includes(ability)}
-                      onChange={() => handleDefensiveAbilityToggle(ability)}
-                      className="rounded border-gray-300"
-                    />
-                    <span className="text-sm">{ability}</span>
-                  </div>
-                  <span className="text-xs text-muted-foreground">{count}</span>
-                </label>
-              ))}
+            <div className="space-y-2">
+              {/* Search and bulk actions */}
+              <div className="flex gap-2">
+                <Input
+                  type="text"
+                  placeholder="Search defenses..."
+                  value={defensiveSearch}
+                  onChange={(e) => setDefensiveSearch(e.target.value)}
+                  className="flex-1 h-7 text-xs"
+                />
+                <div className="flex gap-1">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="h-7 px-2 text-xs"
+                    onClick={() => {
+                      const visibleDefensive = (uniqueDefensiveAbilitiesWithCounts || uniqueDefensiveAbilities.map(d => ({ value: d, count: 0 })))
+                        .filter(({ value, count }) =>
+                          value.toLowerCase().includes(defensiveSearch.toLowerCase()) && count > 0
+                        )
+                        .map(({ value }) => value);
+                      setFilters(prev => ({ ...prev, defensiveAbilities: visibleDefensive }));
+                    }}
+                  >
+                    All
+                  </Button>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="h-7 px-2 text-xs"
+                    onClick={() => setFilters(prev => ({ ...prev, defensiveAbilities: [] }))}
+                  >
+                    None
+                  </Button>
+                </div>
+              </div>
+              <div className="space-y-1 max-h-48 overflow-y-auto">
+                {(uniqueDefensiveAbilitiesWithCounts || uniqueDefensiveAbilities.map(d => ({ value: d, count: 0 })))
+                  .filter(({ value }) => value.toLowerCase().includes(defensiveSearch.toLowerCase()))
+                  .map(({ value: ability, count }) => {
+                  const maxCount = Math.max(...(uniqueDefensiveAbilitiesWithCounts || []).map(d => d.count));
+                  const percentage = maxCount > 0 ? (count / maxCount) * 100 : 0;
+
+                  return (
+                    <label
+                      key={ability}
+                      className="relative flex items-center justify-between px-2 py-1 hover:bg-gray-50 rounded cursor-pointer"
+                    >
+                      {/* Data density bar */}
+                      <div
+                        className="absolute inset-0 bg-orange-50 opacity-30 rounded"
+                        style={{ width: `${percentage}%` }}
+                      />
+                      <div className="relative flex items-center gap-2 flex-1">
+                        <input
+                          type="checkbox"
+                          checked={filters.defensiveAbilities.includes(ability)}
+                          onChange={() => handleDefensiveAbilityToggle(ability)}
+                          className="rounded border-gray-300"
+                        />
+                        <span className="text-sm">{ability}</span>
+                      </div>
+                      <span className="relative text-xs text-muted-foreground font-medium">{count}</span>
+                    </label>
+                  );
+                })}
+              </div>
             </div>
           )}
         </div>
@@ -667,27 +926,77 @@ export function Sidebar({
             </div>
           </div>
           {expandedSections.alignment && (
-            <div className="space-y-1 max-h-48 overflow-y-auto">
-              {(uniqueAlignmentsWithCounts || uniqueAlignments.map(a => ({ value: a, count: 0 }))).slice(0, 20).map(({ value: alignment, count }) => (
-                <label
-                  key={alignment}
-                  className={`flex items-center justify-between px-2 py-1 hover:bg-gray-50 rounded cursor-pointer ${
-                    count === 0 ? 'opacity-50' : ''
-                  }`}
+            <div className="space-y-2">
+              {/* Bulk actions for alignments */}
+              <div className="flex gap-1">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="h-7 px-2 text-xs flex-1"
+                  onClick={() => {
+                    const allAlignments = (uniqueAlignmentsWithCounts || uniqueAlignments.map(a => ({ value: a, count: 0 })))
+                      .filter(({ count }) => count > 0)
+                      .map(({ value }) => value);
+                    setFilters(prev => ({ ...prev, alignments: allAlignments }));
+                  }}
                 >
-                  <div className="flex items-center gap-2">
-                    <input
-                      type="checkbox"
-                      checked={filters.alignments.includes(alignment)}
-                      onChange={() => handleAlignmentToggle(alignment)}
-                      className="rounded border-gray-300"
-                      disabled={!filters.alignments.includes(alignment) && count === 0}
-                    />
-                    <span className={`text-sm ${count === 0 && !filters.alignments.includes(alignment) ? 'text-gray-400' : ''}`}>{alignment}</span>
-                  </div>
-                  <span className="text-xs text-muted-foreground">{count}</span>
-                </label>
-              ))}
+                  All
+                </Button>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="h-7 px-2 text-xs flex-1"
+                  onClick={() => setFilters(prev => ({ ...prev, alignments: [] }))}
+                >
+                  None
+                </Button>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="h-7 px-2 text-xs flex-1"
+                  onClick={() => {
+                    const allAlignments = (uniqueAlignmentsWithCounts || uniqueAlignments.map(a => ({ value: a, count: 0 })))
+                      .filter(({ count }) => count > 0)
+                      .map(({ value }) => value);
+                    const inverted = allAlignments.filter(a => !filters.alignments.includes(a));
+                    setFilters(prev => ({ ...prev, alignments: inverted }));
+                  }}
+                >
+                  Invert
+                </Button>
+              </div>
+              <div className="space-y-1 max-h-48 overflow-y-auto">
+                {(uniqueAlignmentsWithCounts || uniqueAlignments.map(a => ({ value: a, count: 0 }))).slice(0, 20).map(({ value: alignment, count }) => {
+                  const maxCount = Math.max(...(uniqueAlignmentsWithCounts || []).map(a => a.count));
+                  const percentage = maxCount > 0 ? (count / maxCount) * 100 : 0;
+
+                  return (
+                    <label
+                      key={alignment}
+                      className={`relative flex items-center justify-between px-2 py-1 hover:bg-gray-50 rounded cursor-pointer ${
+                        count === 0 ? 'opacity-50' : ''
+                      }`}
+                    >
+                      {/* Data density bar */}
+                      <div
+                        className="absolute inset-0 bg-indigo-50 opacity-30 rounded"
+                        style={{ width: `${percentage}%` }}
+                      />
+                      <div className="relative flex items-center gap-2 flex-1">
+                        <input
+                          type="checkbox"
+                          checked={filters.alignments.includes(alignment)}
+                          onChange={() => handleAlignmentToggle(alignment)}
+                          className="rounded border-gray-300"
+                          disabled={!filters.alignments.includes(alignment) && count === 0}
+                        />
+                        <span className={`text-sm ${count === 0 && !filters.alignments.includes(alignment) ? 'text-gray-400' : ''}`}>{alignment}</span>
+                      </div>
+                      <span className="relative text-xs text-muted-foreground font-medium">{count}</span>
+                    </label>
+                  );
+                })}
+              </div>
             </div>
           )}
         </div>
