@@ -2,7 +2,6 @@ import type { CreatureEnriched } from '@/types/creature-complete';
 import { Badge } from '@/components/ui/badge';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Button } from '@/components/ui/button';
-import { StatBlock } from './StatBlock';
 import {
   Sword, Shield, Heart, Zap, Brain, Eye, MessageSquare, Footprints,
   Sparkles, ShieldCheck, AlertTriangle, Target, Activity, Globe,
@@ -51,17 +50,24 @@ export function CreatureDetailMain({ creature, onBack }: CreatureDetailMainProps
     }));
   };
 
-  // Helper function to calculate default spell DC for a given level
+  // Helper functions
   const getDefaultSpellDC = (spellLevel: number) => {
-    // Calculate default DC: 10 + spell level + casting ability modifier
     const intMod = Math.floor(((creature.ability_scores.INT ?? 10) - 10) / 2);
     const wisMod = Math.floor(((creature.ability_scores.WIS ?? 10) - 10) / 2);
     const chaMod = Math.floor(((creature.ability_scores.CHA ?? 10) - 10) / 2);
-
-    // Use the highest mental ability modifier as default
     const abilityModifier = Math.max(intMod, wisMod, chaMod);
-
     return 10 + spellLevel + abilityModifier;
+  };
+
+  const formatModifier = (score: number | null | undefined) => {
+    if (!score) return '+0';
+    const mod = Math.floor((score - 10) / 2);
+    return mod >= 0 ? `+${mod}` : `${mod}`;
+  };
+
+  const formatSave = (save: number | undefined) => {
+    if (save === undefined) return '—';
+    return save >= 0 ? `+${save}` : `${save}`;
   };
 
   return (
@@ -151,7 +157,69 @@ export function CreatureDetailMain({ creature, onBack }: CreatureDetailMainProps
               <Sword className="h-5 w-5" />
               Combat Statistics
             </h2>
-            <StatBlock creature={creature} />
+
+            {/* Dense stat block */}
+            <div className="bg-surface-secondary rounded-md border p-2 text-xs space-y-2">
+              {/* Row 1: HP, AC, Init, Speed */}
+              <div className="grid grid-cols-4 gap-3">
+                <div><span className="text-secondary">HP:</span> <span className="font-semibold">{creature.hp?.total ?? '—'}</span></div>
+                <div><span className="text-secondary">AC:</span> <span className="font-semibold">{creature.ac?.AC ?? '—'}</span>{creature.ac?.touch && ` (${creature.ac.touch}t, ${creature.ac.flat_footed}ff)`}</div>
+                <div><span className="text-secondary">Init:</span> <span className="font-semibold">{formatSave(creature.initiative_parsed?.value ?? creature.initiative)}</span></div>
+                <div><span className="text-secondary">Speed:</span> <span className="font-semibold">{creature.speeds?.base ?? 30}ft</span>{creature.speeds?.fly && `, fly ${creature.speeds.fly}ft`}</div>
+              </div>
+
+              {/* Row 2: Abilities */}
+              <div className="flex gap-4">
+                {['STR', 'DEX', 'CON', 'INT', 'WIS', 'CHA'].map((ability) => {
+                  const score = creature.ability_scores[ability as keyof typeof creature.ability_scores];
+                  return (
+                    <div key={ability}>
+                      <span className="text-secondary">{ability}:</span> <span className="font-semibold">{score ?? '—'}</span> <span className="text-tertiary">({formatModifier(score)})</span>
+                    </div>
+                  );
+                })}
+              </div>
+
+              {/* Row 3: Saves, Combat, Space */}
+              <div className="grid grid-cols-3 gap-3">
+                <div>
+                  <span className="text-secondary">Saves:</span> Fort {formatSave(creature.saves?.fort)}, Ref {formatSave(creature.saves?.ref)}, Will {formatSave(creature.saves?.will)}
+                </div>
+                <div>
+                  <span className="text-secondary">Combat:</span> BAB +{creature.bab ?? 0}, CMB +{creature.cmb ?? 0}, CMD {creature.cmd ?? 10}
+                </div>
+                <div>
+                  <span className="text-secondary">Space/Reach:</span> {creature.space ?? 5}ft/{creature.reach ?? 5}ft
+                </div>
+              </div>
+
+              {/* Attacks */}
+              {(creature.attacks?.melee?.length || creature.attacks?.ranged?.length) && (
+                <div className="border-t pt-1">
+                  {creature.attacks.melee?.length > 0 && <div><span className="text-secondary">Melee:</span> {creature.attacks.melee.join(', ')}</div>}
+                  {creature.attacks.ranged?.length > 0 && <div><span className="text-secondary">Ranged:</span> {creature.attacks.ranged.join(', ')}</div>}
+                  {creature.attacks.special?.length > 0 && <div><span className="text-secondary">Special:</span> {creature.attacks.special.join(', ')}</div>}
+                </div>
+              )}
+
+              {/* Defenses */}
+              {(creature.sr || creature.dr?.length || creature.immunities_normalized?.length || creature.resistances || creature.weaknesses_normalized?.length) && (
+                <div className="border-t pt-1 space-y-0.5">
+                  {creature.sr && <div><span className="text-secondary">SR:</span> {creature.sr}</div>}
+                  {creature.dr?.length > 0 && <div><span className="text-secondary">DR:</span> {creature.dr.map(dr => `${dr.amount}/${dr.types?.join(' and ') || 'special'}`).join(', ')}</div>}
+                  {creature.immunities_normalized?.length > 0 && <div><span className="text-secondary">Immune:</span> {creature.immunities_normalized.join(', ')}</div>}
+                  {creature.resistances && Object.keys(creature.resistances).length > 0 && <div><span className="text-secondary">Resist:</span> {Object.entries(creature.resistances).map(([type, value]) => `${type} ${value}`).join(', ')}</div>}
+                  {creature.weaknesses_normalized?.length > 0 && <div><span className="text-secondary">Weak:</span> {creature.weaknesses_normalized.join(', ')}</div>}
+                </div>
+              )}
+
+              {/* Senses */}
+              {creature.senses && Object.keys(creature.senses).length > 0 && (
+                <div className="border-t pt-1">
+                  <span className="text-secondary">Senses:</span> {Object.entries(creature.senses).map(([sense, value]) => `${sense}${typeof value === 'number' ? ` ${value}ft` : ''}`).join(', ')}
+                </div>
+              )}
+            </div>
           </div>
 
           {/* Abilities Section */}
