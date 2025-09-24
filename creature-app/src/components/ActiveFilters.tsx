@@ -3,6 +3,7 @@ import { Button } from '@/components/ui/button';
 import { X, Filter } from 'lucide-react';
 import type { Filters } from '@/hooks/useCreatures';
 import { createDefaultFilters } from '@/utils/filterUtils';
+import { FILTER_DEFINITIONS } from '@/config/filters';
 
 interface ActiveFiltersProps {
   filters: Filters;
@@ -12,91 +13,69 @@ interface ActiveFiltersProps {
 export function ActiveFilters({ filters, setFilters }: ActiveFiltersProps) {
   const activeFilters: { label: string; value: string; clear: () => void }[] = [];
 
-  // Collect all active filters
-  filters.types.forEach(type => {
-    activeFilters.push({
-      label: filters.excludeMode?.types ? 'Exclude Type' : 'Type',
-      value: type,
-      clear: () => setFilters(prev => ({
-        ...prev,
-        types: prev.types.filter(t => t !== type)
-      }))
-    });
-  });
+  // Use configuration-driven approach to collect active filters
+  FILTER_DEFINITIONS.forEach(filterConfig => {
+    switch (filterConfig.type) {
+      case 'multiSelect': {
+        const values = (filters as any)[filterConfig.key] as string[] || [];
+        const excludeMode = filters.excludeMode?.[filterConfig.key as keyof typeof filters.excludeMode];
+        const labelPrefix = excludeMode ? 'Exclude' : '';
 
-  filters.sizes.forEach(size => {
-    activeFilters.push({
-      label: filters.excludeMode?.sizes ? 'Exclude Size' : 'Size',
-      value: size,
-      clear: () => setFilters(prev => ({
-        ...prev,
-        sizes: prev.sizes.filter(s => s !== size)
-      }))
-    });
-  });
+        values.forEach(value => {
+          activeFilters.push({
+            label: labelPrefix ? `${labelPrefix} ${filterConfig.label}` : filterConfig.label,
+            value,
+            clear: () => setFilters(prev => ({
+              ...prev,
+              [filterConfig.key]: ((prev as any)[filterConfig.key] as string[]).filter(v => v !== value)
+            }))
+          });
+        });
+        break;
+      }
+      case 'range': {
+        const minKey = `${filterConfig.key}Min` as keyof Filters;
+        const maxKey = `${filterConfig.key}Max` as keyof Filters;
+        const min = filters[minKey] as number | null;
+        const max = filters[maxKey] as number | null;
 
-  filters.alignments.forEach(alignment => {
-    activeFilters.push({
-      label: filters.excludeMode?.alignments ? 'Exclude Alignment' : 'Alignment',
-      value: alignment,
-      clear: () => setFilters(prev => ({
-        ...prev,
-        alignments: prev.alignments.filter(a => a !== alignment)
-      }))
-    });
-  });
+        if (min !== null || max !== null) {
+          let rangeText = '';
+          if (min !== null && max !== null) {
+            rangeText = `${min} - ${max}`;
+          } else if (min !== null) {
+            rangeText = `≥ ${min}`;
+          } else {
+            rangeText = `≤ ${max}`;
+          }
 
-  if (filters.crMin !== null || filters.crMax !== null) {
-    const crRange = `${filters.crMin ?? '0'} - ${filters.crMax ?? '30'}`;
-    activeFilters.push({
-      label: 'CR',
-      value: crRange,
-      clear: () => setFilters(prev => ({ ...prev, crMin: null, crMax: null }))
-    });
-  }
-
-  filters.subtypes.forEach(subtype => {
-    activeFilters.push({
-      label: 'Subtype',
-      value: subtype,
-      clear: () => setFilters(prev => ({
-        ...prev,
-        subtypes: prev.subtypes.filter(s => s !== subtype)
-      }))
-    });
-  });
-
-  filters.movementTypes.forEach(movement => {
-    activeFilters.push({
-      label: 'Movement',
-      value: movement,
-      clear: () => setFilters(prev => ({
-        ...prev,
-        movementTypes: prev.movementTypes.filter(m => m !== movement)
-      }))
-    });
-  });
-
-  filters.specialAbilities.forEach(ability => {
-    activeFilters.push({
-      label: 'Ability',
-      value: ability,
-      clear: () => setFilters(prev => ({
-        ...prev,
-        specialAbilities: prev.specialAbilities.filter(a => a !== ability)
-      }))
-    });
-  });
-
-  filters.defensiveAbilities.forEach(ability => {
-    activeFilters.push({
-      label: 'Defense',
-      value: ability,
-      clear: () => setFilters(prev => ({
-        ...prev,
-        defensiveAbilities: prev.defensiveAbilities.filter(a => a !== ability)
-      }))
-    });
+          activeFilters.push({
+            label: filterConfig.label,
+            value: rangeText,
+            clear: () => setFilters(prev => ({
+              ...prev,
+              [minKey]: null,
+              [maxKey]: null
+            }))
+          });
+        }
+        break;
+      }
+      case 'boolean': {
+        const value = filters[filterConfig.key as keyof Filters] as boolean | null;
+        if (value !== null) {
+          activeFilters.push({
+            label: filterConfig.label,
+            value: value ? 'Yes' : 'No',
+            clear: () => setFilters(prev => ({
+              ...prev,
+              [filterConfig.key]: null
+            }))
+          });
+        }
+        break;
+      }
+    }
   });
 
   if (activeFilters.length === 0) return null;

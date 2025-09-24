@@ -125,7 +125,7 @@ function App() {
                       </span>
                     </div>
                     <Badge className="bg-secondary">
-                      CR {creature.cr_parsed?.display ?? creature.cr ?? '-'}
+                      CR {creature.cr_parsed?.value ?? creature.cr ?? '-'}
                     </Badge>
                   </div>
                 </div>
@@ -362,7 +362,7 @@ function App() {
                           </p>
                         </div>
                         <div className="text-right">
-                          <div className="text-sm font-medium">CR {creature.cr_parsed?.display ?? creature.cr ?? '-'}</div>
+                          <div className="text-sm font-medium">CR {creature.cr_parsed?.value ?? creature.cr ?? '-'}</div>
                           {creature.xp && (
                             <div className="text-xs text-muted-foreground">{creature.xp.toLocaleString()} XP</div>
                           )}
