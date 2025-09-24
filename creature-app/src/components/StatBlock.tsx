@@ -1,6 +1,12 @@
 import type { CreatureEnriched } from '@/types/creature-complete';
 import { Badge } from '@/components/ui/badge';
 import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from '@/components/ui/tooltip';
+import {
   Sword, Shield, Heart, Zap, Brain, Eye, Footprints,
   ShieldCheck, Target, Swords, Activity
 } from 'lucide-react';
@@ -28,16 +34,17 @@ export function StatBlock({ creature }: StatBlockProps) {
   };
 
   return (
-    <div className="space-y-6">
-      {/* Primary Combat Stats - Card Layout */}
-      <div className="grid grid-cols-3 gap-4">
-        {/* HP Card */}
-        <div className="bg-gradient-to-br from-red-50 to-white border border-red-200 rounded-xl p-4">
-          <div className="flex items-center justify-between mb-2">
-            <Heart className="h-5 w-5 text-red-500" />
-            <span className="text-xs font-medium text-red-600">Hit Points</span>
-          </div>
-          <div className="text-2xl font-bold text-gray-900">{creature.hp?.total ?? '—'}</div>
+    <TooltipProvider>
+      <div className="space-y-6">
+        {/* Primary Combat Stats - Card Layout */}
+        <div className="grid grid-cols-3 gap-4">
+          {/* HP Card */}
+          <div className="bg-gradient-to-br from-red-50 to-white border border-red-200 rounded-xl p-4">
+            <div className="flex items-center justify-between mb-2">
+              <Heart className="h-5 w-5 text-red-500" />
+              <span className="text-xs font-medium text-red-600">Hit Points</span>
+            </div>
+            <div className="text-2xl font-bold text-gray-900">{creature.hp?.total ?? '—'}</div>
           {creature.hp?.long && (
             <div className="text-xs text-gray-600 mt-1">{creature.hp.long}</div>
           )}
@@ -54,7 +61,19 @@ export function StatBlock({ creature }: StatBlockProps) {
           </div>
           <div className="text-2xl font-bold text-gray-900">{creature.ac?.AC ?? '—'}</div>
           <div className="text-xs text-gray-600 mt-1">
-            Touch {creature.ac?.touch ?? '—'} | FF {creature.ac?.flat_footed ?? '—'}
+            <Tooltip>
+              <TooltipTrigger>Touch {creature.ac?.touch ?? '—'}</TooltipTrigger>
+              <TooltipContent>
+                <p>Touch AC - Ignores armor, natural armor, and shield bonuses</p>
+              </TooltipContent>
+            </Tooltip>
+            {' | '}
+            <Tooltip>
+              <TooltipTrigger>FF {creature.ac?.flat_footed ?? '—'}</TooltipTrigger>
+              <TooltipContent>
+                <p>Flat-Footed AC - When surprised or unable to react (no Dex bonus)</p>
+              </TooltipContent>
+            </Tooltip>
           </div>
         </div>
 
@@ -146,18 +165,39 @@ export function StatBlock({ creature }: StatBlockProps) {
           </h3>
           <div className="space-y-2">
             <div className="flex justify-between items-center py-1 border-b">
-              <span className="text-sm text-gray-600">Base Attack</span>
+              <Tooltip>
+                <TooltipTrigger>
+                  <span className="text-sm text-gray-600">Base Attack</span>
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p>Base Attack Bonus - Added to all attack rolls</p>
+                </TooltipContent>
+              </Tooltip>
               <span className="font-semibold">+{creature.bab ?? 0}</span>
             </div>
             <div className="flex justify-between items-center py-1 border-b">
-              <span className="text-sm text-gray-600">CMB</span>
+              <Tooltip>
+                <TooltipTrigger>
+                  <span className="text-sm text-gray-600">CMB</span>
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p>Combat Maneuver Bonus - For grapple, trip, disarm, etc.</p>
+                </TooltipContent>
+              </Tooltip>
               <span className="font-semibold">
                 +{creature.cmb ?? 0}
                 {creature.cmb_other && <span className="text-xs text-gray-500 ml-1">({creature.cmb_other})</span>}
               </span>
             </div>
             <div className="flex justify-between items-center py-1">
-              <span className="text-sm text-gray-600">CMD</span>
+              <Tooltip>
+                <TooltipTrigger>
+                  <span className="text-sm text-gray-600">CMD</span>
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p>Combat Maneuver Defense - Against combat maneuvers</p>
+                </TooltipContent>
+              </Tooltip>
               <span className="font-semibold">
                 {creature.cmd ?? 10}
                 {creature.cmd_other && <span className="text-xs text-gray-500 ml-1">({creature.cmd_other})</span>}
@@ -264,13 +304,27 @@ export function StatBlock({ creature }: StatBlockProps) {
           <div className="grid grid-cols-2 gap-3">
             {creature.sr && (
               <div className="bg-purple-50 border border-purple-200 rounded-lg p-3">
-                <div className="text-xs font-medium text-purple-600 mb-1">Spell Resistance</div>
+                <Tooltip>
+                  <TooltipTrigger>
+                    <div className="text-xs font-medium text-purple-600 mb-1">Spell Resistance</div>
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p>SR - Roll 1d20 + caster level to overcome</p>
+                  </TooltipContent>
+                </Tooltip>
                 <div className="text-lg font-bold">{creature.sr}</div>
               </div>
             )}
             {creature.dr?.length > 0 && (
               <div className="bg-gray-50 border border-gray-200 rounded-lg p-3">
-                <div className="text-xs font-medium text-gray-600 mb-1">Damage Reduction</div>
+                <Tooltip>
+                  <TooltipTrigger>
+                    <div className="text-xs font-medium text-gray-600 mb-1">Damage Reduction</div>
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p>DR - Reduces damage from attacks (amount/type needed to bypass)</p>
+                  </TooltipContent>
+                </Tooltip>
                 <div className="text-sm font-semibold">
                   {creature.dr.map(dr => `${dr.amount}/${dr.weakness}`).join(', ')}
                 </div>
@@ -332,6 +386,7 @@ export function StatBlock({ creature }: StatBlockProps) {
           </div>
         </div>
       )}
-    </div>
+      </div>
+    </TooltipProvider>
   );
 }

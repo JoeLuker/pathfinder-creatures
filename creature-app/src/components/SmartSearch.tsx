@@ -1,5 +1,13 @@
 import { useState, useEffect, useRef } from 'react';
 import { Input } from '@/components/ui/input';
+import {
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,
+} from '@/components/ui/command';
 import { Search, TrendingUp, Clock, Hash } from 'lucide-react';
 import type { CreatureEnriched } from '@/types/creature-complete';
 
@@ -93,66 +101,69 @@ export function SmartSearch({ value, onChange, creatures }: SmartSearchProps) {
         )}
       </div>
 
-      {/* Suggestions Dropdown */}
+      {/* Enhanced Command-based Suggestions */}
       {isFocused && (value.length === 0 || suggestions.length > 0) && (
-        <div className="absolute top-full mt-1 w-full bg-white rounded-lg shadow-lg border z-50 py-2">
-          {value.length === 0 ? (
-            <>
-              {recentSearches.length > 0 && (
-                <div className="px-3 pb-2">
-                  <div className="flex items-center gap-2 text-xs text-muted-foreground mb-2">
-                    <Clock className="h-3 w-3" />
-                    <span>Recent</span>
-                  </div>
-                  {recentSearches.map((search, idx) => (
-                    <button
-                      key={idx}
-                      className="block w-full text-left px-2 py-1 text-sm hover:bg-gray-50 rounded"
-                      onMouseDown={() => handleSearch(search)}
+        <div className="absolute top-full mt-1 w-full z-50">
+          <Command className="rounded-lg border shadow-lg bg-white">
+            <CommandList>
+              {value.length === 0 ? (
+                <>
+                  {recentSearches.length > 0 && (
+                    <CommandGroup heading="Recent">
+                      {recentSearches.map((search, idx) => (
+                        <CommandItem
+                          key={`recent-${idx}`}
+                          value={search}
+                          onSelect={() => handleSearch(search)}
+                          className="cursor-pointer"
+                        >
+                          <Clock className="mr-2 h-4 w-4" />
+                          {search}
+                        </CommandItem>
+                      ))}
+                    </CommandGroup>
+                  )}
+                  <CommandGroup heading="Popular searches">
+                    {popularSearches.map((search, idx) => (
+                      <CommandItem
+                        key={`popular-${idx}`}
+                        value={search}
+                        onSelect={() => handleSearch(search)}
+                        className="cursor-pointer"
+                      >
+                        <TrendingUp className="mr-2 h-4 w-4" />
+                        {search}
+                      </CommandItem>
+                    ))}
+                  </CommandGroup>
+                </>
+              ) : (
+                <CommandGroup heading="Suggestions">
+                  {suggestions.map((suggestion, idx) => (
+                    <CommandItem
+                      key={`suggestion-${idx}`}
+                      value={suggestion}
+                      onSelect={() => handleSearch(suggestion)}
+                      className="cursor-pointer"
                     >
-                      {search}
-                    </button>
+                      <Hash className="mr-2 h-4 w-4" />
+                      <span className="font-medium">{suggestion}</span>
+                    </CommandItem>
                   ))}
-                </div>
+                </CommandGroup>
               )}
-              <div className="px-3 pt-2 border-t">
-                <div className="flex items-center gap-2 text-xs text-muted-foreground mb-2">
-                  <TrendingUp className="h-3 w-3" />
-                  <span>Popular searches</span>
-                </div>
-                {popularSearches.map((search, idx) => (
-                  <button
-                    key={idx}
-                    className="block w-full text-left px-2 py-1 text-sm hover:bg-gray-50 rounded"
-                    onMouseDown={() => handleSearch(search)}
-                  >
-                    {search}
-                  </button>
-                ))}
-              </div>
-            </>
-          ) : (
-            <div className="px-3">
-              {suggestions.map((suggestion, idx) => (
-                <button
-                  key={idx}
-                  className="block w-full text-left px-2 py-1 text-sm hover:bg-gray-50 rounded"
-                  onMouseDown={() => handleSearch(suggestion)}
-                >
-                  <span className="font-medium">{suggestion}</span>
-                </button>
-              ))}
-            </div>
-          )}
+              <CommandEmpty>No results found.</CommandEmpty>
+            </CommandList>
 
-          <div className="px-3 pt-2 mt-2 border-t">
-            <div className="text-xs text-muted-foreground">
-              <span className="font-medium">Fuzzy search enabled!</span> Typos are OK - "dragn" finds "dragon", "lich" finds "lich" and "lichling"
+            <div className="px-3 py-2 border-t text-xs text-muted-foreground">
+              <div>
+                <span className="font-medium">Fuzzy search enabled!</span> Typos are OK - "dragn" finds "dragon", "lich" finds "lich" and "lichling"
+              </div>
+              <div className="mt-1">
+                <span className="font-medium">Examples:</span> "telepathy", "regeneration", "damage reduction", "CR 10", "flying demon"
+              </div>
             </div>
-            <div className="text-xs text-muted-foreground mt-1">
-              <span className="font-medium">Examples:</span> "telepathy", "regeneration", "damage reduction", "CR 10", "flying demon"
-            </div>
-          </div>
+          </Command>
         </div>
       )}
     </div>

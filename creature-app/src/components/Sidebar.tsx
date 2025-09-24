@@ -3,6 +3,7 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Slider } from '@/components/ui/slider';
+import { Combobox, type ComboboxOption } from '@/components/ui/combobox';
 import type { Filters, SortField, SortDirection } from '@/hooks/useCreatures';
 import { Search, SlidersHorizontal, ChevronDown, ChevronUp, Shield, Footprints, Sparkles, ShieldCheck } from 'lucide-react';
 
@@ -156,6 +157,15 @@ export function Sidebar({
     }
   };
 
+  // Convert types data to combobox options
+  const typeOptions: ComboboxOption[] = (uniqueTypesWithCounts || uniqueTypes.map(t => ({ value: t, count: 0 })))
+    .filter(({ value }) => value.toLowerCase().includes(typeSearch.toLowerCase()))
+    .map(({ value, count }) => ({
+      value,
+      label: value.charAt(0).toUpperCase() + value.slice(1),
+      count,
+    }));
+
   const activeFiltersCount =
     (filters.search ? 1 : 0) +
     filters.types.length +
@@ -204,14 +214,56 @@ export function Sidebar({
           )}
         </div>
 
-        {/* Type Filter */}
+        {/* Type Filter - Enhanced with Combobox */}
         <div className="border-t pt-3">
+          <div className="flex items-center justify-between mb-2">
+            <span className="text-sm font-medium">Type (Quick Select)</span>
+            {filters.types.length > 0 && (
+              <Badge
+                variant={filters.excludeMode?.types ? "destructive" : "secondary"}
+                className="text-xs h-5"
+              >
+                {filters.types.length} selected
+              </Badge>
+            )}
+          </div>
+          <div className="space-y-2">
+            <Combobox
+              options={typeOptions}
+              placeholder="Select a creature type..."
+              searchPlaceholder="Search creature types..."
+              emptyText="No creature types found."
+              onValueChange={(value) => {
+                if (value && !filters.types.includes(value)) {
+                  handleTypeToggle(value);
+                }
+              }}
+            />
+            {filters.types.length > 0 && (
+              <div className="flex flex-wrap gap-1">
+                {filters.types.map(type => (
+                  <Badge
+                    key={type}
+                    variant="secondary"
+                    className="text-xs cursor-pointer hover:bg-destructive hover:text-destructive-foreground"
+                    onClick={() => handleTypeToggle(type)}
+                  >
+                    {type.charAt(0).toUpperCase() + type.slice(1)} ×
+                  </Badge>
+                ))}
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* Type Filter - Original Implementation */}
+        <div className="border-t pt-3 mt-3">
           <div className="flex items-center justify-between mb-2">
             <button
               className="flex items-center gap-2 flex-1 text-left"
               onClick={() => toggleSection('type')}
             >
-              <span className="text-sm font-medium">Types</span>
+              <span className="text-sm font-medium">Types (Advanced)</span>
               {filters.types.length > 0 && (
                 <Badge
                   variant={filters.excludeMode?.types ? "destructive" : "secondary"}
