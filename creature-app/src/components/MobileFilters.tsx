@@ -11,6 +11,7 @@ interface MobileFiltersProps {
   filters: Filters;
   setFilters: React.Dispatch<React.SetStateAction<Filters>>;
   creatures: any[];
+  filteredCreatures?: any[];
   crDistribution?: {
     distribution: { cr: number; count: number }[];
     minCR: number;
@@ -50,6 +51,7 @@ export function MobileFilters(props: MobileFiltersProps) {
             filters={props.filters}
             setFilters={props.setFilters}
             creatures={props.creatures}
+            filteredCreatures={props.filteredCreatures}
             crDistribution={props.crDistribution}
           />
         </div>

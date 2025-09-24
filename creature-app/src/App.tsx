@@ -28,6 +28,7 @@ function App() {
     setCurrentPage,
     totalPages,
     allCreatures,
+    filteredCreatures,
     crDistribution
   } = useCreatures();
 
@@ -85,6 +86,7 @@ function App() {
                   filters={filters}
                   setFilters={setFilters}
                   creatures={allCreatures}
+                  filteredCreatures={filteredCreatures}
                   crDistribution={crDistribution}
                   sortField={sortField}
                   setSortField={setSortField}
@@ -156,6 +158,7 @@ function App() {
                 filters={filters}
                 setFilters={setFilters}
                 creatures={allCreatures}
+                filteredCreatures={filteredCreatures}
                 crDistribution={crDistribution}
               />
             </div>

@@ -12,7 +12,7 @@ import {
   getFiltersByCategory,
   type FilterConfig
 } from '@/config/filters';
-import { getActiveFilterCount } from '@/utils/filterUtils';
+import { getActiveFilterCount, getPredictiveCount } from '@/utils/filterUtils';
 import { SlidersHorizontal, ChevronDown, ChevronUp } from 'lucide-react';
 
 interface CountItem {
@@ -23,7 +23,8 @@ interface CountItem {
 interface SidebarProps {
   filters: Filters;
   setFilters: React.Dispatch<React.SetStateAction<Filters>>;
-  creatures: any[];
+  creatures: any[]; // All creatures for filter extraction
+  filteredCreatures?: any[]; // Currently filtered creatures for predictive counts
   crDistribution?: {
     distribution: { cr: number; count: number }[];
     minCR: number;
@@ -35,6 +36,7 @@ export function Sidebar({
   filters,
   setFilters,
   creatures,
+  filteredCreatures,
   crDistribution,
 }: SidebarProps) {
   const [expandedSections, setExpandedSections] = useState<Record<string, boolean>>(
@@ -86,30 +88,39 @@ export function Sidebar({
   };
 
 
-  // Extract unique values for multi-select filters from creatures
+  // Extract unique values with predictive counts - show how many creatures will remain
   const getUniqueValues = (filterConfig: FilterConfig): CountItem[] => {
-    const valuesMap = new Map<string, number>();
+    const valuesSet = new Set<string>();
 
+    // First collect all possible values from all creatures
     creatures.forEach(creature => {
       const value = filterConfig.getValue?.(creature);
       if (value != null) {
         if (Array.isArray(value)) {
           value.forEach(v => {
             if (v) {
-              const key = String(v).toLowerCase();
-              valuesMap.set(key, (valuesMap.get(key) || 0) + 1);
+              valuesSet.add(String(v).toLowerCase());
             }
           });
         } else {
-          const key = String(value).toLowerCase();
-          valuesMap.set(key, (valuesMap.get(key) || 0) + 1);
+          valuesSet.add(String(value).toLowerCase());
         }
       }
     });
 
-    return Array.from(valuesMap.entries())
-      .map(([value, count]) => ({ value, count }))
-      .sort((a, b) => b.count - a.count);
+    // Calculate predictive count for each value
+    return Array.from(valuesSet)
+      .map(value => ({
+        value,
+        count: getPredictiveCount(
+          filteredCreatures || creatures,
+          filters,
+          filterConfig,
+          value
+        )
+      }))
+      .filter(item => item.count > 0) // Only show values that will return results
+      .sort((a, b) => b.count - a.count); // Sort by count descending
   };
 
   const activeFiltersCount = getActiveFilterCount(filters);

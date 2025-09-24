@@ -288,6 +288,7 @@ export function useCreatures() {
   return {
     creatures: paginatedCreatures,
     allCreatures: creatures,
+    filteredCreatures: filteredCreatures, // Before pagination for predictive counts
     totalCreatures: creatures.length,
     filteredCount: sortedCreatures.length,
     loading,

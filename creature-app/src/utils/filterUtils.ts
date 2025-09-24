@@ -1,5 +1,6 @@
 import type { Filters } from '@/hooks/useCreatures';
 import { FILTER_DEFINITIONS, type FilterConfig } from '@/config/filters';
+import type { CreatureEnriched } from '@/types/creature-complete';
 
 // Create default empty filters based on the configuration
 export const createDefaultFilters = (): Filters => {
@@ -237,4 +238,43 @@ export const getFilterDisplayValue = (filters: Filters, filterKey: string): stri
     default:
       return '';
   }
+};
+
+// Calculate predictive count - how many creatures will remain if this filter value is selected
+export const getPredictiveCount = (
+  creatures: CreatureEnriched[],
+  currentFilters: Filters,
+  filterConfig: FilterConfig,
+  filterValue: string | boolean | { min: number | null; max: number | null }
+): number => {
+  // Create a simulated filter state with the new value applied
+  const simulatedFilters = { ...currentFilters };
+
+  switch (filterConfig.type) {
+    case 'multiSelect': {
+      const currentValues = (currentFilters[filterConfig.key as keyof Filters] as string[]) || [];
+      const newValues = currentValues.includes(filterValue as string)
+        ? currentValues // Already selected, no change
+        : [...currentValues, filterValue as string];
+      (simulatedFilters as any)[filterConfig.key] = newValues;
+      break;
+    }
+    case 'boolean': {
+      (simulatedFilters as any)[filterConfig.key] = filterValue as boolean;
+      break;
+    }
+    case 'range': {
+      const { min, max } = filterValue as { min: number | null; max: number | null };
+      (simulatedFilters as any)[`${filterConfig.key}Min`] = min;
+      (simulatedFilters as any)[`${filterConfig.key}Max`] = max;
+      break;
+    }
+  }
+
+  // Apply all filters to get the count
+  return creatures.filter(creature => {
+    return FILTER_DEFINITIONS.every(config => {
+      return applyFilter(creature, config, simulatedFilters, simulatedFilters.excludeMode?.[config.key as keyof typeof simulatedFilters.excludeMode]);
+    });
+  }).length;
 };
