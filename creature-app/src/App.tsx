@@ -188,10 +188,6 @@ function App() {
                 uniqueSpecialAbilitiesWithCounts={uniqueSpecialAbilitiesWithCounts}
                 uniqueDefensiveAbilitiesWithCounts={uniqueDefensiveAbilitiesWithCounts}
                 crDistribution={crDistribution}
-                sortField={sortField}
-                setSortField={setSortField}
-                sortDirection={sortDirection}
-                setSortDirection={setSortDirection}
               />
             </div>
           </ScrollArea>
@@ -219,6 +215,26 @@ function App() {
                 <span className="text-sm font-medium">
                   {filteredCount} of {totalCreatures} creatures
                 </span>
+                <div className="flex items-center gap-2">
+                  <span className="text-xs text-muted-foreground">Sort by:</span>
+                  <select
+                    value={sortField}
+                    onChange={(e) => setSortField(e.target.value as any)}
+                    className="text-xs px-2 py-1 border rounded"
+                  >
+                    <option value="name">Name</option>
+                    <option value="cr">CR</option>
+                    <option value="type">Type</option>
+                    <option value="size">Size</option>
+                  </select>
+                  <button
+                    onClick={() => setSortDirection(sortDirection === 'asc' ? 'desc' : 'asc')}
+                    className="text-xs px-2 py-1 border rounded hover:bg-gray-50"
+                    title={`Sort ${sortDirection === 'asc' ? 'Descending' : 'Ascending'}`}
+                  >
+                    {sortDirection === 'asc' ? '↑' : '↓'}
+                  </button>
+                </div>
               </div>
               <ActiveFilters filters={filters} setFilters={setFilters} />
             </div>
@@ -235,15 +251,125 @@ function App() {
                     size="sm"
                     onClick={() => setFilters({
                       search: '',
+
+                      // Basic creature info
                       types: [],
                       sizes: [],
-                      crMin: null,
-                      crMax: null,
                       alignments: [],
                       subtypes: [],
+
+                      // Challenge and Experience
+                      crMin: null,
+                      crMax: null,
+                      mrMin: null,
+                      mrMax: null,
+                      xpMin: null,
+                      xpMax: null,
+
+                      // Combat Stats - AC
+                      acMin: null,
+                      acMax: null,
+                      touchAcMin: null,
+                      touchAcMax: null,
+                      flatFootedAcMin: null,
+                      flatFootedAcMax: null,
+
+                      // Hit Points
+                      hpMin: null,
+                      hpMax: null,
+
+                      // Initiative
+                      initiativeMin: null,
+                      initiativeMax: null,
+
+                      // Saving Throws
+                      fortMin: null,
+                      fortMax: null,
+                      refMin: null,
+                      refMax: null,
+                      willMin: null,
+                      willMax: null,
+
+                      // Ability Scores
+                      strMin: null,
+                      strMax: null,
+                      dexMin: null,
+                      dexMax: null,
+                      conMin: null,
+                      conMax: null,
+                      intMin: null,
+                      intMax: null,
+                      wisMin: null,
+                      wisMax: null,
+                      chaMin: null,
+                      chaMax: null,
+
+                      // Combat Values
+                      babMin: null,
+                      babMax: null,
+                      cmbMin: null,
+                      cmbMax: null,
+                      cmdMin: null,
+                      cmdMax: null,
+
+                      // Space and Reach
+                      spaceMin: null,
+                      spaceMax: null,
+                      reachMin: null,
+                      reachMax: null,
+
+                      // Speeds
+                      baseSpeedMin: null,
+                      baseSpeedMax: null,
+                      burrowSpeedMin: null,
+                      burrowSpeedMax: null,
+                      climbSpeedMin: null,
+                      climbSpeedMax: null,
+                      flySpeedMin: null,
+                      flySpeedMax: null,
+                      swimSpeedMin: null,
+                      swimSpeedMax: null,
+
+                      // Movement Types
                       movementTypes: [],
+
+                      // Spell Resistance
+                      srMin: null,
+                      srMax: null,
+
+                      // Multi-select arrays
                       specialAbilities: [],
-                      defensiveAbilities: []
+                      defensiveAbilities: [],
+                      languages: [],
+                      environments: [],
+                      senseTypes: [],
+
+                      // Damage Reduction
+                      drTypes: [],
+                      drAmountMin: null,
+                      drAmountMax: null,
+
+                      // Resistances
+                      resistanceTypes: [],
+                      resistanceAmountMin: null,
+                      resistanceAmountMax: null,
+
+                      // Immunities and Weaknesses
+                      immunities: [],
+                      weaknesses: [],
+
+                      // Attack types
+                      hasMeleeAttacks: null,
+                      hasRangedAttacks: null,
+                      hasSpecialAttacks: null,
+
+                      // Special flags
+                      hasSpellLikeAbilities: null,
+                      hasSpells: null,
+                      hasPsychicMagic: null,
+                      hasRegeneration: null,
+                      hasFastHealing: null,
+                      hasAuras: null
                     })}
                   >
                     Clear filters

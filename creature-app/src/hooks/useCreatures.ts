@@ -4,15 +4,126 @@ import type { CreatureEnriched } from '@/types/creature-complete';
 
 export interface Filters {
   search: string;
-  types: string[];  // Changed to array for multi-select
-  sizes: string[];  // Changed to array for multi-select
+
+  // Basic creature info
+  types: string[];
+  sizes: string[];
+  alignments: string[];
+  subtypes: string[];
+
+  // Challenge and Experience
   crMin: number | null;
   crMax: number | null;
-  alignments: string[];  // Changed to array for multi-select
-  subtypes: string[];
+  mrMin: number | null;  // Mythic Rank
+  mrMax: number | null;
+  xpMin: number | null;
+  xpMax: number | null;
+
+  // Combat Stats - AC
+  acMin: number | null;
+  acMax: number | null;
+  touchAcMin: number | null;
+  touchAcMax: number | null;
+  flatFootedAcMin: number | null;
+  flatFootedAcMax: number | null;
+
+  // Hit Points
+  hpMin: number | null;
+  hpMax: number | null;
+
+  // Initiative
+  initiativeMin: number | null;
+  initiativeMax: number | null;
+
+  // Saving Throws
+  fortMin: number | null;
+  fortMax: number | null;
+  refMin: number | null;
+  refMax: number | null;
+  willMin: number | null;
+  willMax: number | null;
+
+  // Ability Scores
+  strMin: number | null;
+  strMax: number | null;
+  dexMin: number | null;
+  dexMax: number | null;
+  conMin: number | null;
+  conMax: number | null;
+  intMin: number | null;
+  intMax: number | null;
+  wisMin: number | null;
+  wisMax: number | null;
+  chaMin: number | null;
+  chaMax: number | null;
+
+  // Combat Values
+  babMin: number | null;
+  babMax: number | null;
+  cmbMin: number | null;
+  cmbMax: number | null;
+  cmdMin: number | null;
+  cmdMax: number | null;
+
+  // Space and Reach
+  spaceMin: number | null;
+  spaceMax: number | null;
+  reachMin: number | null;
+  reachMax: number | null;
+
+  // Speeds
+  baseSpeedMin: number | null;
+  baseSpeedMax: number | null;
+  burrowSpeedMin: number | null;
+  burrowSpeedMax: number | null;
+  climbSpeedMin: number | null;
+  climbSpeedMax: number | null;
+  flySpeedMin: number | null;
+  flySpeedMax: number | null;
+  swimSpeedMin: number | null;
+  swimSpeedMax: number | null;
+
+  // Movement Types (has movement type)
   movementTypes: string[];
+
+  // Spell Resistance
+  srMin: number | null;
+  srMax: number | null;
+
+  // Multi-select arrays
   specialAbilities: string[];
   defensiveAbilities: string[];
+  languages: string[];
+  environments: string[];
+  senseTypes: string[];
+
+  // Damage Reduction
+  drTypes: string[];  // e.g., ["magic", "silver", "cold iron"]
+  drAmountMin: number | null;
+  drAmountMax: number | null;
+
+  // Resistances
+  resistanceTypes: string[];  // e.g., ["fire", "cold", "acid"]
+  resistanceAmountMin: number | null;
+  resistanceAmountMax: number | null;
+
+  // Immunities and Weaknesses
+  immunities: string[];
+  weaknesses: string[];
+
+  // Attack types
+  hasMeleeAttacks: boolean | null;
+  hasRangedAttacks: boolean | null;
+  hasSpecialAttacks: boolean | null;
+
+  // Special flags
+  hasSpellLikeAbilities: boolean | null;
+  hasSpells: boolean | null;
+  hasPsychicMagic: boolean | null;
+  hasRegeneration: boolean | null;
+  hasFastHealing: boolean | null;
+  hasAuras: boolean | null;
+
   excludeMode?: {
     types?: boolean;
     sizes?: boolean;
@@ -21,6 +132,13 @@ export interface Filters {
     movementTypes?: boolean;
     specialAbilities?: boolean;
     defensiveAbilities?: boolean;
+    languages?: boolean;
+    environments?: boolean;
+    senseTypes?: boolean;
+    drTypes?: boolean;
+    resistanceTypes?: boolean;
+    immunities?: boolean;
+    weaknesses?: boolean;
   };
 }
 
@@ -35,15 +153,125 @@ export function useCreatures() {
   const [error, setError] = useState<string | null>(null);
   const [filters, setFilters] = useState<Filters>({
     search: '',
+
+    // Basic creature info
     types: [],
     sizes: [],
-    crMin: null,
-    crMax: null,
     alignments: [],
     subtypes: [],
+
+    // Challenge and Experience
+    crMin: null,
+    crMax: null,
+    mrMin: null,
+    mrMax: null,
+    xpMin: null,
+    xpMax: null,
+
+    // Combat Stats - AC
+    acMin: null,
+    acMax: null,
+    touchAcMin: null,
+    touchAcMax: null,
+    flatFootedAcMin: null,
+    flatFootedAcMax: null,
+
+    // Hit Points
+    hpMin: null,
+    hpMax: null,
+
+    // Initiative
+    initiativeMin: null,
+    initiativeMax: null,
+
+    // Saving Throws
+    fortMin: null,
+    fortMax: null,
+    refMin: null,
+    refMax: null,
+    willMin: null,
+    willMax: null,
+
+    // Ability Scores
+    strMin: null,
+    strMax: null,
+    dexMin: null,
+    dexMax: null,
+    conMin: null,
+    conMax: null,
+    intMin: null,
+    intMax: null,
+    wisMin: null,
+    wisMax: null,
+    chaMin: null,
+    chaMax: null,
+
+    // Combat Values
+    babMin: null,
+    babMax: null,
+    cmbMin: null,
+    cmbMax: null,
+    cmdMin: null,
+    cmdMax: null,
+
+    // Space and Reach
+    spaceMin: null,
+    spaceMax: null,
+    reachMin: null,
+    reachMax: null,
+
+    // Speeds
+    baseSpeedMin: null,
+    baseSpeedMax: null,
+    burrowSpeedMin: null,
+    burrowSpeedMax: null,
+    climbSpeedMin: null,
+    climbSpeedMax: null,
+    flySpeedMin: null,
+    flySpeedMax: null,
+    swimSpeedMin: null,
+    swimSpeedMax: null,
+
+    // Movement Types
     movementTypes: [],
+
+    // Spell Resistance
+    srMin: null,
+    srMax: null,
+
+    // Multi-select arrays
     specialAbilities: [],
-    defensiveAbilities: []
+    defensiveAbilities: [],
+    languages: [],
+    environments: [],
+    senseTypes: [],
+
+    // Damage Reduction
+    drTypes: [],
+    drAmountMin: null,
+    drAmountMax: null,
+
+    // Resistances
+    resistanceTypes: [],
+    resistanceAmountMin: null,
+    resistanceAmountMax: null,
+
+    // Immunities and Weaknesses
+    immunities: [],
+    weaknesses: [],
+
+    // Attack types
+    hasMeleeAttacks: null,
+    hasRangedAttacks: null,
+    hasSpecialAttacks: null,
+
+    // Special flags
+    hasSpellLikeAbilities: null,
+    hasSpells: null,
+    hasPsychicMagic: null,
+    hasRegeneration: null,
+    hasFastHealing: null,
+    hasAuras: null
   });
   const [sortField, setSortField] = useState<SortField>('name');
   const [sortDirection, setSortDirection] = useState<SortDirection>('asc');
@@ -99,91 +327,228 @@ export function useCreatures() {
       searchResults = results.map(result => result.item);
     }
 
-    // Then apply other filters
+    // Then apply all filters
     return searchResults.filter(creature => {
-      // Types filter (multi-select with exclude mode)
-      if (filters.types.length > 0 && creature.type) {
-        const matches = filters.types.includes(creature.type);
-        if (filters.excludeMode?.types) {
-          if (matches) return false; // Exclude if it matches any selected type
-        } else {
-          if (!matches) return false; // Include only if it matches a selected type
-        }
-      }
+      // Helper function for range filtering
+      const inRange = (value: number | null | undefined, min: number | null, max: number | null): boolean => {
+        if (min !== null && (value === null || value === undefined || value < min)) return false;
+        if (max !== null && (value === null || value === undefined || value > max)) return false;
+        return true;
+      };
 
-      // Sizes filter (multi-select with exclude mode)
-      if (filters.sizes.length > 0 && creature.size) {
-        const matches = filters.sizes.includes(creature.size);
-        if (filters.excludeMode?.sizes) {
-          if (matches) return false;
-        } else {
-          if (!matches) return false;
-        }
-      }
+      // Helper function for multi-select filtering with exclude mode
+      const multiSelectFilter = (
+        values: string[],
+        creatureValues: string | string[] | null | undefined,
+        excludeMode: boolean | undefined
+      ): boolean => {
+        if (values.length === 0) return true;
+        if (!creatureValues) return false;
 
-      // Use parsed CR values for more accurate filtering
+        const creatureValuesArray = Array.isArray(creatureValues) ? creatureValues : [creatureValues];
+        const matches = values.some(filter =>
+          creatureValuesArray.some(val => val.toLowerCase().includes(filter.toLowerCase()))
+        );
+
+        return excludeMode ? !matches : matches;
+      };
+
+      // Basic creature info filters
+      if (!multiSelectFilter(filters.types, creature.type, filters.excludeMode?.types)) return false;
+      if (!multiSelectFilter(filters.sizes, creature.size, filters.excludeMode?.sizes)) return false;
+      if (!multiSelectFilter(filters.alignments, creature.alignment, filters.excludeMode?.alignments)) return false;
+      if (!multiSelectFilter(filters.subtypes, creature.subtypes_normalized, filters.excludeMode?.subtypes)) return false;
+
+      // Challenge and Experience filters
       const crValue = creature.cr_parsed?.value ?? creature.cr;
-      if (filters.crMin !== null && (crValue === null || crValue < filters.crMin)) {
-        return false;
-      }
-      if (filters.crMax !== null && (crValue === null || crValue > filters.crMax)) {
-        return false;
-      }
+      if (!inRange(crValue, filters.crMin, filters.crMax)) return false;
 
-      // Alignments filter (multi-select with exclude mode)
-      if (filters.alignments.length > 0 && creature.alignment) {
-        const matches = filters.alignments.includes(creature.alignment);
-        if (filters.excludeMode?.alignments) {
-          if (matches) return false;
-        } else {
-          if (!matches) return false;
-        }
-      }
+      const mrValue = creature.mr_parsed?.value ?? creature.mr;
+      if (!inRange(mrValue, filters.mrMin, filters.mrMax)) return false;
 
-      // Filter by subtypes (normalized array)
-      if (filters.subtypes.length > 0) {
-        const creatureSubtypes = creature.subtypes_normalized || [];
-        if (!filters.subtypes.some(subtype => creatureSubtypes.includes(subtype))) {
-          return false;
-        }
-      }
+      if (!inRange(creature.xp, filters.xpMin, filters.xpMax)) return false;
 
-      // Filter by movement types (from parsed speeds)
+      // AC filters
+      if (!inRange(creature.ac, filters.acMin, filters.acMax)) return false;
+      if (!inRange(creature.touch_ac, filters.touchAcMin, filters.touchAcMax)) return false;
+      if (!inRange(creature.flat_ac, filters.flatFootedAcMin, filters.flatFootedAcMax)) return false;
+
+      // HP filters
+      if (!inRange(creature.hp?.total, filters.hpMin, filters.hpMax)) return false;
+
+      // Initiative filters
+      const initiativeValue = creature.initiative_parsed?.value ??
+        (Array.isArray(creature.initiative) ? creature.initiative[0] : creature.initiative);
+      if (!inRange(initiativeValue, filters.initiativeMin, filters.initiativeMax)) return false;
+
+      // Saving Throws filters
+      if (!inRange(creature.fort, filters.fortMin, filters.fortMax)) return false;
+      if (!inRange(creature.ref, filters.refMin, filters.refMax)) return false;
+      if (!inRange(creature.will, filters.willMin, filters.willMax)) return false;
+
+      // Ability Score filters
+      if (!inRange(creature.ability_scores.STR, filters.strMin, filters.strMax)) return false;
+      if (!inRange(creature.ability_scores.DEX, filters.dexMin, filters.dexMax)) return false;
+      if (!inRange(creature.ability_scores.CON, filters.conMin, filters.conMax)) return false;
+      if (!inRange(creature.ability_scores.INT, filters.intMin, filters.intMax)) return false;
+      if (!inRange(creature.ability_scores.WIS, filters.wisMin, filters.wisMax)) return false;
+      if (!inRange(creature.ability_scores.CHA, filters.chaMin, filters.chaMax)) return false;
+
+      // Combat Values filters
+      if (!inRange(creature.bab, filters.babMin, filters.babMax)) return false;
+      if (!inRange(creature.cmb, filters.cmbMin, filters.cmbMax)) return false;
+      if (!inRange(creature.cmd, filters.cmdMin, filters.cmdMax)) return false;
+
+      // Space and Reach filters
+      if (!inRange(creature.space, filters.spaceMin, filters.spaceMax)) return false;
+      if (!inRange(creature.reach, filters.reachMin, filters.reachMax)) return false;
+
+      // Speed filters
+      if (!inRange(creature.speeds?.base, filters.baseSpeedMin, filters.baseSpeedMax)) return false;
+      if (!inRange(creature.speeds?.burrow, filters.burrowSpeedMin, filters.burrowSpeedMax)) return false;
+      if (!inRange(creature.speeds?.climb, filters.climbSpeedMin, filters.climbSpeedMax)) return false;
+      if (!inRange(creature.speeds?.fly, filters.flySpeedMin, filters.flySpeedMax)) return false;
+      if (!inRange(creature.speeds?.swim, filters.swimSpeedMin, filters.swimSpeedMax)) return false;
+
+      // Movement Types filter (has movement type)
       if (filters.movementTypes.length > 0) {
         const parsedSpeeds = creature.speeds?._parsed;
-        if (!parsedSpeeds) return false;
-
         const hasMovement = filters.movementTypes.some(moveType => {
           switch(moveType) {
-            case 'burrow': return parsedSpeeds.burrow !== null;
-            case 'climb': return parsedSpeeds.climb !== null;
-            case 'fly': return parsedSpeeds.fly !== null;
-            case 'swim': return parsedSpeeds.swim !== null;
+            case 'burrow': return parsedSpeeds?.burrow !== null || creature.speeds?.burrow !== null;
+            case 'climb': return parsedSpeeds?.climb !== null || creature.speeds?.climb !== null;
+            case 'fly': return parsedSpeeds?.fly !== null || creature.speeds?.fly !== null;
+            case 'swim': return parsedSpeeds?.swim !== null || creature.speeds?.swim !== null;
             default: return false;
           }
         });
         if (!hasMovement) return false;
       }
 
-      // Filter by special abilities (from parsed array)
-      if (filters.specialAbilities.length > 0) {
-        const parsedAbilities = creature.special_abilities?._parsed || [];
-        const abilityNames = parsedAbilities.map(a => a.name.toLowerCase());
-        if (!filters.specialAbilities.some(ability =>
-          abilityNames.some(name => name.includes(ability.toLowerCase()))
-        )) {
-          return false;
+      // Spell Resistance filter
+      const srValue = typeof creature.sr === 'number' ? creature.sr : (creature.sr_parsed?.value ?? null);
+      if (!inRange(srValue, filters.srMin, filters.srMax)) return false;
+
+      // Special abilities filters
+      if (!multiSelectFilter(filters.specialAbilities,
+        creature.special_abilities?._parsed?.map(a => a.name) || [],
+        filters.excludeMode?.specialAbilities)) return false;
+
+      if (!multiSelectFilter(filters.defensiveAbilities,
+        creature.defensive_abilities_normalized,
+        filters.excludeMode?.defensiveAbilities)) return false;
+
+      // Language filters
+      if (!multiSelectFilter(filters.languages,
+        creature.languages_normalized,
+        filters.excludeMode?.languages)) return false;
+
+      // Environment filters
+      if (!multiSelectFilter(filters.environments,
+        creature.environment,
+        filters.excludeMode?.environments)) return false;
+
+      // Senses filters
+      if (filters.senseTypes.length > 0) {
+        const senseNames = creature.senses ? Object.keys(creature.senses) : [];
+        if (!multiSelectFilter(filters.senseTypes, senseNames, filters.excludeMode?.senseTypes)) return false;
+      }
+
+      // Damage Reduction filters
+      if (filters.drTypes.length > 0 || filters.drAmountMin !== null || filters.drAmountMax !== null) {
+        const drEntries = creature.dr || [];
+        if (drEntries.length === 0) {
+          if (filters.drTypes.length > 0) return false;
+        } else {
+          if (filters.drTypes.length > 0) {
+            const matches = drEntries.some(dr =>
+              filters.drTypes.some(filterType =>
+                dr.types?.some(type => type.toLowerCase().includes(filterType.toLowerCase()))
+              )
+            );
+            if (filters.excludeMode?.drTypes ? matches : !matches) return false;
+          }
+
+          if (filters.drAmountMin !== null || filters.drAmountMax !== null) {
+            const amounts = drEntries.map(dr => dr.amount).filter(Boolean);
+            if (amounts.length === 0) return false;
+
+            const maxAmount = Math.max(...amounts);
+            if (!inRange(maxAmount, filters.drAmountMin, filters.drAmountMax)) return false;
+          }
         }
       }
 
-      // Filter by defensive abilities (normalized array)
-      if (filters.defensiveAbilities.length > 0) {
-        const defAbilities = creature.defensive_abilities_normalized || [];
-        if (!filters.defensiveAbilities.some(ability =>
-          defAbilities.some(def => def.toLowerCase().includes(ability.toLowerCase()))
-        )) {
-          return false;
+      // Resistances filters
+      if (filters.resistanceTypes.length > 0 || filters.resistanceAmountMin !== null || filters.resistanceAmountMax !== null) {
+        const resistances = creature.resistances;
+        if (!resistances || Object.keys(resistances).length === 0) {
+          if (filters.resistanceTypes.length > 0) return false;
+        } else {
+          if (filters.resistanceTypes.length > 0) {
+            const resistanceNames = Object.keys(resistances);
+            if (!multiSelectFilter(filters.resistanceTypes, resistanceNames, filters.excludeMode?.resistanceTypes)) return false;
+          }
+
+          if (filters.resistanceAmountMin !== null || filters.resistanceAmountMax !== null) {
+            const amounts = Object.values(resistances).map(val => typeof val === 'number' ? val : null).filter(Boolean) as number[];
+            if (amounts.length === 0) return false;
+
+            const maxAmount = Math.max(...amounts);
+            if (!inRange(maxAmount, filters.resistanceAmountMin, filters.resistanceAmountMax)) return false;
+          }
         }
+      }
+
+      // Immunities and Weaknesses filters
+      if (!multiSelectFilter(filters.immunities, creature.immunities_normalized, filters.excludeMode?.immunities)) return false;
+      if (!multiSelectFilter(filters.weaknesses, creature.weaknesses_normalized, filters.excludeMode?.weaknesses)) return false;
+
+      // Attack type filters
+      if (filters.hasMeleeAttacks !== null) {
+        const hasMelee = (creature.attacks?.melee?.length ?? 0) > 0;
+        if (filters.hasMeleeAttacks !== hasMelee) return false;
+      }
+
+      if (filters.hasRangedAttacks !== null) {
+        const hasRanged = (creature.attacks?.ranged?.length ?? 0) > 0;
+        if (filters.hasRangedAttacks !== hasRanged) return false;
+      }
+
+      if (filters.hasSpecialAttacks !== null) {
+        const hasSpecial = (creature.attacks?.special?.length ?? 0) > 0;
+        if (filters.hasSpecialAttacks !== hasSpecial) return false;
+      }
+
+      // Special flags filters
+      if (filters.hasSpellLikeAbilities !== null) {
+        const hasSpellLike = !!(creature.spell_like_abilities?.entries?.length);
+        if (filters.hasSpellLikeAbilities !== hasSpellLike) return false;
+      }
+
+      if (filters.hasSpells !== null) {
+        const hasSpells = !!(creature.spells?.entries?.length);
+        if (filters.hasSpells !== hasSpells) return false;
+      }
+
+      if (filters.hasPsychicMagic !== null) {
+        const hasPsychic = !!(creature.psychic_magic?.entries?.length);
+        if (filters.hasPsychicMagic !== hasPsychic) return false;
+      }
+
+      if (filters.hasRegeneration !== null) {
+        const hasRegen = !!(creature.hp?.regeneration);
+        if (filters.hasRegeneration !== hasRegen) return false;
+      }
+
+      if (filters.hasFastHealing !== null) {
+        const hasFastHeal = !!(creature.hp?.fast_healing);
+        if (filters.hasFastHealing !== hasFastHeal) return false;
+      }
+
+      if (filters.hasAuras !== null) {
+        const hasAuras = (creature.auras_normalized?.length ?? 0) > 0;
+        if (filters.hasAuras !== hasAuras) return false;
       }
 
       return true;

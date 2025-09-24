@@ -4,7 +4,8 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Slider } from '@/components/ui/slider';
 import { Combobox, type ComboboxOption } from '@/components/ui/combobox';
-import type { Filters, SortField, SortDirection } from '@/hooks/useCreatures';
+import { RangeSlider } from '@/components/ui/range-slider';
+import type { Filters } from '@/hooks/useCreatures';
 import { Search, SlidersHorizontal, ChevronDown, ChevronUp, Shield, Footprints, Sparkles, ShieldCheck } from 'lucide-react';
 
 interface CountItem {
@@ -34,10 +35,6 @@ interface SidebarProps {
     minCR: number;
     maxCR: number;
   };
-  sortField: SortField;
-  setSortField: (field: SortField) => void;
-  sortDirection: SortDirection;
-  setSortDirection: (direction: SortDirection) => void;
 }
 
 export function Sidebar({
@@ -58,21 +55,17 @@ export function Sidebar({
   uniqueSpecialAbilitiesWithCounts,
   uniqueDefensiveAbilitiesWithCounts,
   crDistribution,
-  sortField,
-  setSortField,
-  sortDirection,
-  setSortDirection,
 }: SidebarProps) {
   const [expandedSections, setExpandedSections] = useState({
     type: true,
     size: false,
     alignment: false,
     cr: false,
+    ac: false,
     subtypes: false,
     movement: false,
     abilities: false,
     defensive: false,
-    sort: false,
   });
 
   // Search states for different filter sections
@@ -148,14 +141,6 @@ export function Sidebar({
     }));
   };
 
-  const handleSort = (field: SortField) => {
-    if (sortField === field) {
-      setSortDirection(sortDirection === 'asc' ? 'desc' : 'asc');
-    } else {
-      setSortField(field);
-      setSortDirection('asc');
-    }
-  };
 
   // Convert types data to combobox options
   const typeOptions: ComboboxOption[] = (uniqueTypesWithCounts || uniqueTypes.map(t => ({ value: t, count: 0 })))
@@ -618,6 +603,55 @@ export function Sidebar({
           )}
         </div>
 
+        {/* Armor Class Filters */}
+        <div className="border-t pt-3 mt-3">
+          <button
+            className="flex items-center justify-between w-full text-left mb-2"
+            onClick={() => toggleSection('ac')}
+          >
+            <div className="flex items-center gap-2">
+              <Shield className="h-4 w-4" />
+              <span className="text-sm font-medium">Armor Class</span>
+            </div>
+            {expandedSections.ac ? (
+              <ChevronUp className="h-4 w-4" />
+            ) : (
+              <ChevronDown className="h-4 w-4" />
+            )}
+          </button>
+          {expandedSections.ac && (
+            <div className="space-y-4">
+              <RangeSlider
+                label="Total AC"
+                min={1}
+                max={50}
+                value={[filters.acMin, filters.acMax]}
+                onChange={([min, max]) =>
+                  setFilters(prev => ({ ...prev, acMin: min, acMax: max }))
+                }
+              />
+              <RangeSlider
+                label="Touch AC"
+                min={1}
+                max={30}
+                value={[filters.touchAcMin, filters.touchAcMax]}
+                onChange={([min, max]) =>
+                  setFilters(prev => ({ ...prev, touchAcMin: min, touchAcMax: max }))
+                }
+              />
+              <RangeSlider
+                label="Flat-Footed AC"
+                min={1}
+                max={50}
+                value={[filters.flatFootedAcMin, filters.flatFootedAcMax]}
+                onChange={([min, max]) =>
+                  setFilters(prev => ({ ...prev, flatFootedAcMin: min, flatFootedAcMax: max }))
+                }
+              />
+            </div>
+          )}
+        </div>
+
         {/* Movement Types Filter */}
         <div className="border-t pt-3 mt-3">
           <button
@@ -1054,47 +1088,6 @@ export function Sidebar({
         </div>
       </div>
 
-      {/* Sort Options */}
-      <div className="bg-white rounded-lg shadow-sm border p-4">
-        <button
-          className="flex items-center justify-between w-full text-left mb-2"
-          onClick={() => toggleSection('sort')}
-        >
-          <span className="font-medium text-sm">Sort By</span>
-          {expandedSections.sort ? (
-            <ChevronUp className="h-4 w-4" />
-          ) : (
-            <ChevronDown className="h-4 w-4" />
-          )}
-        </button>
-        {expandedSections.sort && (
-          <div className="space-y-1">
-            {[
-              { field: 'name' as SortField, label: 'Name' },
-              { field: 'cr' as SortField, label: 'Challenge Rating' },
-              { field: 'type' as SortField, label: 'Type' },
-              { field: 'size' as SortField, label: 'Size' },
-            ].map(({ field, label }) => (
-              <button
-                key={field}
-                onClick={() => handleSort(field)}
-                className={`w-full text-left px-2 py-1 rounded text-sm hover:bg-gray-50 ${
-                  sortField === field ? 'bg-secondary text-secondary-foreground' : ''
-                }`}
-              >
-                <div className="flex items-center justify-between">
-                  <span>{label}</span>
-                  {sortField === field && (
-                    <span className="text-xs">
-                      {sortDirection === 'asc' ? '↑' : '↓'}
-                    </span>
-                  )}
-                </div>
-              </button>
-            ))}
-          </div>
-        )}
-      </div>
     </div>
   );
 }
