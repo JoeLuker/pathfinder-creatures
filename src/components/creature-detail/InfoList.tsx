@@ -9,7 +9,7 @@ export function InfoList({ label, items }: InfoListProps) { // noqa
   return (
     <div className="grid grid-cols-[120px_1fr] gap-3 items-start">
       <span className="text-sm font-medium text-text-secondary">{label}</span>
-      <span className="text-sm text-text-primary">{items.join(', ')}</span>
+      <span className="text-sm text-text-primary font-sans">{items.join(', ')}</span>
     </div>
   );
 }

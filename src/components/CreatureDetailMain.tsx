@@ -29,7 +29,7 @@ export function CreatureDetailMain({ creature, onBack }: CreatureDetailMainProps
   };
 
   return (
-    <div className="flex-1 flex flex-col bg-background">
+    <div className="flex-1 flex flex-col bg-background font-sans">
       {/* Enhanced Header */}
       <div className="bg-surface-secondary border-b border-border">
         <div className="max-w-4xl mx-auto px-6 py-4">
@@ -47,7 +47,7 @@ export function CreatureDetailMain({ creature, onBack }: CreatureDetailMainProps
                 <h1 className="text-2xl font-bold text-text-primary mb-2">
                   {creature.name}
                 </h1>
-                <div className="flex items-center gap-4 text-sm">
+                <div className="flex items-center gap-4 text-sm mb-2">
                   <div className="flex items-center gap-2">
                     <Badge className="bg-interactive-primary text-text-inverse border-0">
                       CR {crDisplay}
@@ -63,6 +63,11 @@ export function CreatureDetailMain({ creature, onBack }: CreatureDetailMainProps
                     )}
                   </div>
                 </div>
+                {creature.desc_short && (
+                  <p className="text-sm text-text-secondary leading-relaxed max-w-3xl">
+                    {creature.desc_short}
+                  </p>
+                )}
               </div>
             </div>
             <Button
@@ -440,7 +445,7 @@ export function CreatureDetailMain({ creature, onBack }: CreatureDetailMainProps
             )}
 
             {/* Description */}
-            {(creature.desc_short || creature.desc_long) && (
+            {creature.desc_long && (
               <Card className="p-6 bg-surface-secondary/30 border-border/50">
                 <div className="flex items-center gap-2 mb-4">
                   <BookOpen className="h-4 w-4 text-interactive-primary" />
@@ -448,17 +453,10 @@ export function CreatureDetailMain({ creature, onBack }: CreatureDetailMainProps
                     Description
                   </h3>
                 </div>
-                <div className="prose prose-sm max-w-none space-y-3">
-                  {creature.desc_short && (
-                    <p className="font-medium text-text-primary leading-relaxed">
-                      {creature.desc_short}
-                    </p>
-                  )}
-                  {creature.desc_long && (
-                    <p className="text-text-secondary leading-relaxed">
-                      {creature.desc_long}
-                    </p>
-                  )}
+                <div className="prose prose-sm max-w-none">
+                  <p className="text-text-secondary leading-relaxed">
+                    {creature.desc_long}
+                  </p>
                 </div>
               </Card>
             )}
