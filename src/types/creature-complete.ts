@@ -662,13 +662,4 @@ export const CreatureEnrichedWithParsedSchema = CreatureEnrichedSchema.extend({
 });
 
 // Type exports
-export type CreatureComplete = z.infer<typeof CreatureCompleteSchema>;
 export type CreatureEnriched = z.infer<typeof CreatureEnrichedWithParsedSchema>;
-export type CreatureType = z.infer<typeof CreatureTypeEnum>;
-export type Size = z.infer<typeof SizeEnum>;
-export type Alignment = z.infer<typeof AlignmentEnum>;
-export type Subtype = z.infer<typeof SubtypeEnum>;
-
-// Partial schema for filtering/searching (all fields optional)
-export const CreatureFilterSchema = CreatureEnrichedSchema.partial();
-export type CreatureFilter = z.infer<typeof CreatureFilterSchema>;
