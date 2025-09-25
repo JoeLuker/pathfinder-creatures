@@ -214,7 +214,7 @@ export function CreatureDetailMain({ creature, onBack }: CreatureDetailMainProps
                       {creature.HD.class && Array.isArray(creature.HD.class) && creature.HD.class.length > 0 && (
                         <span>
                           {creature.HD.class.map((hd: any, idx: number) => (
-                            <span key={idx}>
+                            <span key={`hd-class-${hd.name}-${idx}`}>
                               {idx > 0 && ' + '}
                               {hd.num}d{hd.die} ({hd.name})
                             </span>
@@ -270,7 +270,7 @@ export function CreatureDetailMain({ creature, onBack }: CreatureDetailMainProps
                 <StatRow label="Auras">
                   <div className="flex gap-1 flex-wrap">
                     {creature.auras_normalized.map((aura: any, idx: number) => (
-                      <Badge key={idx} variant="secondary" className="text-xs">
+                      <Badge key={`aura-${aura.name}-${idx}`} variant="secondary" className="text-xs">
                         {aura.name}
                         {aura.radius && ` (${aura.radius} ft.)`}
                         {aura.DC && `, DC ${aura.DC}`}
@@ -308,7 +308,7 @@ export function CreatureDetailMain({ creature, onBack }: CreatureDetailMainProps
                 <StatRow label="Immune">
                   <div className="flex gap-1 flex-wrap">
                     {creature.immunities_normalized.map((item, idx) => (
-                      <Badge key={idx} variant="secondary" className="text-xs">
+                      <Badge key={`immunity-${item}-${idx}`} variant="secondary" className="text-xs">
                         {typeof item === 'string' ? item : JSON.stringify(item)}
                       </Badge>
                     ))}
@@ -322,7 +322,7 @@ export function CreatureDetailMain({ creature, onBack }: CreatureDetailMainProps
                   <div className="flex gap-1 flex-wrap">
                     {creature.resistances_normalized && creature.resistances_normalized.length > 0 ? (
                       creature.resistances_normalized.map((item, idx) => (
-                        <Badge key={idx} variant="secondary" className="text-xs">
+                        <Badge key={`resistance-${item}-${idx}`} variant="secondary" className="text-xs">
                           {typeof item === 'string' ? item : JSON.stringify(item)}
                         </Badge>
                       ))
@@ -475,7 +475,7 @@ export function CreatureDetailMain({ creature, onBack }: CreatureDetailMainProps
                           </Badge>
                           <div className="flex-1 flex flex-wrap gap-1">
                             {grouped[freq].map((ability, idx) => (
-                              <span key={idx} className="text-sm">
+                              <span key={`sla-${freq}-${ability.name}-${idx}`} className="text-sm">
                                 <span className="italic text-text-secondary">{ability.name}</span>
                                 {ability.DC && (
                                   <span className="text-xs text-muted-foreground"> (DC {ability.DC})</span>
@@ -524,7 +524,7 @@ export function CreatureDetailMain({ creature, onBack }: CreatureDetailMainProps
                           </Badge>
                           <div className="flex-1 flex flex-wrap gap-x-2 gap-y-1">
                             {grouped[level].map((spell: any, idx: number) => (
-                              <span key={idx} className="text-sm">
+                              <span key={`spell-${level}-${spell.name || spell}-${idx}`} className="text-sm">
                                 <span className={`${spell.is_mythic_spell ? 'font-semibold text-interactive-primary' : 'text-text-secondary'}`}>
                                   {spell.metamagic?.length > 0 && (
                                     <span className="text-xs text-muted-foreground">{spell.metamagic.join(', ')} </span>
@@ -613,7 +613,7 @@ export function CreatureDetailMain({ creature, onBack }: CreatureDetailMainProps
                 <StatRow label="Feats">
                   <div className="flex gap-1 flex-wrap">
                     {(creature.feats_normalized || creature.feats || []).map((feat, idx) => (
-                      <Badge key={idx} variant="secondary" className="text-xs">
+                      <Badge key={`feat-${feat}-${idx}`} variant="secondary" className="text-xs">
                         {feat}
                       </Badge>
                     ))}
@@ -708,7 +708,7 @@ export function CreatureDetailMain({ creature, onBack }: CreatureDetailMainProps
               <StatBlockSection title="Gear">
                 <div className="space-y-2">
                   {creature.gear.gear.map((item, idx) => (
-                    <div key={idx} className="flex items-start gap-2">
+                    <div key={`gear-${item}-${idx}`} className="flex items-start gap-2">
                       <span className="text-text-secondary text-sm">•</span>
                       <span className="text-sm text-text-primary">{item}</span>
                     </div>
@@ -722,7 +722,7 @@ export function CreatureDetailMain({ creature, onBack }: CreatureDetailMainProps
               <StatBlockSection title="Special Abilities">
                 <div className="space-y-3">
                   {(creature.special_abilities_parsed || creature.special_abilities_normalized || []).map((ability, idx) => (
-                    <Card key={idx} className="p-3 bg-surface-secondary/30 border-border/50">
+                    <Card key={`ability-${typeof ability === 'string' ? ability.substring(0, 20) : (ability as any).name}-${idx}`} className="p-3 bg-surface-secondary/30 border-border/50">
                       {typeof ability === 'string' ? (
                         <p className="text-sm leading-relaxed">{ability}</p>
                       ) : (
@@ -794,7 +794,7 @@ export function CreatureDetailMain({ creature, onBack }: CreatureDetailMainProps
                 </div>
                 <div className="space-y-1">
                   {creature.sources.map((source, idx) => (
-                    <div key={idx} className="flex items-center justify-between text-sm">
+                    <div key={`source-${source.name || source}-${idx}`} className="flex items-center justify-between text-sm">
                       <span className="text-text-secondary">
                         {source.name}
                         {source.page && <span className="text-text-tertiary">, p. {source.page}</span>}

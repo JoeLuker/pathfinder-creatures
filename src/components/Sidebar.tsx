@@ -16,6 +16,11 @@ import {
 import { getActiveFilterCount, getPredictiveCount } from '@/utils/filterUtils';
 import { SlidersHorizontal, ChevronDown, ChevronUp } from 'lucide-react';
 
+// Constants for virtualization
+const VIRTUAL_LIST_HEIGHT = 192; // 48 * 4 (tailwind's max-h-48)
+const VIRTUAL_ROW_HEIGHT = 36;
+const VIRTUAL_LIST_STYLE = { height: VIRTUAL_LIST_HEIGHT, overflow: 'auto' as const };
+
 interface CountItem {
   value: string;
   count: number;
@@ -495,9 +500,9 @@ export function Sidebar({ // noqa
                             {filteredValues.length > 100 ? (
                               // Use virtualization for large lists
                               <List
-                                style={{ height: 192, overflow: 'auto' }} // 192px = 48 * 4 (tailwind's max-h-48)
+                                style={VIRTUAL_LIST_STYLE}
                                 rowCount={filteredValues.length}
-                                rowHeight={36} // Height of each checkbox item
+                                rowHeight={VIRTUAL_ROW_HEIGHT}
                                 rowComponent={({ index, style }) => {
                                   const { value, count } = filteredValues[index];
                                   const percentage = maxCount > 0 ? (count / maxCount) * 100 : 0;
