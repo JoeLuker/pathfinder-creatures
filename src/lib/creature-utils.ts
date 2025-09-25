@@ -57,16 +57,6 @@ export function getPerception(creature: CreatureEnriched): number | null {
     ?? null;
 }
 
-export function getSkills(creature: CreatureEnriched): Record<string, number> {
-  const skills = creature.skills_normalized || creature.skills || {}; // noqa
-  // Filter out metadata fields
-  return Object.fromEntries(
-    Object.entries(skills).filter(([key, value]) =>
-      key !== '_racial_mods' && value !== undefined && value !== null
-    )
-  ) as Record<string, number>;
-}
-
 // Get combat stats with fallbacks
 export function getInitiative(creature: CreatureEnriched): number | null {
   return creature.initiative_parsed?.value ?? creature.initiative ?? null;
@@ -91,61 +81,3 @@ export function getMovementSpeeds(creature: CreatureEnriched) {
   };
 }
 
-// Get feats list
-export function getFeats(creature: CreatureEnriched): string[] {
-  return creature.feats_normalized || creature.feats || [];
-}
-
-// Get languages list
-export function getLanguages(creature: CreatureEnriched): string[] {
-  return creature.languages_normalized || [];
-}
-
-// Get special qualities
-export function getSpecialQualities(creature: CreatureEnriched): string[] {
-  return creature.special_qualities_normalized || [];
-}
-
-// Get special attacks
-export function getSpecialAttacks(creature: CreatureEnriched): string[] {
-  return creature.special_attacks_normalized?.length > 0
-    ? creature.special_attacks_normalized
-    : creature.attacks?.special || [];
-}
-
-// Get immunities
-export function getImmunities(creature: CreatureEnriched): string[] {
-  return creature.immunities_normalized || [];
-}
-
-// Get resistances
-export function getResistances(creature: CreatureEnriched): Array<{ type: string; value: string | number }> {
-  if (creature.resistances_normalized?.length > 0) {
-    return creature.resistances_normalized.map(r => ({ type: r, value: '' }));
-  }
-
-  if (creature.resistances && Object.keys(creature.resistances).length > 0) {
-    return Object.entries(creature.resistances).map(([type, value]) => ({ type, value }));
-  }
-
-  return [];
-}
-
-// Get weaknesses
-export function getWeaknesses(creature: CreatureEnriched): string {
-  if (creature.weaknesses_normalized?.length > 0) {
-    return creature.weaknesses_normalized.join(', ');
-  }
-
-  if (typeof creature.weaknesses === 'string') {
-    return creature.weaknesses;
-  }
-
-  if (Array.isArray(creature.weaknesses)) {
-    return creature.weaknesses
-      .map(w => typeof w === 'string' ? w : `${w.weakness || ''} ${w.amount || ''}`)
-      .join(', ');
-  }
-
-  return '';
-}
