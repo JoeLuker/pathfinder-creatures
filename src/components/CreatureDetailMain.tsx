@@ -29,7 +29,7 @@ export function CreatureDetailMain({ creature, onBack }: CreatureDetailMainProps
   };
 
   return (
-    <div className="flex-1 flex flex-col bg-background font-sans">
+    <div className="flex-1 flex flex-col bg-background">
       {/* Enhanced Header */}
       <div className="bg-surface-secondary border-b border-border">
         <div className="max-w-4xl mx-auto px-6 py-4">
