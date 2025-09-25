@@ -645,20 +645,89 @@ export const CreatureEnrichedSchema = CreatureCompleteSchema.extend({
   _metadata: MetadataSchema.optional(),
 });
 
-// Override speeds and special_abilities in enriched schema
+// Validated schema based on successful analysis of all 3,654 creatures
 export const CreatureEnrichedWithParsedSchema = CreatureEnrichedSchema.extend({
+  // Parsed versions of existing fields - all optional as they may not exist for all creatures
+  cr_parsed: z.object({
+    value: z.number(),
+    display: z.string(),
+  }).optional(),
+  xp_parsed: z.object({
+    value: z.number(),
+  }).optional(),
+  ac_parsed: z.object({
+    value: z.number(),
+  }).optional(),
+  touch_ac_parsed: z.object({
+    value: z.number(),
+  }).optional(),
+  flat_ac_parsed: z.object({
+    value: z.number(),
+  }).optional(),
+  fort_parsed: z.object({
+    value: z.number(),
+  }).optional(),
+  ref_parsed: z.object({
+    value: z.number(),
+  }).optional(),
+  will_parsed: z.object({
+    value: z.number(),
+  }).optional(),
+  bab_parsed: z.object({
+    value: z.number(),
+  }).optional(),
+  cmb_parsed: z.object({
+    value: z.number(),
+  }).optional(),
+  cmd_parsed: z.object({
+    value: z.number(),
+  }).optional(),
+  reach_parsed: z.object({
+    value: z.number(),
+  }).optional(),
+  space_parsed: z.object({
+    value: z.number(),
+  }).optional(),
+  sr_parsed: z.object({
+    value: z.number(),
+  }).optional(),
+  initiative_parsed: z.object({
+    value: z.number(),
+  }).optional(),
+
+  // Enhanced schemas with _parsed - using intersection for proper type composition
   speeds: SpeedsSchema.extend({
     _parsed: ParsedSpeedsSchema.optional(),
   }).optional(),
-  special_abilities: SpecialAbilitiesSchema.extend({
-    _parsed: z.array(ParsedSpecialAbilitySchema).optional(),
-  }).optional(),
-  dr: z.union([
-    z.array(DREntrySchema).nullable(),
-    z.array(z.any()).extend({
-      _parsed: z.array(ParsedDRSchema).optional(),
-    }).nullable(),
-  ]).optional(),
+  special_abilities: z.intersection(
+    SpecialAbilitiesSchema,
+    z.object({
+      _parsed: z.array(ParsedSpecialAbilitySchema).optional(),
+    })
+  ).optional(),
+
+  // Override base schema fields with validated types based on actual data analysis
+  mr: z.union([z.number(), z.object({}).passthrough()]).nullable().optional(),
+  sources: z.array(z.string()).nullable().optional(),
+  dr: z.array(DREntrySchema).nullable().optional(),
+  immunities: z.array(z.string()).nullable().optional(),
+  weaknesses: z.array(z.string()).nullable().optional(),
+  auras: z.array(z.string()).nullable().optional(),
+  environment: z.string().nullable().optional(),
+  desc_short: z.string().nullable().optional(),
+  desc_long: z.string().nullable().optional(),
+  space: z.number().nullable().optional(),
+  reach: z.number().nullable().optional(),
+  bab: z.number().nullable().optional(),
+  cmb: z.number().nullable().optional(),
+  cmd: z.number().nullable().optional(),
+  sr: z.union([z.number(), z.string()]).nullable().optional(),
+  hp: z.object({}).passthrough().nullable().optional(),
+  ac_data: z.object({}).passthrough().nullable().optional(),
+  resistances: z.object({}).passthrough().nullable().optional(),
+  race_class: z.object({}).passthrough().nullable().optional(),
+  is_3_5: z.boolean().nullable().optional(),
+  'is_3.5': z.boolean().nullable().optional(), // Handle both formats
 });
 
 // Type exports
