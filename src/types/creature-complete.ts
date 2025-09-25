@@ -647,72 +647,105 @@ export const CreatureEnrichedSchema = CreatureCompleteSchema.extend({
 
 // Validated schema based on successful analysis of all 3,654 creatures
 export const CreatureEnrichedWithParsedSchema = CreatureEnrichedSchema.extend({
-  // Parsed versions of existing fields - all optional as they may not exist for all creatures
+  // Parsed versions of existing fields - all optional with flexible structure
   cr_parsed: z.object({
     value: z.number(),
-    display: z.string(),
+    display: z.string().optional(),
+    notes: z.any().optional(),
+    original: z.any().optional(),
   }).optional(),
   xp_parsed: z.object({
     value: z.number(),
+    notes: z.any().optional(),
+    original: z.any().optional(),
   }).optional(),
   ac_parsed: z.object({
     value: z.number(),
+    notes: z.any().optional(),
+    original: z.any().optional(),
   }).optional(),
   touch_ac_parsed: z.object({
     value: z.number(),
+    notes: z.any().optional(),
+    original: z.any().optional(),
   }).optional(),
   flat_ac_parsed: z.object({
     value: z.number(),
+    notes: z.any().optional(),
+    original: z.any().optional(),
   }).optional(),
   fort_parsed: z.object({
     value: z.number(),
+    notes: z.any().optional(),
+    original: z.any().optional(),
   }).optional(),
   ref_parsed: z.object({
     value: z.number(),
+    notes: z.any().optional(),
+    original: z.any().optional(),
   }).optional(),
   will_parsed: z.object({
     value: z.number(),
+    notes: z.any().optional(),
+    original: z.any().optional(),
   }).optional(),
   bab_parsed: z.object({
     value: z.number(),
+    notes: z.any().optional(),
+    original: z.any().optional(),
   }).optional(),
   cmb_parsed: z.object({
     value: z.number(),
+    notes: z.any().optional(),
+    original: z.any().optional(),
   }).optional(),
   cmd_parsed: z.object({
     value: z.number(),
+    notes: z.any().optional(),
+    original: z.any().optional(),
   }).optional(),
   reach_parsed: z.object({
     value: z.number(),
+    notes: z.any().optional(),
+    original: z.any().optional(),
   }).optional(),
   space_parsed: z.object({
     value: z.number(),
+    notes: z.any().optional(),
+    original: z.any().optional(),
   }).optional(),
   sr_parsed: z.object({
     value: z.number(),
+    notes: z.any().optional(),
+    original: z.any().optional(),
   }).optional(),
   initiative_parsed: z.object({
     value: z.number(),
+    original: z.any().optional(),
   }).optional(),
 
   // Enhanced schemas with _parsed - using intersection for proper type composition
   speeds: SpeedsSchema.extend({
     _parsed: ParsedSpeedsSchema.optional(),
   }).optional(),
-  special_abilities: z.intersection(
-    SpecialAbilitiesSchema,
-    z.object({
-      _parsed: z.array(ParsedSpecialAbilitySchema).optional(),
-    })
-  ).optional(),
+  special_abilities: z.object({}).passthrough().optional(),
 
   // Override base schema fields with validated types based on actual data analysis
   mr: z.union([z.number(), z.object({}).passthrough()]).nullable().optional(),
-  sources: z.array(z.string()).nullable().optional(),
-  dr: z.array(DREntrySchema).nullable().optional(),
-  immunities: z.array(z.string()).nullable().optional(),
-  weaknesses: z.array(z.string()).nullable().optional(),
-  auras: z.array(z.string()).nullable().optional(),
+  sources: z.array(z.object({
+    name: z.string(),
+    page: z.number().optional(),
+    link: z.string().optional(),
+  })).nullable().optional(),
+  dr: z.array(z.object({
+    amount: z.number().optional(),
+    types: z.array(z.string()).optional(),
+    notes: z.string().optional(),
+  }).passthrough()).nullable().optional(),
+  immunities: z.array(z.union([z.string(), z.object({}).passthrough()])).nullable().optional(),
+  weaknesses: z.array(z.union([z.string(), z.object({}).passthrough()])).nullable().optional(),
+  auras: z.array(z.union([z.string(), z.object({}).passthrough()])).nullable().optional(),
+  auras_normalized: z.array(z.union([z.string(), z.object({}).passthrough()])).nullable().optional(),
   environment: z.string().nullable().optional(),
   desc_short: z.string().nullable().optional(),
   desc_long: z.string().nullable().optional(),
@@ -726,6 +759,12 @@ export const CreatureEnrichedWithParsedSchema = CreatureEnrichedSchema.extend({
   ac_data: z.object({}).passthrough().nullable().optional(),
   resistances: z.object({}).passthrough().nullable().optional(),
   race_class: z.object({}).passthrough().nullable().optional(),
+  skills: z.object({}).passthrough().nullable().optional(),
+  attacks: z.object({}).passthrough().nullable().optional(),
+  spell_like_abilities: z.object({}).passthrough().nullable().optional(),
+  spells: z.object({}).passthrough().nullable().optional(),
+  psychic_magic: z.object({}).passthrough().nullable().optional(),
+  ecology: z.object({}).passthrough().nullable().optional(),
   is_3_5: z.boolean().nullable().optional(),
   'is_3.5': z.boolean().nullable().optional(), // Handle both formats
 });

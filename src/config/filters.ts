@@ -214,7 +214,7 @@ export const FILTER_DEFINITIONS: FilterConfig[] = [
     max: 30,
     step: 1,
     priority: 13,
-    getValue: (creature) => creature.saves?.fort
+    getValue: (creature) => creature.fort
   },
   {
     key: 'ref',
@@ -225,7 +225,7 @@ export const FILTER_DEFINITIONS: FilterConfig[] = [
     max: 30,
     step: 1,
     priority: 14,
-    getValue: (creature) => creature.saves?.ref
+    getValue: (creature) => creature.ref
   },
   {
     key: 'will',
@@ -236,7 +236,7 @@ export const FILTER_DEFINITIONS: FilterConfig[] = [
     max: 30,
     step: 1,
     priority: 15,
-    getValue: (creature) => creature.saves?.will
+    getValue: (creature) => creature.will
   },
 
   // Ability Scores

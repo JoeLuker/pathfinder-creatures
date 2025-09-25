@@ -28,7 +28,8 @@ function App() {
     loadMore,
     allCreatures,
     filteredCreatures,
-    crDistribution
+    crDistribution,
+    precomputedFilterOptions
   } = useCreatures();
 
   const [selectedCreature, setSelectedCreature] = useState<CreatureEnriched | null>(null);
@@ -76,6 +77,7 @@ function App() {
                 setFilters={setFilters}
                 creatures={allCreatures}
                 filteredCreatures={filteredCreatures}
+                precomputedFilterOptions={precomputedFilterOptions}
                 crDistribution={crDistribution}
                 sortField={sortField}
                 setSortField={setSortField}
@@ -144,6 +146,7 @@ function App() {
                   setFilters={setFilters}
                   creatures={allCreatures}
                   filteredCreatures={filteredCreatures}
+                  precomputedFilterOptions={precomputedFilterOptions}
                   crDistribution={crDistribution}
                 />
               </div>

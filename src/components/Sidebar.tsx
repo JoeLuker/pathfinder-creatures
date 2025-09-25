@@ -1,4 +1,5 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
+import { List } from 'react-window';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -25,6 +26,7 @@ interface SidebarProps {
   setFilters: React.Dispatch<React.SetStateAction<Filters>>;
   creatures: any[]; // All creatures for filter extraction
   filteredCreatures?: any[]; // Currently filtered creatures for predictive counts
+  precomputedFilterOptions: Map<string, { value: string; count: number }[]>;
   crDistribution?: {
     distribution: { cr: number; count: number }[];
     minCR: number;
@@ -37,6 +39,7 @@ export function Sidebar({ // noqa
   setFilters,
   creatures,
   filteredCreatures,
+  precomputedFilterOptions,
   crDistribution,
 }: SidebarProps) {
   const [expandedSections, setExpandedSections] = useState<Record<string, boolean>>(() => {
@@ -125,99 +128,6 @@ export function Sidebar({ // noqa
     return Array.from(values).sort((a, b) => a - b);
   };
 
-  // Extract unique values with counts - show all options for multiselect filters
-  const getUniqueValues = (filterConfig: FilterConfig): CountItem[] => {
-    const valueCounts = new Map<string, number>();
-
-    // For multiselect filters, we need to show all possible values from all creatures
-    // so users can select multiple options. Count from filtered creatures (excluding this filter)
-    const sourceCreatures = filterConfig.type === 'multiSelect'
-      ? creatures  // Show all possible values for multiselect
-      : (filteredCreatures || creatures); // Use filtered for other types
-
-    // Get counts from currently filtered creatures (for display)
-    const countFromFiltered = filteredCreatures || creatures;
-
-    // First, collect all possible values
-    sourceCreatures.forEach(creature => {
-      const value = filterConfig.getValue?.(creature);
-      if (value != null) {
-        if (Array.isArray(value)) {
-          value.forEach(v => {
-            if (v) {
-              const key = String(v).toLowerCase();
-              if (!valueCounts.has(key)) {
-                valueCounts.set(key, 0); // Initialize with 0
-              }
-            }
-          });
-        } else {
-          const key = String(value).toLowerCase();
-          if (!valueCounts.has(key)) {
-            valueCounts.set(key, 0); // Initialize with 0
-          }
-        }
-      }
-    });
-
-    // Then count from filtered creatures to get accurate counts
-    countFromFiltered.forEach(creature => {
-      const value = filterConfig.getValue?.(creature);
-      if (value != null) {
-        if (Array.isArray(value)) {
-          value.forEach(v => {
-            if (v) {
-              const key = String(v).toLowerCase();
-              if (valueCounts.has(key)) {
-                valueCounts.set(key, (valueCounts.get(key) || 0) + 1);
-              }
-            }
-          });
-        } else {
-          const key = String(value).toLowerCase();
-          if (valueCounts.has(key)) {
-            valueCounts.set(key, (valueCounts.get(key) || 0) + 1);
-          }
-        }
-      }
-    });
-
-    // Convert to array and sort with natural ordering for specific fields
-    const items = Array.from(valueCounts.entries())
-      .map(([value, count]) => ({ value, count }));
-
-    // Define natural orderings for specific fields
-    const naturalOrders: Record<string, string[]> = {
-      sizes: ['Fine', 'Diminutive', 'Tiny', 'Small', 'Medium', 'Large', 'Huge', 'Gargantuan', 'Colossal'],
-      alignments: [
-        'Lawful Good', 'Neutral Good', 'Chaotic Good',
-        'Lawful Neutral', 'True Neutral', 'Chaotic Neutral',
-        'Lawful Evil', 'Neutral Evil', 'Chaotic Evil'
-      ]
-    };
-
-    const naturalOrder = naturalOrders[filterConfig.key];
-    if (naturalOrder) {
-      // Sort by natural order, with unknown values at the end alphabetically
-      return items.sort((a, b) => {
-        const indexA = naturalOrder.findIndex(item => item.toLowerCase() === a.value.toLowerCase());
-        const indexB = naturalOrder.findIndex(item => item.toLowerCase() === b.value.toLowerCase());
-
-        if (indexA !== -1 && indexB !== -1) {
-          return indexA - indexB; // Both found, use natural order
-        } else if (indexA !== -1) {
-          return -1; // A is in natural order, B is not - A comes first
-        } else if (indexB !== -1) {
-          return 1; // B is in natural order, A is not - B comes first
-        } else {
-          return a.value.localeCompare(b.value); // Both unknown, alphabetical
-        }
-      });
-    }
-
-    // Default to alphabetical sorting
-    return items.sort((a, b) => a.value.localeCompare(b.value));
-  };
 
   const activeFiltersCount = getActiveFilterCount(filters);
 
@@ -491,7 +401,7 @@ export function Sidebar({ // noqa
                           />
                         );
                       case 'multiSelect':
-                        const uniqueValues = getUniqueValues(filter);
+                        const uniqueValues = precomputedFilterOptions.get(filter.key) || [];
                         const searchValue = searchStates[filter.key] || '';
                         const showAll = showAllValues[filter.key] ?? false;
 
@@ -556,34 +466,73 @@ export function Sidebar({ // noqa
                                 className="h-10 md:h-7 text-xs min-h-[40px] md:min-h-auto"
                               />
                             )}
-                            <div className="space-y-1 max-h-48 overflow-y-auto">
-                              {filteredValues.map(({ value, count }) => {
-                                const percentage = maxCount > 0 ? (count / maxCount) * 100 : 0;
-                                const isChecked = currentValues.includes(value);
+                            {filteredValues.length > 100 ? (
+                              // Use virtualization for large lists
+                              <List
+                                style={{ height: 192, overflow: 'auto' }} // 192px = 48 * 4 (tailwind's max-h-48)
+                                rowCount={filteredValues.length}
+                                rowHeight={36} // Height of each checkbox item
+                                rowComponent={({ index, style }) => {
+                                  const { value, count } = filteredValues[index];
+                                  const percentage = maxCount > 0 ? (count / maxCount) * 100 : 0;
+                                  const isChecked = currentValues.includes(value);
 
-                                return (
-                                  <label
-                                    key={value}
-                                    className="relative flex items-center justify-between px-2 py-2 md:py-1 hover:bg-surface-secondary rounded cursor-pointer min-h-[44px] md:min-h-auto"
-                                  >
-                                    <div
-                                      className="absolute inset-0 bg-interactive-primary opacity-20 rounded"
-                                      style={{ width: `${percentage}%` }} // noqa
-                                    />
-                                    <div className="relative flex items-center gap-2 flex-1">
-                                      <input
-                                        type="checkbox"
-                                        checked={isChecked}
-                                        onChange={() => handleMultiSelectToggle(filter.key, value)}
-                                        className="rounded border-border"
-                                      />
-                                      <span className="text-sm capitalize">{value}</span>
+                                  return (
+                                    <div style={style}>
+                                      <label
+                                        className="relative flex items-center justify-between px-2 py-2 md:py-1 hover:bg-surface-secondary rounded cursor-pointer min-h-[44px] md:min-h-auto"
+                                      >
+                                        <div
+                                          className="absolute inset-0 bg-interactive-primary opacity-20 rounded"
+                                          style={{ width: `${percentage}%` }}
+                                        />
+                                        <div className="relative flex items-center gap-2 flex-1">
+                                          <input
+                                            type="checkbox"
+                                            checked={isChecked}
+                                            onChange={() => handleMultiSelectToggle(filter.key, value)}
+                                            className="rounded border-border"
+                                          />
+                                          <span className="text-sm capitalize">{value}</span>
+                                        </div>
+                                        <span className="relative text-xs text-muted-foreground font-medium">{count}</span>
+                                      </label>
                                     </div>
-                                    <span className="relative text-xs text-muted-foreground font-medium">{count}</span>
-                                  </label>
-                                );
-                              })}
-                            </div>
+                                  );
+                                }}
+                                rowProps={{}}
+                              />
+                            ) : (
+                              // Use regular rendering for small lists
+                              <div className="space-y-1 max-h-48 overflow-y-auto">
+                                {filteredValues.map(({ value, count }) => {
+                                  const percentage = maxCount > 0 ? (count / maxCount) * 100 : 0;
+                                  const isChecked = currentValues.includes(value);
+
+                                  return (
+                                    <label
+                                      key={value}
+                                      className="relative flex items-center justify-between px-2 py-2 md:py-1 hover:bg-surface-secondary rounded cursor-pointer min-h-[44px] md:min-h-auto"
+                                    >
+                                      <div
+                                        className="absolute inset-0 bg-interactive-primary opacity-20 rounded"
+                                        style={{ width: `${percentage}%` }}
+                                      />
+                                      <div className="relative flex items-center gap-2 flex-1">
+                                        <input
+                                          type="checkbox"
+                                          checked={isChecked}
+                                          onChange={() => handleMultiSelectToggle(filter.key, value)}
+                                          className="rounded border-border"
+                                        />
+                                        <span className="text-sm capitalize">{value}</span>
+                                      </div>
+                                      <span className="relative text-xs text-muted-foreground font-medium">{count}</span>
+                                    </label>
+                                  );
+                                })}
+                              </div>
+                            )}
                           </div>
                         );
                       case 'boolean':
