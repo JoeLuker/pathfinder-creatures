@@ -10,6 +10,12 @@ import { StatBlockSection } from './creature-detail/StatBlockSection';
 import { StatRow } from './creature-detail/StatRow';
 import { InfoList } from './creature-detail/InfoList';
 import { formatModifier, formatAbilityScore } from '@/lib/formatters';
+import {
+  getAC, getTouchAC, getFlatFootedAC, getHP, getHPDetails,
+  getFortSave, getRefSave, getWillSave, getAbilityScore,
+  getPerception, getCR, getXP, getInitiative, getMovementSpeeds
+} from '@/lib/creature-utils';
+import { SemanticBadge } from '@/components/ui/semantic-badge';
 
 interface CreatureDetailMainProps {
   creature: CreatureEnriched | null;
@@ -21,7 +27,7 @@ export function CreatureDetailMain({ creature, onBack }: CreatureDetailMainProps
     return <EmptyState />;
   }
 
-  const crDisplay = creature.cr_parsed?.display ?? creature.cr?.toString() ?? '-'; // noqa
+  const crDisplay = getCR(creature); // noqa
 
   const handleCopyJson = () => {
     navigator.clipboard.writeText(JSON.stringify(creature, null, 2));
@@ -53,7 +59,7 @@ export function CreatureDetailMain({ creature, onBack }: CreatureDetailMainProps
                       CR {crDisplay}
                     </Badge>
                     <span className="text-text-secondary">
-                      {creature.xp?.toLocaleString() ?? '—'} XP
+                      {getXP(creature)} XP
                     </span>
                   </div>
                   <div className="text-text-secondary">
@@ -92,7 +98,7 @@ export function CreatureDetailMain({ creature, onBack }: CreatureDetailMainProps
                 <div className="flex items-center gap-2">
                   <span className="text-text-secondary">Initiative</span>
                   <Badge variant="outline" className="font-mono">
-                    {formatModifier(creature.initiative_parsed?.value ?? creature.initiative)}
+                    {formatModifier(getInitiative(creature))}
                   </Badge>
                 </div>
 
@@ -112,7 +118,7 @@ export function CreatureDetailMain({ creature, onBack }: CreatureDetailMainProps
                 <div className="flex items-center gap-2">
                   <span className="text-text-secondary">Perception</span>
                   <Badge variant="outline" className="font-mono">
-                    {formatModifier(creature.skills_parsed?.Perception?.value ?? creature.skills?.Perception ?? creature.skills_normalized?.Perception)}
+                    {formatModifier(getPerception(creature))}
                   </Badge>
                 </div>
               </div>
@@ -122,17 +128,17 @@ export function CreatureDetailMain({ creature, onBack }: CreatureDetailMainProps
             <StatBlockSection title="Defense">
               <StatRow label="Armor Class">
                 <div className="flex items-center gap-3">
-                  <Badge className="bg-sapphire-500/10 text-sapphire-600 border-sapphire-500/30">
-                    {creature.ac_data?.AC ?? creature.ac ?? '—'}
-                  </Badge>
-                  {creature.ac_data?.touch && (
+                  <SemanticBadge semantic="defense">
+                    {getAC(creature)}
+                  </SemanticBadge>
+                  {getTouchAC(creature) && (
                     <span className="text-sm text-text-secondary">
-                      touch {creature.ac_data.touch}
+                      touch {getTouchAC(creature)}
                     </span>
                   )}
-                  {creature.ac_data?.flat_footed && (
+                  {getFlatFootedAC(creature) && (
                     <span className="text-sm text-text-secondary">
-                      flat-footed {creature.ac_data.flat_footed}
+                      flat-footed {getFlatFootedAC(creature)}
                     </span>
                   )}
                 </div>
@@ -140,11 +146,11 @@ export function CreatureDetailMain({ creature, onBack }: CreatureDetailMainProps
 
               <StatRow label="Hit Points">
                 <div className="flex items-center gap-3">
-                  <Badge className="bg-red-500/10 text-red-600 border-red-500/30">
-                    {creature.hp?.total ?? '—'}
-                  </Badge>
+                  <SemanticBadge semantic="danger">
+                    {getHP(creature)}
+                  </SemanticBadge>
                   <span className="text-sm text-text-tertiary">
-                    ({creature.hp?.long ?? creature.hd ?? '—'})
+                    ({getHPDetails(creature)})
                   </span>
                 </div>
               </StatRow>
@@ -153,21 +159,21 @@ export function CreatureDetailMain({ creature, onBack }: CreatureDetailMainProps
                 <div className="flex items-center gap-2">
                   <div className="flex items-center gap-1">
                     <span className="text-xs text-text-tertiary">Fort</span>
-                    <Badge variant="outline" className="font-mono text-xs">
-                      {formatModifier(creature.saves_data?.fort ?? creature.fort ?? creature.saves?.fort)}
-                    </Badge>
+                    <SemanticBadge semantic="modifier" size="xs">
+                      {formatModifier(getFortSave(creature))}
+                    </SemanticBadge>
                   </div>
                   <div className="flex items-center gap-1">
                     <span className="text-xs text-text-tertiary">Ref</span>
-                    <Badge variant="outline" className="font-mono text-xs">
-                      {formatModifier(creature.saves_data?.ref ?? creature.ref ?? creature.saves?.ref)}
-                    </Badge>
+                    <SemanticBadge semantic="modifier" size="xs">
+                      {formatModifier(getRefSave(creature))}
+                    </SemanticBadge>
                   </div>
                   <div className="flex items-center gap-1">
                     <span className="text-xs text-text-tertiary">Will</span>
-                    <Badge variant="outline" className="font-mono text-xs">
-                      {formatModifier(creature.saves_data?.will ?? creature.will ?? creature.saves?.will)}
-                    </Badge>
+                    <SemanticBadge semantic="modifier" size="xs">
+                      {formatModifier(getWillSave(creature))}
+                    </SemanticBadge>
                   </div>
                 </div>
               </StatRow>
@@ -252,29 +258,36 @@ export function CreatureDetailMain({ creature, onBack }: CreatureDetailMainProps
             <StatBlockSection title="Offense">
               <StatRow label="Movement">
                 <div className="flex items-center gap-2 flex-wrap">
-                  <Badge variant="outline" className="text-xs">
-                    {creature.speeds?.base ?? 30} ft.
-                  </Badge>
-                  {creature.speeds?.fly && (
-                    <Badge variant="outline" className="text-xs">
-                      fly {creature.speeds.fly} ft.
-                    </Badge>
-                  )}
-                  {creature.speeds?.swim && (
-                    <Badge variant="outline" className="text-xs">
-                      swim {creature.speeds.swim} ft.
-                    </Badge>
-                  )}
-                  {creature.speeds?.climb && (
-                    <Badge variant="outline" className="text-xs">
-                      climb {creature.speeds.climb} ft.
-                    </Badge>
-                  )}
-                  {creature.speeds?.burrow && (
-                    <Badge variant="outline" className="text-xs">
-                      burrow {creature.speeds.burrow} ft.
-                    </Badge>
-                  )}
+                  {(() => {
+                    const speeds = getMovementSpeeds(creature);
+                    return (
+                      <>
+                        <Badge variant="outline" className="text-xs">
+                          {speeds.base} ft.
+                        </Badge>
+                        {speeds.fly && (
+                          <Badge variant="outline" className="text-xs">
+                            fly {speeds.fly} ft.
+                          </Badge>
+                        )}
+                        {speeds.swim && (
+                          <Badge variant="outline" className="text-xs">
+                            swim {speeds.swim} ft.
+                          </Badge>
+                        )}
+                        {speeds.climb && (
+                          <Badge variant="outline" className="text-xs">
+                            climb {speeds.climb} ft.
+                          </Badge>
+                        )}
+                        {speeds.burrow && (
+                          <Badge variant="outline" className="text-xs">
+                            burrow {speeds.burrow} ft.
+                          </Badge>
+                        )}
+                      </>
+                    );
+                  })()}
                 </div>
               </StatRow>
 
@@ -308,42 +321,17 @@ export function CreatureDetailMain({ creature, onBack }: CreatureDetailMainProps
             <StatBlockSection title="Statistics">
               <StatRow label="Abilities">
                 <div className="grid grid-cols-3 sm:grid-cols-6 gap-2">
-                  <div className="text-center">
-                    <div className="text-xs text-text-tertiary mb-1">STR</div>
-                    <Badge variant="outline" className="w-full justify-center">
-                      {formatAbilityScore(creature.ability_scores?.STR, creature.ability_scores_parsed?.str?.modifier)}
-                    </Badge>
-                  </div>
-                  <div className="text-center">
-                    <div className="text-xs text-text-tertiary mb-1">DEX</div>
-                    <Badge variant="outline" className="w-full justify-center">
-                      {formatAbilityScore(creature.ability_scores?.DEX, creature.ability_scores_parsed?.dex?.modifier)}
-                    </Badge>
-                  </div>
-                  <div className="text-center">
-                    <div className="text-xs text-text-tertiary mb-1">CON</div>
-                    <Badge variant="outline" className="w-full justify-center">
-                      {formatAbilityScore(creature.ability_scores?.CON, creature.ability_scores_parsed?.con?.modifier)}
-                    </Badge>
-                  </div>
-                  <div className="text-center">
-                    <div className="text-xs text-text-tertiary mb-1">INT</div>
-                    <Badge variant="outline" className="w-full justify-center">
-                      {formatAbilityScore(creature.ability_scores?.INT, creature.ability_scores_parsed?.int?.modifier)}
-                    </Badge>
-                  </div>
-                  <div className="text-center">
-                    <div className="text-xs text-text-tertiary mb-1">WIS</div>
-                    <Badge variant="outline" className="w-full justify-center">
-                      {formatAbilityScore(creature.ability_scores?.WIS, creature.ability_scores_parsed?.wis?.modifier)}
-                    </Badge>
-                  </div>
-                  <div className="text-center">
-                    <div className="text-xs text-text-tertiary mb-1">CHA</div>
-                    <Badge variant="outline" className="w-full justify-center">
-                      {formatAbilityScore(creature.ability_scores?.CHA, creature.ability_scores_parsed?.cha?.modifier)}
-                    </Badge>
-                  </div>
+                  {(['STR', 'DEX', 'CON', 'INT', 'WIS', 'CHA'] as const).map(ability => {
+                    const { score, modifier } = getAbilityScore(creature, ability);
+                    return (
+                      <div key={ability} className="text-center">
+                        <div className="text-xs text-text-tertiary mb-1">{ability}</div>
+                        <Badge variant="outline" className="w-full justify-center">
+                          {formatAbilityScore(score, modifier)}
+                        </Badge>
+                      </div>
+                    );
+                  })}
                 </div>
               </StatRow>
 
