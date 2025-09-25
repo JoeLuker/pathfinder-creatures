@@ -43,16 +43,9 @@ export function Sidebar({ // noqa
   crDistribution,
 }: SidebarProps) {
   const [expandedSections, setExpandedSections] = useState<Record<string, boolean>>(() => {
-    const isMobile = typeof window !== 'undefined' && window.innerWidth < 768;
     return getAllCategories().reduce((acc, category) => {
-      // On mobile, expand commonly used sections by default
-      if (isMobile) {
-        acc[category] = category === FILTER_CATEGORIES.BASIC ||
-                       category === FILTER_CATEGORIES.CHALLENGE ||
-                       category === FILTER_CATEGORIES.COMBAT;
-      } else {
-        acc[category] = false;
-      }
+      // All filters collapsed by default
+      acc[category] = false;
       return acc;
     }, {} as Record<string, boolean>);
   });
