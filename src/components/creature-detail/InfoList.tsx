@@ -7,9 +7,9 @@ export function InfoList({ label, items }: InfoListProps) { // noqa
   if (!items || items.length === 0) return null;
 
   return (
-    <div className="mb-1">
-      <span className="font-bold">{label}</span>{' '}
-      <span className="text-sm">{items.join(', ')}</span>
+    <div className="grid grid-cols-[120px_1fr] gap-3 items-start">
+      <span className="text-sm font-medium text-text-secondary">{label}</span>
+      <span className="text-sm text-text-primary">{items.join(', ')}</span>
     </div>
   );
 }
