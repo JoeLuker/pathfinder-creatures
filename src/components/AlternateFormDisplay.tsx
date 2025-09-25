@@ -64,7 +64,7 @@ export function AlternateFormDisplay({ creature }: AlternateFormDisplayProps) {
 
           {/* Display any alternate form data */}
           <div className="bg-surface-primary p-4 rounded border border-purple-200">
-            <pre className="text-xs text-text-secondary overflow-auto">
+            <pre className="text-xs text-text-secondary overflow-x-auto whitespace-pre-wrap break-words max-w-full">
               {JSON.stringify(creature.second_statblock, null, 2)}
             </pre>
           </div>

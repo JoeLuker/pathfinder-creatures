@@ -199,6 +199,13 @@
     font-family: var(--font-sans);
     transition: background-color var(--duration-normal) var(--easing-out),
                 color var(--duration-normal) var(--easing-out);
+    overflow-x: hidden;
+    max-width: 100vw;
+  }
+
+  #root {
+    overflow-x: hidden;
+    max-width: 100vw;
   }
 
   /* Custom scrollbar styling */
