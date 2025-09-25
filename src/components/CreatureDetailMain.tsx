@@ -30,9 +30,14 @@ export function CreatureDetailMain({ creature, onBack }: CreatureDetailMainProps
 
   const crDisplay = getCR(creature); // noqa
 
-  const handleCopyJson = () => {
-    navigator.clipboard.writeText(JSON.stringify(creature, null, 2));
-    toast.success('JSON copied to clipboard');
+  const handleCopyJson = async () => {
+    try {
+      await navigator.clipboard.writeText(JSON.stringify(creature, null, 2));
+      toast.success('JSON copied to clipboard');
+    } catch (err) {
+      toast.error('Could not copy to clipboard');
+      console.error('Clipboard error:', err);
+    }
   };
 
   return (

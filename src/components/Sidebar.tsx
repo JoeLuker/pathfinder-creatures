@@ -86,6 +86,27 @@ export function Sidebar({ // noqa
     }));
   };
 
+  // Get active filter count for a category
+  const getCategoryActiveCount = (category: string) => {
+    const categoryFilters = getFiltersByCategory(category);
+    let count = 0;
+
+    categoryFilters.forEach(filter => {
+      if (filter.type === 'multi-select') {
+        const values = (filters[filter.key as keyof Filters] as string[]) || [];
+        count += values.length;
+      } else if (filter.type === 'range') {
+        const minKey = `${filter.key}Min` as keyof Filters;
+        const maxKey = `${filter.key}Max` as keyof Filters;
+        if (filters[minKey] !== null || filters[maxKey] !== null) count++;
+      } else if (filter.type === 'boolean') {
+        if (filters[filter.key as keyof Filters] !== null) count++;
+      }
+    });
+
+    return count;
+  };
+
   // Generic toggle handler for multi-select filters
   const handleMultiSelectToggle = (filterKey: string, value: string) => {
     setFilters(prev => {
@@ -196,6 +217,14 @@ export function Sidebar({ // noqa
                     <div className="flex items-center gap-2">
                       {crFilter.icon && <crFilter.icon className="h-4 w-4" />}
                       <span className="text-sm font-medium">{category}</span>
+                      {(() => {
+                        const activeCount = getCategoryActiveCount(category);
+                        return activeCount > 0 ? (
+                          <span className="bg-interactive-primary text-text-inverse text-xs px-2 py-0.5 rounded-full font-medium">
+                            {activeCount}
+                          </span>
+                        ) : null;
+                      })()}
                     </div>
                     {isExpanded ? (
                       <ChevronUp className="h-4 w-4" />
@@ -347,30 +376,14 @@ export function Sidebar({ // noqa
                     return IconComponent ? <IconComponent className="h-4 w-4" /> : null;
                   })()}
                   <span className="text-sm font-medium">{category}</span>
-                  {/* Show active filter count for this category */}
                   {(() => {
-                    const activeCount = categoryFilters.reduce((count, filter) => {
-                      switch (filter.type) {
-                        case 'range':
-                          const minKey = `${filter.key}Min` as keyof Filters;
-                          const maxKey = `${filter.key}Max` as keyof Filters;
-                          return count + (filters[minKey] !== null || filters[maxKey] !== null ? 1 : 0);
-                        case 'multiSelect':
-                          const multiValue = filters[filter.key as keyof Filters] as string[];
-                          return count + (multiValue?.length > 0 ? 1 : 0);
-                        case 'boolean':
-                          return count + (filters[filter.key as keyof Filters] !== null ? 1 : 0);
-                        default:
-                          return count;
-                      }
-                    }, 0);
-                    return activeCount > 0 && (
-                      <Badge variant="secondary" className="text-xs h-5">
+                    const activeCount = getCategoryActiveCount(category);
+                    return activeCount > 0 ? (
+                      <span className="bg-interactive-primary text-text-inverse text-xs px-2 py-0.5 rounded-full font-medium">
                         {activeCount}
-                      </Badge>
-                    );
-                  })()
-                  }
+                      </span>
+                    ) : null;
+                  })()}
                 </div>
                 {isExpanded ? (
                   <ChevronUp className="h-4 w-4" />

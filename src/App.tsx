@@ -8,9 +8,10 @@ import { Search } from 'lucide-react';
 import { MobileFilters } from '@/components/MobileFilters';
 import { ThemeToggle } from '@/components/ThemeToggle';
 import type { CreatureEnriched } from '@/types/creature-complete';
-import { Loader2, ChevronLeft, ChevronRight } from 'lucide-react';
+import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { ScrollArea } from '@/components/ui/scroll-area';
+import { LoadingSkeleton } from '@/components/LoadingSkeleton';
 
 function App() {
   const {
@@ -42,19 +43,25 @@ function App() {
   };
 
   if (loading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
-      </div>
-    );
+    return <LoadingSkeleton />;
   }
 
   if (error) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <div className="text-center">
-          <h2 className="text-2xl font-semibold text-destructive mb-2">Error Loading Data</h2>
-          <p className="text-muted-foreground">{error}</p>
+        <div className="text-center max-w-md">
+          <h2 className="text-2xl font-semibold text-destructive mb-2">Couldn't Load Creatures</h2>
+          <p className="text-muted-foreground mb-4">
+            {error.toLowerCase().includes('fetch') || error.toLowerCase().includes('network')
+              ? 'This might be a connection issue. Please check your internet and try again.'
+              : 'Something went wrong loading the creature database.'}
+          </p>
+          <Button
+            onClick={() => window.location.reload()}
+            variant="outline"
+          >
+            Refresh Page
+          </Button>
         </div>
       </div>
     );

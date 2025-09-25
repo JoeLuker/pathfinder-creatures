@@ -38,7 +38,28 @@ export function CreatureList({
   setSortDirection,
   className = ""
 }: CreatureListProps) {
-  // const scrollAreaRef = useRef<HTMLDivElement>(null); // Unused for now
+  const scrollAreaRef = useRef<HTMLDivElement>(null);
+  const scrollPositionRef = useRef(0);
+
+  // Save scroll position before selecting a creature
+  const handleCreatureClick = (creature: CreatureEnriched) => {
+    const scrollElement = scrollAreaRef.current?.querySelector('[data-radix-scroll-area-viewport]');
+    if (scrollElement) {
+      scrollPositionRef.current = scrollElement.scrollTop;
+    }
+    onCreatureClick(creature);
+  };
+
+  // Restore scroll position when returning to list
+  useEffect(() => {
+    if (!selectedCreature) {
+      const scrollElement = scrollAreaRef.current?.querySelector('[data-radix-scroll-area-viewport]');
+      if (scrollElement && scrollPositionRef.current > 0) {
+        scrollElement.scrollTop = scrollPositionRef.current;
+      }
+    }
+  }, [selectedCreature]);
+  // Remove duplicate scrollAreaRef declaration
   const sentinelRef = useRef<HTMLDivElement>(null);
 
   // Infinite scroll intersection observer
@@ -124,7 +145,7 @@ export function CreatureList({
       </div>
 
       {/* Creature List Content */}
-      <ScrollArea className="flex-1">
+      <ScrollArea className="flex-1" ref={scrollAreaRef}>
         <div className="p-2">
           {creatures.length === 0 ? (
             <div className="text-center py-8">
@@ -143,7 +164,7 @@ export function CreatureList({
               {creatures.map((creature) => (
                 <div
                   key={creature.url}
-                  onClick={() => onCreatureClick(creature)}
+                  onClick={() => handleCreatureClick(creature)}
                   className={`cursor-pointer rounded-md border p-2 hover:shadow-md transition-all bg-surface-primary ${
                     selectedCreature?.url === creature.url ? 'border-primary shadow-md' : ''
                   }`}
