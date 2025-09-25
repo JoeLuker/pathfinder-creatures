@@ -40,10 +40,12 @@ npm run preview
 - Build command: `npm run build`
 - Publish directory: `dist`
 
-#### 2. Vercel
-- Configuration: `vercel.json` is included
-- Connect repository and deploy
-- Zero-config deployment supported
+#### 2. Vercel (Recommended)
+- **Modern Approach**: Use Vercel Dashboard (not CLI)
+- Go to [vercel.com/new](https://vercel.com/new)
+- Import from GitHub: `JoeLuker/pathfinder-creatures`
+- Auto-detects Vite, uses `vercel.json` config
+- Automatic deployments on GitHub pushes
 
 #### 3. Static Hosting
 - Build the project: `npm run build`

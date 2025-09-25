@@ -675,17 +675,6 @@ export function CreatureDetailMain({ creature, onBack }: CreatureDetailMainProps
               )}
             </StatBlockSection>
 
-            {/* Ecology Section */}
-            {creature.ecology && Object.keys(creature.ecology).length > 0 && (
-              <StatBlockSection title="Ecology">
-                {Object.entries(creature.ecology).map(([key, value]) => (
-                  <StatRow key={key} label={key.charAt(0).toUpperCase() + key.slice(1)}>
-                    <span className="text-sm">{typeof value === 'string' ? value : JSON.stringify(value)}</span>
-                  </StatRow>
-                ))}
-              </StatBlockSection>
-            )}
-
             {/* Psychic Magic */}
             {creature.psychic_magic && (
               <StatBlockSection title="Psychic Magic">
