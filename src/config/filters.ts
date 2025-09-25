@@ -40,7 +40,9 @@ export const FILTER_CATEGORIES = {
   MOVEMENT: 'Movement & Speed',
   SPECIAL: 'Special Abilities',
   ENVIRONMENT: 'Environment & Senses',
-  ATTACKS: 'Attacks & Actions'
+  ATTACKS: 'Attacks & Actions',
+  SKILLS: 'Skills',
+  FEATS: 'Feats'
 } as const;
 
 export const FILTER_DEFINITIONS: FilterConfig[] = [
@@ -685,6 +687,141 @@ export const FILTER_DEFINITIONS: FilterConfig[] = [
     category: FILTER_CATEGORIES.SPECIAL,
     priority: 53,
     getValue: (creature) => (creature.auras_normalized?.length ?? 0) > 0
+  },
+
+  // Feats
+  {
+    key: 'feats',
+    label: 'Feats',
+    type: 'multiSelect',
+    category: FILTER_CATEGORIES.FEATS,
+    searchable: true,
+    excludeMode: true,
+    priority: 54,
+    getValue: (creature) => creature.feats_normalized || creature.feats || []
+  },
+
+  // Skills
+  {
+    key: 'perceptionValue',
+    label: 'Perception',
+    type: 'range',
+    category: FILTER_CATEGORIES.SKILLS,
+    min: -10,
+    max: 50,
+    step: 1,
+    priority: 55,
+    getValue: (creature) => {
+      return creature.skills_parsed?.Perception?.value ??
+             creature.skills?.Perception ??
+             creature.skills_normalized?.Perception;
+    }
+  },
+  {
+    key: 'stealthValue',
+    label: 'Stealth',
+    type: 'range',
+    category: FILTER_CATEGORIES.SKILLS,
+    min: -10,
+    max: 50,
+    step: 1,
+    priority: 56,
+    getValue: (creature) => {
+      return creature.skills_parsed?.Stealth?.value ??
+             creature.skills?.Stealth ??
+             creature.skills_normalized?.Stealth;
+    }
+  },
+  {
+    key: 'acrobaticsValue',
+    label: 'Acrobatics',
+    type: 'range',
+    category: FILTER_CATEGORIES.SKILLS,
+    min: -10,
+    max: 50,
+    step: 1,
+    priority: 57,
+    getValue: (creature) => {
+      return creature.skills_parsed?.Acrobatics?.value ??
+             creature.skills?.Acrobatics ??
+             creature.skills_normalized?.Acrobatics;
+    }
+  },
+  {
+    key: 'spellcraftValue',
+    label: 'Spellcraft',
+    type: 'range',
+    category: FILTER_CATEGORIES.SKILLS,
+    min: -10,
+    max: 50,
+    step: 1,
+    priority: 58,
+    getValue: (creature) => {
+      return creature.skills_parsed?.Spellcraft?.value ??
+             creature.skills?.Spellcraft ??
+             creature.skills_normalized?.Spellcraft;
+    }
+  },
+  {
+    key: 'diplomacyValue',
+    label: 'Diplomacy',
+    type: 'range',
+    category: FILTER_CATEGORIES.SKILLS,
+    min: -10,
+    max: 50,
+    step: 1,
+    priority: 59,
+    getValue: (creature) => {
+      return creature.skills_parsed?.Diplomacy?.value ??
+             creature.skills?.Diplomacy ??
+             creature.skills_normalized?.Diplomacy;
+    }
+  },
+  {
+    key: 'intimidateValue',
+    label: 'Intimidate',
+    type: 'range',
+    category: FILTER_CATEGORIES.SKILLS,
+    min: -10,
+    max: 50,
+    step: 1,
+    priority: 60,
+    getValue: (creature) => {
+      return creature.skills_parsed?.Intimidate?.value ??
+             creature.skills?.Intimidate ??
+             creature.skills_normalized?.Intimidate;
+    }
+  },
+  {
+    key: 'knowledgeValue',
+    label: 'Knowledge (any)',
+    type: 'range',
+    category: FILTER_CATEGORIES.SKILLS,
+    min: -10,
+    max: 50,
+    step: 1,
+    priority: 61,
+    getValue: (creature) => {
+      const skills = creature.skills_normalized || creature.skills || {};
+      const knowledgeSkills = Object.entries(skills)
+        .filter(([skill]) => skill.toLowerCase().includes('knowledge'))
+        .map(([, value]) => typeof value === 'number' ? value : 0);
+      return knowledgeSkills.length > 0 ? Math.max(...knowledgeSkills) : null;
+    }
+  },
+  {
+    key: 'skillCount',
+    label: 'Total Skills',
+    type: 'range',
+    category: FILTER_CATEGORIES.SKILLS,
+    min: 0,
+    max: 50,
+    step: 1,
+    priority: 62,
+    getValue: (creature) => {
+      const skills = creature.skills_normalized || creature.skills || {};
+      return Object.keys(skills).filter(skill => skill !== '_racial_mods').length;
+    }
   }
 ];
 

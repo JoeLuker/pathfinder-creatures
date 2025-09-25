@@ -195,10 +195,128 @@ function parseInitiative(initiative) {
   };
 }
 
+// Fix malformed feats that contain skills data
+function fixMalformedFeats(creature) {
+  if (!Array.isArray(creature.feats)) return creature;
+
+  const cleaned = { ...creature };
+  const properFeats = [];
+  const extractedSkills = {};
+
+
+  for (const feat of creature.feats) {
+    if (typeof feat !== 'string') {
+      properFeats.push(feat);
+      continue;
+    }
+
+
+    // Check if feat contains "Skills" keyword indicating malformed data (CHECK THIS FIRST!)
+    if (feat.includes(' Skills ') || feat.startsWith('+')) {
+      // This is malformed data, try to extract skills
+      const skillsMatch = feat.match(/(.+?)\s+Skills\s+(.+)/);
+
+      if (skillsMatch) {
+        const featPart = skillsMatch[1].trim();
+        const skillsPart = skillsMatch[2];
+
+        // Add the feat part if it's valid
+        if (featPart && !featPart.includes('+')) {
+          properFeats.push(featPart);
+        }
+
+        // Parse the skills part
+        const skillMatch2 = skillsPart.match(/^(.+?)\s*\+(\d+)$/);
+        if (skillMatch2) {
+          const skillName = skillMatch2[1].trim();
+          const skillValue = parseInt(skillMatch2[2]);
+          extractedSkills[skillName] = skillValue;
+        }
+      } else if (feat.startsWith('+')) {
+        // Handle "+4 Perform" style entries
+        const modMatch = feat.match(/^\+(\d+)\s+(.+)$/);
+        if (modMatch) {
+          if (!extractedSkills._racial_mods) extractedSkills._racial_mods = {};
+          extractedSkills._racial_mods[modMatch[2].trim()] = parseInt(modMatch[1]);
+        }
+      }
+      continue;
+    }
+
+    // Check for racial modifiers pattern
+    if (feat.includes('Racial Modifiers')) {
+      const racialMatch = feat.match(/^(.+?);\s*Racial Modifiers\s+(.+)$/);
+      if (racialMatch) {
+        const skillName = racialMatch[1].trim();
+        const skillMatch2 = skillName.match(/^(.+?)\s*\+(\d+)$/);
+        if (skillMatch2) {
+          extractedSkills[skillMatch2[1].trim()] = parseInt(skillMatch2[2]);
+        }
+        // Parse racial modifiers
+        const racialMods = racialMatch[2];
+        const modMatches = racialMods.matchAll(/\+(\d+)\s+([^,+]+)/g);
+        if (!extractedSkills._racial_mods) extractedSkills._racial_mods = {};
+        for (const match of modMatches) {
+          extractedSkills._racial_mods[match[2].trim()] = parseInt(match[1]);
+        }
+      }
+      continue;
+    }
+
+    // Check if this looks like a simple skill (contains +number)
+    const skillMatch = feat.match(/^(.+?)\s*\+(\d+)$/);
+    if (skillMatch) {
+      const skillName = skillMatch[1].trim();
+      const skillValue = parseInt(skillMatch[2]);
+      extractedSkills[skillName] = skillValue;
+      continue;
+    }
+
+    // This appears to be a proper feat
+    properFeats.push(feat);
+  }
+
+  // Update feats array
+  cleaned.feats = properFeats;
+
+  // Update feats_raw if it exists
+  if (cleaned.feats_raw) {
+    cleaned.feats_raw = properFeats.map(feat => ({ name: feat }));
+  }
+
+  // Clean up existing skills to remove malformed entries
+  if (cleaned.skills) {
+    const cleanedSkills = {};
+    for (const [skillName, skillValue] of Object.entries(cleaned.skills)) {
+      // Skip malformed skill names that contain feat names
+      if (!skillName.includes('Weapon Focus') && !skillName.includes('Skills ')) {
+        cleanedSkills[skillName] = skillValue;
+      }
+    }
+    cleaned.skills = cleanedSkills;
+  }
+
+  // Merge extracted skills into existing skills object, avoiding duplicates
+  if (Object.keys(extractedSkills).length > 0) {
+    cleaned.skills = { ...cleaned.skills };
+    for (const [skillName, skillValue] of Object.entries(extractedSkills)) {
+      // Only add if not already present or if it's the _racial_mods object
+      if (!cleaned.skills.hasOwnProperty(skillName) || skillName === '_racial_mods') {
+        cleaned.skills[skillName] = skillValue;
+      }
+    }
+  }
+
+  return cleaned;
+}
+
 // Main enrichment function - adds parsed fields without removing anything
 function enrichCreature(creature) {
   // Start with all original data
-  const enriched = { ...creature };
+  let enriched = { ...creature };
+
+  // Fix malformed feats first
+  enriched = fixMalformedFeats(enriched);
 
   // Add parsed numeric fields
   const parsedNumeric = addParsedNumericFields(creature);

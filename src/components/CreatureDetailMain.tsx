@@ -46,7 +46,7 @@ export function CreatureDetailMain({ creature, onBack }: CreatureDetailMainProps
 
   // Helper functions for stat block formatting
   const formatSave = (save: number | undefined) => {
-    if (save === undefined || save === null) return '+0';
+    if (save === undefined || save === null) return 'ERROR';
     return save >= 0 ? `+${save}` : `${save}`;
   };
 
@@ -115,7 +115,7 @@ export function CreatureDetailMain({ creature, onBack }: CreatureDetailMainProps
                   </Badge>
                 ))
               }
-              <Badge variant="outline">Perception {formatSave(creature.skills_parsed?.Perception?.value ?? creature.skills?.Perception)}</Badge>
+              <Badge variant="outline">Perception {formatSave(creature.skills_parsed?.Perception?.value ?? creature.skills?.Perception ?? creature.skills_normalized?.Perception)}</Badge>
             </div>
 
             {/* DEFENSE Section */}
@@ -125,9 +125,9 @@ export function CreatureDetailMain({ creature, onBack }: CreatureDetailMainProps
               {/* AC */}
               <div className="flex items-center gap-2 mb-1">
                 <span className="font-bold">AC</span>
-                <Badge variant="default">AC {creature.ac?.AC ?? '—'}</Badge>
-                {creature.ac?.touch && <Badge variant="secondary">Touch {creature.ac.touch}</Badge>}
-                {creature.ac?.flat_footed && <Badge variant="secondary">Flat {creature.ac.flat_footed}</Badge>}
+                <Badge variant="default">AC {creature.ac_data?.AC ?? creature.ac ?? '—'}</Badge>
+                {creature.ac_data?.touch && <Badge variant="secondary">Touch {creature.ac_data.touch}</Badge>}
+                {creature.ac_data?.flat_footed && <Badge variant="secondary">Flat {creature.ac_data.flat_footed}</Badge>}
               </div>
 
               {/* HP */}
@@ -140,9 +140,9 @@ export function CreatureDetailMain({ creature, onBack }: CreatureDetailMainProps
               {/* Saves */}
               <div className="flex items-center gap-2 mb-1">
                 <span className="font-bold">Saves</span>
-                <Badge variant="outline">Fort {formatSave(creature.saves?.fort)}</Badge>
-                <Badge variant="outline">Ref {formatSave(creature.saves?.ref)}</Badge>
-                <Badge variant="outline">Will {formatSave(creature.saves?.will)}</Badge>
+                <Badge variant="outline">Fort {formatSave(creature.saves_data?.fort ?? creature.fort ?? creature.saves?.fort)}</Badge>
+                <Badge variant="outline">Ref {formatSave(creature.saves_data?.ref ?? creature.ref ?? creature.saves?.ref)}</Badge>
+                <Badge variant="outline">Will {formatSave(creature.saves_data?.will ?? creature.will ?? creature.saves?.will)}</Badge>
               </div>
 
               {/* Defensive abilities */}
@@ -256,8 +256,8 @@ export function CreatureDetailMain({ creature, onBack }: CreatureDetailMainProps
               {/* Combat Stats */}
               <div className="flex items-center gap-2 mb-1">
                 <span className="font-bold">Combat</span>
-                <Badge variant="secondary">BAB {formatSave(creature.bab ?? 0)}</Badge>
-                <Badge variant="secondary">CMB {formatSave(creature.cmb ?? 0)}</Badge>
+                <Badge variant="secondary">BAB {formatSave(creature.bab)}</Badge>
+                <Badge variant="secondary">CMB {formatSave(creature.cmb)}</Badge>
                 <Badge variant="secondary">CMD {creature.cmd ?? '—'}</Badge>
               </div>
 
@@ -265,12 +265,20 @@ export function CreatureDetailMain({ creature, onBack }: CreatureDetailMainProps
               {(creature.feats_normalized?.length > 0 || creature.feats?.length > 0) && (
                 <div className="mb-1">
                   <span className="font-bold">Feats</span>
-                  <span className="text-sm">
+                  <div className="flex items-center gap-1 flex-wrap mt-1">
                     {creature.feats_normalized?.length > 0
-                      ? creature.feats_normalized.join(', ')
-                      : creature.feats?.join(', ')
+                      ? creature.feats_normalized.map((feat, idx) => (
+                          <Badge key={idx} variant="outline" className="text-xs">
+                            {feat}
+                          </Badge>
+                        ))
+                      : creature.feats?.map((feat, idx) => (
+                          <Badge key={idx} variant="outline" className="text-xs">
+                            {feat}
+                          </Badge>
+                        ))
                     }
-                  </span>
+                  </div>
                 </div>
               )}
 
