@@ -38,7 +38,7 @@ export function CreatureList({
   setSortDirection,
   className = ""
 }: CreatureListProps) {
-  const scrollAreaRef = useRef<HTMLDivElement>(null);
+  // const scrollAreaRef = useRef<HTMLDivElement>(null); // Unused for now
   const sentinelRef = useRef<HTMLDivElement>(null);
 
   // Infinite scroll intersection observer

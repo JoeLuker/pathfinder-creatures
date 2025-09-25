@@ -1,0 +1,18 @@
+# Exclude unnecessary data files from deployment
+public/data_clean.json
+
+# Development files
+src/
+*.ts
+*.tsx
+tsconfig.json
+vite.config.ts
+
+# Build artifacts that aren't needed
+node_modules/
+.git/
+
+# Documentation and config files
+*.md
+.env*
+.gitignore

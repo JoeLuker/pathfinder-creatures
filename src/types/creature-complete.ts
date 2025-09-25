@@ -203,6 +203,9 @@ export const SourceSchema = z.object({
 export const RacialHDSchema = z.object({
   die: z.number(),
   num: z.number(),
+  count: z.number().optional(),
+  size: z.number().optional(),
+  plus: z.number().optional(),
 });
 
 export const ClassHDSchema = z.object({
@@ -246,6 +249,7 @@ export const ArmorClassComponentsSchema = z.object({
   profane: z.number().optional(),
   sacred: z.number().optional(),
   wis: z.number().optional(),
+  other: z.number().optional(),
 });
 
 export const ArmorClassSchema = z.object({
@@ -339,6 +343,8 @@ export const SpellEntrySchema = z.object({
   level: z.number().optional(),
   concentration: z.number().optional(),
   notes: z.string().optional(),
+  freq: z.string().optional(),
+  source: z.string().optional(),
 });
 
 export const SpellGroupSchema = z.object({
@@ -349,8 +355,11 @@ export const SpellGroupSchema = z.object({
 });
 
 export const SpellLikeAbilitiesSchema = z.object({
-  entries: z.array(SpellGroupSchema).optional(),
-  sources: z.array(SourceSchema).optional(),
+  entries: z.array(SpellEntrySchema).optional(),
+  sources: z.array(SourceSchema.extend({
+    concentration: z.number().optional(),
+    CL: z.number().optional(),
+  })).optional(),
   varies: z.boolean().optional(),
   symbols_special: z.boolean().optional(),
 });
@@ -516,6 +525,8 @@ export const CreatureCompleteSchema = z.object({
   // Combat stats
   initiative: z.union([z.number(), z.array(z.number())]),
   hp: HealthPointsSchema,
+  HD: HDSchema.optional(), // Hit Dice info
+  hd: z.string().optional(), // Legacy HD string
   ac_data: ArmorClassSchema,
   ac: z.number(),
   touch_ac: z.number(),
@@ -523,6 +534,7 @@ export const CreatureCompleteSchema = z.object({
 
   // Saves
   saves_data: SavingThrowsSchema,
+  saves: SavingThrowsSchema.optional(), // Alternative saves path
   fort: z.number(),
   ref: z.number(),
   will: z.number(),
@@ -577,6 +589,11 @@ export const CreatureCompleteSchema = z.object({
   sr: z.union([z.number(), z.string()]).nullable().optional(),
   weaknesses: z.array(z.string()).nullable().optional(),
   auras: z.array(z.string()).nullable().optional(),
+
+  // Additional healing abilities
+  regeneration: z.number().nullable().optional(),
+  regeneration_weakness: z.string().nullable().optional(),
+  fast_healing: z.number().nullable().optional(),
 
   // Ecology and environment
   environment: z.string(),
@@ -728,20 +745,31 @@ export const CreatureEnrichedWithParsedSchema = CreatureEnrichedSchema.extend({
   speeds: SpeedsSchema.extend({
     _parsed: ParsedSpeedsSchema.optional(),
   }).optional(),
-  special_abilities: z.object({}).passthrough().optional(),
+  special_abilities: SpecialAbilitiesSchema.optional(),
+  special_abilities_parsed: z.array(ParsedSpecialAbilitySchema).optional(),
 
   // Override base schema fields with validated types based on actual data analysis
-  mr: z.union([z.number(), z.object({}).passthrough()]).nullable().optional(),
+  mr: z.number().nullable().optional(),
   sources: z.array(z.object({
     name: z.string(),
     page: z.number().optional(),
     link: z.string().optional(),
   })).nullable().optional(),
-  dr: z.array(z.object({
-    amount: z.number().optional(),
-    types: z.array(z.string()).optional(),
-    notes: z.string().optional(),
-  }).passthrough()).nullable().optional(),
+  dr: z.union([
+    z.string(),
+    z.array(z.object({
+      amount: z.number().optional(),
+      weakness: z.string().optional(),
+      types: z.array(z.string()).optional(),
+      notes: z.string().optional(),
+    })),
+    z.object({
+      amount: z.number().optional(),
+      weakness: z.string().optional(),
+      types: z.array(z.string()).optional(),
+      notes: z.string().optional(),
+    })
+  ]).nullable().optional(),
   immunities: z.array(z.union([z.string(), z.object({}).passthrough()])).nullable().optional(),
   weaknesses: z.array(z.union([z.string(), z.object({}).passthrough()])).nullable().optional(),
   auras: z.array(z.union([z.string(), z.object({}).passthrough()])).nullable().optional(),
@@ -755,18 +783,34 @@ export const CreatureEnrichedWithParsedSchema = CreatureEnrichedSchema.extend({
   cmb: z.number().nullable().optional(),
   cmd: z.number().nullable().optional(),
   sr: z.union([z.number(), z.string()]).nullable().optional(),
-  hp: z.object({}).passthrough().nullable().optional(),
-  ac_data: z.object({}).passthrough().nullable().optional(),
-  resistances: z.object({}).passthrough().nullable().optional(),
-  race_class: z.object({}).passthrough().nullable().optional(),
-  skills: z.object({}).passthrough().nullable().optional(),
-  attacks: z.object({}).passthrough().nullable().optional(),
-  spell_like_abilities: z.object({}).passthrough().nullable().optional(),
-  spells: z.object({}).passthrough().nullable().optional(),
-  psychic_magic: z.object({}).passthrough().nullable().optional(),
-  ecology: z.object({}).passthrough().nullable().optional(),
+  hp: HealthPointsSchema.optional(),
+  ac_data: ArmorClassSchema.optional(),
+  resistances: ResistancesSchema.nullable().optional(),
+  race_class: RaceClassSchema.nullable().optional(),
+  skills: SkillsSchema.optional(),
+  attacks: AttacksSchema.optional(),
+  spell_like_abilities: SpellLikeAbilitiesSchema.optional(),
+  spells: SpellsSchema.optional(),
+  psychic_magic: PsychicMagicSchema.nullable().optional(),
+  ecology: EcologySchema.optional(),
   is_3_5: z.boolean().nullable().optional(),
   'is_3.5': z.boolean().nullable().optional(), // Handle both formats
+
+  // Additional normalized fields
+  subtypes_normalized: z.array(z.string()).optional(),
+  languages_normalized: z.array(z.string()).optional(),
+  defensive_abilities_normalized: z.array(z.string()).optional(),
+  special_qualities_normalized: z.array(z.string()).optional(),
+  feats_normalized: z.array(z.string()).optional(),
+  skills_normalized: SkillsSchema.optional(),
+  immunities_normalized: z.array(z.string()).optional(),
+  resistances_normalized: z.array(z.string()).optional(),
+  weaknesses_normalized: z.array(z.string()).optional(),
+  special_abilities_normalized: z.array(z.union([
+    z.string(),
+    ParsedSpecialAbilitySchema,
+  ])).optional(),
+  special_attacks_normalized: z.array(z.string()).optional(),
 });
 
 // Type exports

@@ -439,7 +439,7 @@ export function filterCreaturesWithIndexes(
   // Ability score ranges
   if (filters.strMin !== null || filters.strMax !== null) {
     additionalFilters.push(c => {
-      const str = c.ability_scores?.str;
+      const str = c.ability_scores?.STR;
       if (str === undefined || str === null) return false;
       if (filters.strMin !== null && str < filters.strMin) return false;
       if (filters.strMax !== null && str > filters.strMax) return false;
@@ -449,7 +449,7 @@ export function filterCreaturesWithIndexes(
 
   if (filters.dexMin !== null || filters.dexMax !== null) {
     additionalFilters.push(c => {
-      const dex = c.ability_scores?.dex;
+      const dex = c.ability_scores?.DEX;
       if (dex === undefined || dex === null) return false;
       if (filters.dexMin !== null && dex < filters.dexMin) return false;
       if (filters.dexMax !== null && dex > filters.dexMax) return false;
@@ -459,7 +459,7 @@ export function filterCreaturesWithIndexes(
 
   if (filters.conMin !== null || filters.conMax !== null) {
     additionalFilters.push(c => {
-      const con = c.ability_scores?.con;
+      const con = c.ability_scores?.CON;
       if (con === undefined || con === null) return false;
       if (filters.conMin !== null && con < filters.conMin) return false;
       if (filters.conMax !== null && con > filters.conMax) return false;
@@ -469,7 +469,7 @@ export function filterCreaturesWithIndexes(
 
   if (filters.intMin !== null || filters.intMax !== null) {
     additionalFilters.push(c => {
-      const int = c.ability_scores?.int;
+      const int = c.ability_scores?.INT;
       if (int === undefined || int === null) return false;
       if (filters.intMin !== null && int < filters.intMin) return false;
       if (filters.intMax !== null && int > filters.intMax) return false;
@@ -479,7 +479,7 @@ export function filterCreaturesWithIndexes(
 
   if (filters.wisMin !== null || filters.wisMax !== null) {
     additionalFilters.push(c => {
-      const wis = c.ability_scores?.wis;
+      const wis = c.ability_scores?.WIS;
       if (wis === undefined || wis === null) return false;
       if (filters.wisMin !== null && wis < filters.wisMin) return false;
       if (filters.wisMax !== null && wis > filters.wisMax) return false;
@@ -489,7 +489,7 @@ export function filterCreaturesWithIndexes(
 
   if (filters.chaMin !== null || filters.chaMax !== null) {
     additionalFilters.push(c => {
-      const cha = c.ability_scores?.cha;
+      const cha = c.ability_scores?.CHA;
       if (cha === undefined || cha === null) return false;
       if (filters.chaMin !== null && cha < filters.chaMin) return false;
       if (filters.chaMax !== null && cha > filters.chaMax) return false;

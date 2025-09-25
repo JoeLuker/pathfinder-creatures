@@ -3,7 +3,8 @@ import { useCreatures } from '@/hooks/useCreatures';
 import { CreatureDetailMain } from '@/components/CreatureDetailMain';
 import { CreatureList } from '@/components/CreatureList';
 import { Sidebar } from '@/components/Sidebar';
-import { SmartSearch } from '@/components/SmartSearch';
+import { Input } from '@/components/ui/input';
+import { Search } from 'lucide-react';
 import { MobileFilters } from '@/components/MobileFilters';
 import { ThemeToggle } from '@/components/ThemeToggle';
 import type { CreatureEnriched } from '@/types/creature-complete';
@@ -99,11 +100,16 @@ function App() {
         </div>
       ) : (
         <div className="md:hidden flex-1 p-2">
-          <SmartSearch
-            value={filters.search}
-            onChange={(value) => setFilters(prev => ({ ...prev, search: value }))}
-            creatures={creatures}
-          />
+          <div className="relative">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+            <Input
+              type="text"
+              placeholder="Search creatures..."
+              value={filters.search}
+              onChange={(e) => setFilters(prev => ({ ...prev, search: e.target.value }))}
+              className="pl-10"
+            />
+          </div>
           <CreatureList
             creatures={creatures}
             filteredCount={filteredCount}
@@ -133,11 +139,16 @@ function App() {
                 <h2 className="text-lg font-display font-semibold text-text-primary">Pathfinder Creatures</h2>
                 <ThemeToggle />
               </div>
-              <SmartSearch
-                value={filters.search}
-                onChange={(value) => setFilters(prev => ({ ...prev, search: value }))}
-                creatures={creatures}
-              />
+              <div className="relative">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                <Input
+                  type="text"
+                  placeholder="Search creatures..."
+                  value={filters.search}
+                  onChange={(e) => setFilters(prev => ({ ...prev, search: e.target.value }))}
+                  className="pl-10"
+                />
+              </div>
             </div>
             <ScrollArea className="flex-1">
               <div className="p-2">

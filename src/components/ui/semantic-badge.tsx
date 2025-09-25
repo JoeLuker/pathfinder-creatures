@@ -5,6 +5,7 @@ import { cn } from '@/lib/utils';
 interface SemanticBadgeProps extends BadgeProps {
   semantic?: 'default' | 'defense' | 'danger' | 'modifier' | 'primary';
   size?: 'xs' | 'sm' | 'default';
+  children?: React.ReactNode;
 }
 
 /**

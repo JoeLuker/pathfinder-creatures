@@ -39,10 +39,10 @@ export function RangeSlider({
   };
 
   return (
-    <div className={`space-y-1 ${className}`}>
+    <div className={`space-y-2 ${className}`}>
       <Label className="text-sm font-medium">{label}</Label>
 
-      <div className="px-2">
+      <div className="px-2 py-1">
         <Slider
           min={min}
           max={max}
@@ -53,7 +53,7 @@ export function RangeSlider({
         />
       </div>
 
-      <div className="flex items-center gap-2 text-xs">
+      <div className="flex items-center gap-2 text-xs pt-1">
         <Input
           type="number"
           placeholder="Min"

@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useState } from 'react';
 import { List } from 'react-window';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
@@ -62,6 +62,9 @@ export function Sidebar({ // noqa
 
   // Filter display states - show all values vs only values with data
   const [showAllValues, setShowAllValues] = useState<Record<string, boolean>>({});
+
+  // Helper to determine toggle button appearance
+  const getToggleVariant = (isActive: boolean) => isActive ? "secondary" : "ghost";
 
   const toggleSection = (section: string) => {
     setExpandedSections(prev => ({ ...prev, [section]: !prev[section] }));
@@ -405,15 +408,42 @@ export function Sidebar({ // noqa
                         const searchValue = searchStates[filter.key] || '';
                         const showAll = showAllValues[filter.key] ?? false;
 
-                        // Filter by search and optionally by data availability
-                        const filteredValues = uniqueValues.filter(({ value, count }) => {
+                        // Compute counts from currently filtered creatures
+                        const filteredCounts = new Map<string, number>();
+                        if (filteredCreatures) {
+                          filteredCreatures.forEach(creature => {
+                            const value = filter.getValue?.(creature);
+                            if (value != null) {
+                              if (Array.isArray(value)) {
+                                value.forEach(v => {
+                                  if (v) {
+                                    const key = String(v).toLowerCase();
+                                    filteredCounts.set(key, (filteredCounts.get(key) || 0) + 1);
+                                  }
+                                });
+                              } else {
+                                const key = String(value).toLowerCase();
+                                filteredCounts.set(key, (filteredCounts.get(key) || 0) + 1);
+                              }
+                            }
+                          });
+                        }
+
+                        // Filter by search and optionally by data availability in filtered results
+                        const filteredValues = uniqueValues.filter(({ value }) => {
                           const matchesSearch = value.toLowerCase().includes(searchValue.toLowerCase());
-                          const hasData = count > 0;
-                          return matchesSearch && (showAll || hasData);
-                        });
+                          const hasDataInFiltered = filteredCounts.has(value);
+                          return matchesSearch && (showAll || hasDataInFiltered);
+                        }).map(({ value, count }) => ({
+                          value,
+                          count: filteredCounts.get(value) || 0,
+                          totalCount: count
+                        }));
 
                         const currentValues = (filters[filter.key as keyof Filters] as string[]) || [];
-                        const maxCount = Math.max(...uniqueValues.map(v => v.count));
+                        const maxCount = showAll
+                          ? Math.max(...uniqueValues.map(v => v.count))
+                          : Math.max(...filteredValues.map(v => v.count), 1);
                         const currentFilterMode = filters.filterMode?.[filter.key as keyof typeof filters.filterMode] || 'any';
 
                         return (
@@ -422,26 +452,28 @@ export function Sidebar({ // noqa
                               <span className="text-xs font-medium text-muted-foreground">{filter.label}</span>
                               <div className="flex items-center gap-1">
                                 <Button
-                                  variant="ghost"
+                                  variant={getToggleVariant(showAll)}
                                   size="sm"
                                   className="h-8 md:h-5 px-2 text-xs min-h-[32px] md:min-h-auto"
                                   onClick={() => toggleShowAllValues(filter.key)}
+                                  title={showAll ? "Showing all options" : "Showing only options with data in current results"}
                                 >
-                                  {showAll ? 'With Data' : 'Show All'}
+                                  {showAll ? '✓ All' : 'Filtered'}
                                 </Button>
                                 {currentValues.length > 1 && (
                                   <Button
-                                    variant="ghost"
+                                    variant={getToggleVariant(currentFilterMode === 'all')}
                                     size="sm"
                                     className="h-8 md:h-5 px-2 text-xs min-h-[32px] md:min-h-auto"
                                     onClick={() => toggleFilterMode(filter.key)}
+                                    title={currentFilterMode === 'all' ? "Creature must have ALL selected values" : "Creature can have ANY selected value"}
                                   >
-                                    {currentFilterMode === 'all' ? 'ALL' : 'ANY'}
+                                    {currentFilterMode === 'all' ? '✓ All' : '✓ Any'}
                                   </Button>
                                 )}
                                 {currentValues.length > 0 && filter.excludeMode && (
                                   <Button
-                                    variant="ghost"
+                                    variant={(filters.excludeMode as any)?.[filter.key] ? "destructive" : "ghost"}
                                     size="sm"
                                     className="h-8 md:h-5 px-2 text-xs min-h-[32px] md:min-h-auto"
                                     onClick={() => setFilters(prev => ({
@@ -451,8 +483,9 @@ export function Sidebar({ // noqa
                                         [filter.key]: !prev.excludeMode?.[filter.key as keyof typeof prev.excludeMode]
                                       }
                                     }))}
+                                    title={(filters.excludeMode as any)?.[filter.key] ? "Hiding creatures with selected values" : "Showing creatures with selected values"}
                                   >
-                                    {(filters.excludeMode as any)?.[filter.key] ? 'Include' : 'Exclude'}
+                                    {(filters.excludeMode as any)?.[filter.key] ? '✗ Exclude' : '✓ Include'}
                                   </Button>
                                 )}
                               </div>
@@ -548,20 +581,22 @@ export function Sidebar({ // noqa
                             </div>
                             <div className="flex gap-1">
                               <Button
-                                variant={booleanValue === true ? "default" : "outline"}
+                                variant={booleanValue === true ? "secondary" : "ghost"}
                                 size="sm"
                                 className="h-8 md:h-6 px-2 text-xs min-h-[32px] md:min-h-auto"
                                 onClick={() => handleBooleanChange(filter.key, booleanValue === true ? null : true)}
+                                title={booleanValue === true ? "Currently filtering to Yes" : "Click to filter to Yes"}
                               >
-                                Yes
+                                {booleanValue === true ? '✓ Yes' : 'Yes'}
                               </Button>
                               <Button
-                                variant={booleanValue === false ? "default" : "outline"}
+                                variant={booleanValue === false ? "secondary" : "ghost"}
                                 size="sm"
                                 className="h-8 md:h-6 px-2 text-xs min-h-[32px] md:min-h-auto"
                                 onClick={() => handleBooleanChange(filter.key, booleanValue === false ? null : false)}
+                                title={booleanValue === false ? "Currently filtering to No" : "Click to filter to No"}
                               >
-                                No
+                                {booleanValue === false ? '✓ No' : 'No'}
                               </Button>
                             </div>
                           </div>

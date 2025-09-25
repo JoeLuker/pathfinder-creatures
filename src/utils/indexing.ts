@@ -88,7 +88,10 @@ export function buildCreatureIndexes(creatures: CreatureEnriched[]): CreatureInd
     addToIndex(indexes.byType, creature.type_clean || creature.type, creature);
     addToIndex(indexes.bySize, creature.size_clean || creature.size, creature);
     addToIndex(indexes.byAlignment, creature.alignment_clean || creature.alignment, creature);
-    addToIndex(indexes.byEnvironment, creature.environment_clean || creature.environment, creature);
+    const environment = creature.environment_clean || creature.environment;
+    if (environment && environment !== null) {
+      addToIndex(indexes.byEnvironment, environment, creature);
+    }
 
     // Source indexes
     creature.sources?.forEach(source => {
@@ -139,9 +142,11 @@ export function buildCreatureIndexes(creatures: CreatureEnriched[]): CreatureInd
     }
 
     // DR types
-    if (creature.dr) {
+    if (creature.dr && Array.isArray(creature.dr)) {
       creature.dr.forEach(dr => {
-        if (dr.type) addToIndex(indexes.byDRType, dr.type.toLowerCase(), creature);
+        if (typeof dr === 'object' && dr.weakness) {
+          addToIndex(indexes.byDRType, dr.weakness.toLowerCase(), creature);
+        }
       });
     }
 
@@ -153,9 +158,9 @@ export function buildCreatureIndexes(creatures: CreatureEnriched[]): CreatureInd
     }
 
     // Movement types
-    if (creature.speeds) {
+    if (creature.speeds && typeof creature.speeds === 'object') {
       Object.keys(creature.speeds).forEach(speed => {
-        if (speed !== 'base' && creature.speeds[speed]) {
+        if (speed !== 'base' && creature.speeds?.[speed as keyof typeof creature.speeds]) {
           addToIndex(indexes.byMovementType, speed.toLowerCase(), creature);
         }
       });
@@ -202,19 +207,19 @@ export function buildCreatureIndexes(creatures: CreatureEnriched[]): CreatureInd
       indexes.withFastHealing.add(creature);
     }
 
-    if (creature.auras && creature.auras.length > 0) {
+    if (creature.auras && Array.isArray(creature.auras) && creature.auras.length > 0) {
       indexes.withAuras.add(creature);
     }
 
-    if (creature.attacks?.melee && creature.attacks.melee.length > 0) {
+    if (creature.attacks?.melee && Array.isArray(creature.attacks.melee) && creature.attacks.melee.length > 0) {
       indexes.withMeleeAttacks.add(creature);
     }
 
-    if (creature.attacks?.ranged && creature.attacks.ranged.length > 0) {
+    if (creature.attacks?.ranged && Array.isArray(creature.attacks.ranged) && creature.attacks.ranged.length > 0) {
       indexes.withRangedAttacks.add(creature);
     }
 
-    if (creature.attacks?.special && creature.attacks.special.length > 0) {
+    if (creature.attacks?.special && Array.isArray(creature.attacks.special) && creature.attacks.special.length > 0) {
       indexes.withSpecialAttacks.add(creature);
     }
   });

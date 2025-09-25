@@ -7,7 +7,8 @@ import type { CreatureEnriched } from '@/types/creature-complete';
 
 // Get AC value with fallbacks
 export function getAC(creature: CreatureEnriched): string {
-  return creature.ac_data?.AC ?? creature.ac ?? '—';
+  const ac = creature.ac_data?.AC ?? creature.ac;
+  return ac !== null && ac !== undefined ? ac.toString() : '—';
 }
 
 export function getTouchAC(creature: CreatureEnriched): number | null {
@@ -42,24 +43,24 @@ export function getWillSave(creature: CreatureEnriched): number | null {
 
 // Get ability scores with modifiers
 export function getAbilityScore(creature: CreatureEnriched, ability: 'STR' | 'DEX' | 'CON' | 'INT' | 'WIS' | 'CHA') {
-  const abilityLower = ability.toLowerCase() as 'str' | 'dex' | 'con' | 'int' | 'wis' | 'cha';
   return {
     score: creature.ability_scores?.[ability] ?? null,
-    modifier: creature.ability_scores_parsed?.[abilityLower]?.modifier ?? null
+    modifier: null // TODO: Add modifier calculation if needed
   };
 }
 
 // Get skills with fallbacks
 export function getPerception(creature: CreatureEnriched): number | null {
-  return creature.skills_parsed?.Perception?.value
-    ?? creature.skills?.Perception
-    ?? creature.skills_normalized?.Perception
-    ?? null;
+  const perception = creature.skills?.Perception;
+  if (typeof perception === 'number') return perception;
+  return null;
 }
 
 // Get combat stats with fallbacks
 export function getInitiative(creature: CreatureEnriched): number | null {
-  return creature.initiative_parsed?.value ?? creature.initiative ?? null;
+  const initiative = creature.initiative_parsed?.value ?? creature.initiative;
+  if (Array.isArray(initiative)) return initiative[0] ?? null;
+  return typeof initiative === 'number' ? initiative : null;
 }
 
 export function getCR(creature: CreatureEnriched): string {
