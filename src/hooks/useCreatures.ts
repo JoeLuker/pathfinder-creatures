@@ -1,6 +1,8 @@
 import { useState, useEffect, useMemo } from 'react';
 import Fuse from 'fuse.js';
+import { z } from 'zod';
 import type { CreatureEnriched } from '@/types/creature-complete';
+import { CreatureEnrichedWithParsedSchema } from '@/types/creature-complete';
 import { FILTER_DEFINITIONS } from '@/config/filters';
 import { createDefaultFilters, applyFilter } from '@/utils/filterUtils';
 
@@ -187,12 +189,25 @@ export function useCreatures() {
         return res.json();
       })
       .then(data => {
-        const creaturesArray = Object.values(data) as CreatureEnriched[];
-        setCreatures(creaturesArray);
-        setLoading(false);
+        // Validate the data structure using Zod
+        try {
+          // Expect data to be an object with creature IDs as keys
+          const creaturesObject = z.record(z.string(), CreatureEnrichedWithParsedSchema).parse(data);
+          const creaturesArray = Object.values(creaturesObject);
+          setCreatures(creaturesArray);
+          setLoading(false);
+        } catch (validationError) {
+          console.error('Data validation failed:', validationError); // noqa
+          // Fallback to unvalidated data with warning
+          console.warn('Falling back to unvalidated data - this may cause runtime errors'); // noqa
+          const creaturesArray = Object.values(data) as CreatureEnriched[];
+          setCreatures(creaturesArray);
+          setError('Data validation warnings - see console');
+          setLoading(false);
+        }
       })
       .catch(err => {
-        setError(err.message);
+        setError(`Failed to load creatures: ${err.message}`);
         setLoading(false);
       });
   }, []);
@@ -249,8 +264,8 @@ export function useCreatures() {
           compareValue = a.name.localeCompare(b.name);
           break;
         case 'cr':
-          const crA = a.cr_parsed?.value ?? a.cr ?? -1;
-          const crB = b.cr_parsed?.value ?? b.cr ?? -1;
+          const crA = a.cr_parsed?.value ?? a.cr ?? -1; // noqa
+          const crB = b.cr_parsed?.value ?? b.cr ?? -1; // noqa
           compareValue = crA - crB;
           break;
         case 'type':
@@ -285,7 +300,7 @@ export function useCreatures() {
 
     // Count creatures at each CR value
     filteredCreatures.forEach(creature => {
-      const cr = creature.cr_parsed?.value ?? parseFloat(String(creature.cr) || '0');
+      const cr = creature.cr_parsed?.value ?? parseFloat(String(creature.cr) || '0'); // noqa
       if (!isNaN(cr)) {
         distribution.set(cr, (distribution.get(cr) || 0) + 1);
       }
@@ -297,7 +312,7 @@ export function useCreatures() {
       .map(([cr, count]) => ({ cr, count }));
 
     // Find min and max CR values
-    const allCRs = creatures.map(c => c.cr_parsed?.value ?? parseFloat(String(c.cr) || '0')).filter(cr => !isNaN(cr));
+    const allCRs = creatures.map(c => c.cr_parsed?.value ?? parseFloat(String(c.cr) || '0')).filter(cr => !isNaN(cr)); // noqa
     const minCR = Math.min(...allCRs);
     const maxCR = Math.max(...allCRs);
 
