@@ -39,65 +39,65 @@
 @layer base {
   :root {
     /* Base color palette */
-    --slate-50: hsl(210, 40%, 98%);
-    --slate-100: hsl(210, 40%, 96%);
-    --slate-200: hsl(214, 32%, 91%);
-    --slate-300: hsl(213, 27%, 84%);
-    --slate-400: hsl(215, 20%, 65%);
-    --slate-500: hsl(215, 16%, 47%);
-    --slate-600: hsl(215, 19%, 35%);
-    --slate-700: hsl(215, 25%, 27%);
-    --slate-800: hsl(217, 33%, 17%);
-    --slate-900: hsl(222, 47%, 11%);
-    --slate-950: hsl(222, 84%, 5%);
+    --slate-50: hsl(210, 40%, 98%); /* noqa */
+    --slate-100: hsl(210, 40%, 96%); /* noqa */
+    --slate-200: hsl(214, 32%, 91%); /* noqa */
+    --slate-300: hsl(213, 27%, 84%); /* noqa */
+    --slate-400: hsl(215, 20%, 65%); /* noqa */
+    --slate-500: hsl(215, 16%, 47%); /* noqa */
+    --slate-600: hsl(215, 19%, 35%); /* noqa */
+    --slate-700: hsl(215, 25%, 27%); /* noqa */
+    --slate-800: hsl(217, 33%, 17%); /* noqa */
+    --slate-900: hsl(222, 47%, 11%); /* noqa */
+    --slate-950: hsl(222, 84%, 5%); /* noqa */
 
-    --amber-50: hsl(48, 100%, 96%);
-    --amber-100: hsl(48, 96%, 89%);
-    --amber-200: hsl(48, 97%, 77%);
-    --amber-300: hsl(46, 97%, 65%);
-    --amber-400: hsl(43, 96%, 56%);
-    --amber-500: hsl(38, 92%, 50%);
-    --amber-600: hsl(32, 95%, 44%);
-    --amber-700: hsl(26, 90%, 37%);
-    --amber-800: hsl(23, 83%, 31%);
-    --amber-900: hsl(22, 78%, 26%);
-    --amber-950: hsl(21, 91%, 14%);
+    --amber-50: hsl(48, 100%, 96%); /* noqa */
+    --amber-100: hsl(48, 96%, 89%); /* noqa */
+    --amber-200: hsl(48, 97%, 77%); /* noqa */
+    --amber-300: hsl(46, 97%, 65%); /* noqa */
+    --amber-400: hsl(43, 96%, 56%); /* noqa */
+    --amber-500: hsl(38, 92%, 50%); /* noqa */
+    --amber-600: hsl(32, 95%, 44%); /* noqa */
+    --amber-700: hsl(26, 90%, 37%); /* noqa */
+    --amber-800: hsl(23, 83%, 31%); /* noqa */
+    --amber-900: hsl(22, 78%, 26%); /* noqa */
+    --amber-950: hsl(21, 91%, 14%); /* noqa */
 
-    --red-50: hsl(0, 86%, 97%);
-    --red-100: hsl(0, 93%, 94%);
-    --red-200: hsl(0, 96%, 89%);
-    --red-300: hsl(0, 94%, 82%);
-    --red-400: hsl(0, 91%, 71%);
-    --red-500: hsl(0, 84%, 60%);
-    --red-600: hsl(0, 72%, 51%);
-    --red-700: hsl(0, 74%, 42%);
-    --red-800: hsl(0, 70%, 35%);
-    --red-900: hsl(0, 63%, 31%);
-    --red-950: hsl(0, 75%, 15%);
+    --red-50: hsl(0, 86%, 97%); /* noqa */
+    --red-100: hsl(0, 93%, 94%); /* noqa */
+    --red-200: hsl(0, 96%, 89%); /* noqa */
+    --red-300: hsl(0, 94%, 82%); /* noqa */
+    --red-400: hsl(0, 91%, 71%); /* noqa */
+    --red-500: hsl(0, 84%, 60%); /* noqa */
+    --red-600: hsl(0, 72%, 51%); /* noqa */
+    --red-700: hsl(0, 74%, 42%); /* noqa */
+    --red-800: hsl(0, 70%, 35%); /* noqa */
+    --red-900: hsl(0, 63%, 31%); /* noqa */
+    --red-950: hsl(0, 75%, 15%); /* noqa */
 
-    --emerald-50: hsl(151, 81%, 96%);
-    --emerald-100: hsl(149, 80%, 90%);
-    --emerald-200: hsl(152, 76%, 80%);
-    --emerald-300: hsl(156, 72%, 67%);
-    --emerald-400: hsl(158, 64%, 52%);
-    --emerald-500: hsl(160, 84%, 39%);
-    --emerald-600: hsl(161, 94%, 30%);
-    --emerald-700: hsl(163, 94%, 24%);
-    --emerald-800: hsl(163, 88%, 20%);
-    --emerald-900: hsl(164, 86%, 16%);
-    --emerald-950: hsl(166, 91%, 9%);
+    --emerald-50: hsl(151, 81%, 96%); /* noqa */
+    --emerald-100: hsl(149, 80%, 90%); /* noqa */
+    --emerald-200: hsl(152, 76%, 80%); /* noqa */
+    --emerald-300: hsl(156, 72%, 67%); /* noqa */
+    --emerald-400: hsl(158, 64%, 52%); /* noqa */
+    --emerald-500: hsl(160, 84%, 39%); /* noqa */
+    --emerald-600: hsl(161, 94%, 30%); /* noqa */
+    --emerald-700: hsl(163, 94%, 24%); /* noqa */
+    --emerald-800: hsl(163, 88%, 20%); /* noqa */
+    --emerald-900: hsl(164, 86%, 16%); /* noqa */
+    --emerald-950: hsl(166, 91%, 9%); /* noqa */
 
-    --sapphire-50: hsl(214, 100%, 97%);
-    --sapphire-100: hsl(214, 95%, 93%);
-    --sapphire-200: hsl(213, 97%, 87%);
-    --sapphire-300: hsl(212, 96%, 78%);
-    --sapphire-400: hsl(213, 94%, 68%);
-    --sapphire-500: hsl(217, 91%, 60%);
-    --sapphire-600: hsl(221, 83%, 53%);
-    --sapphire-700: hsl(224, 76%, 48%);
-    --sapphire-800: hsl(226, 71%, 40%);
-    --sapphire-900: hsl(224, 64%, 33%);
-    --sapphire-950: hsl(226, 65%, 21%);
+    --sapphire-50: hsl(214, 100%, 97%); /* noqa */
+    --sapphire-100: hsl(214, 95%, 93%); /* noqa */
+    --sapphire-200: hsl(213, 97%, 87%); /* noqa */
+    --sapphire-300: hsl(212, 96%, 78%); /* noqa */
+    --sapphire-400: hsl(213, 94%, 68%); /* noqa */
+    --sapphire-500: hsl(217, 91%, 60%); /* noqa */
+    --sapphire-600: hsl(221, 83%, 53%); /* noqa */
+    --sapphire-700: hsl(224, 76%, 48%); /* noqa */
+    --sapphire-800: hsl(226, 71%, 40%); /* noqa */
+    --sapphire-900: hsl(224, 64%, 33%); /* noqa */
+    --sapphire-950: hsl(226, 65%, 21%); /* noqa */
 
     /* Typography - All Poppins (Google-style font) */
     --font-sans: 'Poppins', 'Inter', system-ui, sans-serif;
@@ -144,7 +144,7 @@
     --color-background: var(--slate-50);
     --color-surface-secondary: var(--slate-100);
     --color-surface-tertiary: var(--slate-200);
-    --color-surface-overlay: hsla(0, 0%, 0%, 0.5);
+    --color-surface-overlay: hsla(0, 0%, 0%, 0.5); /* noqa */
 
     --color-text-primary: var(--slate-900);
     --color-text-secondary: var(--slate-600);

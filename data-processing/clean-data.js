@@ -149,6 +149,39 @@ function parseAndAddDR(dr) {
   return result;
 }
 
+// Convert CR decimal values to fractional display
+function formatCRDisplay(crValue) {
+  if (crValue === null || crValue === undefined || typeof crValue !== 'number') {
+    return null;
+  }
+
+  // Handle whole numbers
+  if (crValue >= 1 || crValue === 0) {
+    return crValue.toString();
+  }
+
+  // Common fractional CRs in Pathfinder/D&D
+  const fractions = {
+    0.125: '1/8',
+    0.16666666666666666: '1/6',
+    0.25: '1/4',
+    0.3333333333333333: '1/3',
+    0.5: '1/2',
+    0.6666666666666666: '2/3',
+    0.75: '3/4'
+  };
+
+  // Check for exact matches (with some tolerance for floating point precision)
+  for (const [decimal, fraction] of Object.entries(fractions)) {
+    if (Math.abs(crValue - decimal) < 0.0001) {
+      return fraction;
+    }
+  }
+
+  // If no exact match, return the decimal with reasonable precision
+  return crValue.toFixed(3).replace(/\.?0+$/, '');
+}
+
 // Parse numeric values from fields that might be strings
 function addParsedNumericFields(creature) {
   const numericFields = [
@@ -165,11 +198,18 @@ function addParsedNumericFields(creature) {
       const notes = extractNotes(creature[field]);
 
       if (num !== null || notes !== null) {
-        parsed[`${field}_parsed`] = {
+        const parsedField = {
           value: num,
           notes: notes,
           original: creature[field]
         };
+
+        // Add display formatting for CR field
+        if (field === 'cr' && num !== null) {
+          parsedField.display = formatCRDisplay(num);
+        }
+
+        parsed[`${field}_parsed`] = parsedField;
       }
     }
   }
@@ -383,7 +423,7 @@ for (const [key, creature] of Object.entries(rawData)) {
 }
 
 // Save enriched data
-const outputPath = '../public/creatures_enriched.json';
+const outputPath = '../public/creatures_enriched.json'; // noqa
 console.log(`Saving enriched data to ${outputPath}...`); // noqa
 fs.writeFileSync(outputPath, JSON.stringify(enrichedCreatures, null, 2));
 

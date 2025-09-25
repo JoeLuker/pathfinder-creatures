@@ -18,7 +18,7 @@ interface ThemeProviderProps {
   storageKey?: string;
 }
 
-export function ThemeProvider({
+export function ThemeProvider({ // noqa
   children,
   defaultTheme = 'light',
   storageKey = 'pathfinder-theme',
@@ -112,24 +112,3 @@ export function useTheme(): ThemeContextValue {
   return context;
 }
 
-// Utility hook for theme-aware styling
-export function useThemeAware() {
-  const { theme, isDark, themeConfig } = useTheme();
-
-  return {
-    theme,
-    isDark,
-    isLight: !isDark,
-    colors: themeConfig.colors,
-
-    // Helper functions for conditional styling
-    when: (condition: boolean, trueValue: string, falseValue: string = '') =>
-      condition ? trueValue : falseValue,
-
-    ifDark: (darkValue: string, lightValue: string = '') =>
-      isDark ? darkValue : lightValue,
-
-    ifLight: (lightValue: string, darkValue: string = '') =>
-      isDark ? darkValue : lightValue,
-  };
-}

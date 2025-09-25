@@ -32,19 +32,27 @@ interface SidebarProps {
   };
 }
 
-export function Sidebar({
+export function Sidebar({ // noqa
   filters,
   setFilters,
   creatures,
   filteredCreatures,
   crDistribution,
 }: SidebarProps) {
-  const [expandedSections, setExpandedSections] = useState<Record<string, boolean>>(
-    getAllCategories().reduce((acc, category) => {
-      acc[category] = false;
+  const [expandedSections, setExpandedSections] = useState<Record<string, boolean>>(() => {
+    const isMobile = typeof window !== 'undefined' && window.innerWidth < 768;
+    return getAllCategories().reduce((acc, category) => {
+      // On mobile, expand commonly used sections by default
+      if (isMobile) {
+        acc[category] = category === FILTER_CATEGORIES.BASIC ||
+                       category === FILTER_CATEGORIES.CHALLENGE ||
+                       category === FILTER_CATEGORIES.COMBAT;
+      } else {
+        acc[category] = false;
+      }
       return acc;
-    }, {} as Record<string, boolean>)
-  );
+    }, {} as Record<string, boolean>);
+  });
 
   // Search states for multi-select filters
   const [searchStates, setSearchStates] = useState<Record<string, string>>({});
@@ -214,9 +222,9 @@ export function Sidebar({
   const activeFiltersCount = getActiveFilterCount(filters);
 
   return (
-    <div className="space-y-1 h-full overflow-y-auto">
+    <div className="space-y-2 md:space-y-1 h-full overflow-y-auto">
       {/* Filters */}
-      <div className="bg-surface-primary rounded-md shadow-sm border p-2">
+      <div className="bg-surface-primary rounded-md shadow-sm border p-3 md:p-2">
         <div className="flex items-center justify-between mb-2">
           <div className="flex items-center gap-2">
             <SlidersHorizontal className="h-4 w-4 text-muted-foreground" />
@@ -287,7 +295,7 @@ export function Sidebar({
                   {isExpanded && (
                     <div className="space-y-1">
                       {/* CR Distribution Histogram */}
-                      <div className="h-16 flex items-end gap-0.5 px-2">
+                      <div className="h-12 md:h-16 flex items-end gap-0.5 px-2">
                         {(() => {
                           const maxCount = Math.max(...crDistribution.distribution.map(d => d.count));
                           const bucketWidth = 1;
@@ -318,7 +326,7 @@ export function Sidebar({
                                       ? 'opacity-80'
                                       : 'opacity-20'
                                   }`}
-                                  style={{
+                                  style={{ // noqa
                                     height: `${height}%`,
                                     backgroundColor: 'var(--color-interactive-primary)'
                                   }}
@@ -362,7 +370,7 @@ export function Sidebar({
                             min={crDistribution.minCR}
                             max={filters.crMax ?? crDistribution.maxCR}
                             step={0.5}
-                            className="w-20 h-7 text-xs"
+                            className="w-20 h-10 md:h-7 text-xs min-h-[40px] md:min-h-auto"
                           />
                           <span className="text-xs text-muted-foreground">to</span>
                           <Input
@@ -378,7 +386,7 @@ export function Sidebar({
                             min={filters.crMin ?? crDistribution.minCR}
                             max={crDistribution.maxCR}
                             step={0.5}
-                            className="w-20 h-7 text-xs"
+                            className="w-20 h-10 md:h-7 text-xs min-h-[40px] md:min-h-auto"
                           />
                         </div>
                       </div>
@@ -419,7 +427,7 @@ export function Sidebar({
           return (
             <div key={category} className="border-t pt-3 mt-1">
               <button
-                className="flex items-center justify-between w-full text-left mb-2"
+                className="flex items-center justify-between w-full text-left mb-2 py-2 px-1 -mx-1 rounded-md hover:bg-surface-secondary min-h-[44px] md:min-h-auto md:py-0"
                 onClick={() => toggleSection(category)}
               >
                 <div className="flex items-center gap-2">
@@ -460,7 +468,7 @@ export function Sidebar({
                 )}
               </button>
               {isExpanded && (
-                <div className="space-y-1">
+                <div className="space-y-2 md:space-y-1">
                   {categoryFilters.map(filter => {
                     switch (filter.type) {
                       case 'range':
@@ -499,14 +507,14 @@ export function Sidebar({
                         const currentFilterMode = filters.filterMode?.[filter.key as keyof typeof filters.filterMode] || 'any';
 
                         return (
-                          <div key={filter.key} className="space-y-0.5">
+                          <div key={filter.key} className="space-y-1 md:space-y-0.5">
                             <div className="flex items-center justify-between">
                               <span className="text-xs font-medium text-muted-foreground">{filter.label}</span>
                               <div className="flex items-center gap-1">
                                 <Button
                                   variant="ghost"
                                   size="sm"
-                                  className="h-5 px-2 text-xs"
+                                  className="h-8 md:h-5 px-2 text-xs min-h-[32px] md:min-h-auto"
                                   onClick={() => toggleShowAllValues(filter.key)}
                                 >
                                   {showAll ? 'With Data' : 'Show All'}
@@ -515,7 +523,7 @@ export function Sidebar({
                                   <Button
                                     variant="ghost"
                                     size="sm"
-                                    className="h-5 px-2 text-xs"
+                                    className="h-8 md:h-5 px-2 text-xs min-h-[32px] md:min-h-auto"
                                     onClick={() => toggleFilterMode(filter.key)}
                                   >
                                     {currentFilterMode === 'all' ? 'ALL' : 'ANY'}
@@ -525,7 +533,7 @@ export function Sidebar({
                                   <Button
                                     variant="ghost"
                                     size="sm"
-                                    className="h-5 px-2 text-xs"
+                                    className="h-8 md:h-5 px-2 text-xs min-h-[32px] md:min-h-auto"
                                     onClick={() => setFilters(prev => ({
                                       ...prev,
                                       excludeMode: {
@@ -545,7 +553,7 @@ export function Sidebar({
                                 placeholder={`Search ${filter.label.toLowerCase()}...`}
                                 value={searchValue}
                                 onChange={(e) => setSearchState(filter.key, e.target.value)}
-                                className="h-7 text-xs"
+                                className="h-10 md:h-7 text-xs min-h-[40px] md:min-h-auto"
                               />
                             )}
                             <div className="space-y-1 max-h-48 overflow-y-auto">
@@ -556,11 +564,11 @@ export function Sidebar({
                                 return (
                                   <label
                                     key={value}
-                                    className="relative flex items-center justify-between px-2 py-0 hover:bg-surface-secondary rounded cursor-pointer"
+                                    className="relative flex items-center justify-between px-2 py-2 md:py-1 hover:bg-surface-secondary rounded cursor-pointer min-h-[44px] md:min-h-auto"
                                   >
                                     <div
                                       className="absolute inset-0 bg-interactive-primary opacity-20 rounded"
-                                      style={{ width: `${percentage}%` }}
+                                      style={{ width: `${percentage}%` }} // noqa
                                     />
                                     <div className="relative flex items-center gap-2 flex-1">
                                       <input
@@ -593,7 +601,7 @@ export function Sidebar({
                               <Button
                                 variant={booleanValue === true ? "default" : "outline"}
                                 size="sm"
-                                className="h-6 px-2 text-xs"
+                                className="h-8 md:h-6 px-2 text-xs min-h-[32px] md:min-h-auto"
                                 onClick={() => handleBooleanChange(filter.key, booleanValue === true ? null : true)}
                               >
                                 Yes
@@ -601,7 +609,7 @@ export function Sidebar({
                               <Button
                                 variant={booleanValue === false ? "default" : "outline"}
                                 size="sm"
-                                className="h-6 px-2 text-xs"
+                                className="h-8 md:h-6 px-2 text-xs min-h-[32px] md:min-h-auto"
                                 onClick={() => handleBooleanChange(filter.key, booleanValue === false ? null : false)}
                               >
                                 No

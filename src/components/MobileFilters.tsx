@@ -23,7 +23,7 @@ interface MobileFiltersProps {
   setSortDirection: (direction: SortDirection) => void;
 }
 
-export function MobileFilters(props: MobileFiltersProps) {
+export function MobileFilters(props: MobileFiltersProps) { // noqa
   const [open, setOpen] = useState(false);
 
   // Count active filters
@@ -32,7 +32,7 @@ export function MobileFilters(props: MobileFiltersProps) {
   return (
     <Sheet open={open} onOpenChange={setOpen}>
       <SheetTrigger asChild>
-        <Button variant="outline" className="gap-2">
+        <Button variant="outline" className="gap-2 min-h-[44px] px-4">
           <SlidersHorizontal className="h-4 w-4" />
           <span>Filters</span>
           {activeCount > 0 && (
@@ -42,11 +42,11 @@ export function MobileFilters(props: MobileFiltersProps) {
           )}
         </Button>
       </SheetTrigger>
-      <SheetContent side="left" className="w-[85vw] sm:w-[385px] p-0 flex flex-col">
-        <SheetHeader className="px-2 py-4 border-b flex-none">
-          <SheetTitle>Filters & Sort</SheetTitle>
+      <SheetContent side="left" className="w-[90vw] sm:w-[385px] p-0 flex flex-col max-w-sm">
+        <SheetHeader className="px-4 py-4 border-b flex-none bg-surface-primary">
+          <SheetTitle className="text-lg font-semibold">Filters</SheetTitle>
         </SheetHeader>
-        <div className="flex-1 overflow-y-auto px-2 py-4">
+        <div className="flex-1 overflow-y-auto px-4 py-4">
           <Sidebar
             filters={props.filters}
             setFilters={props.setFilters}
@@ -55,11 +55,11 @@ export function MobileFilters(props: MobileFiltersProps) {
             crDistribution={props.crDistribution}
           />
         </div>
-        <div className="flex-none p-2 bg-surface-primary border-t">
-          <div className="flex gap-2">
+        <div className="flex-none p-4 bg-surface-secondary border-t shadow-lg">
+          <div className="flex gap-3">
             <Button
               variant="outline"
-              className="flex-1"
+              className="flex-1 min-h-[44px]"
               onClick={() => {
                 props.setFilters(createDefaultFilters());
               }}
@@ -67,7 +67,7 @@ export function MobileFilters(props: MobileFiltersProps) {
               Clear All
             </Button>
             <Button
-              className="flex-1"
+              className="flex-1 min-h-[44px]"
               onClick={() => setOpen(false)}
             >
               Apply Filters

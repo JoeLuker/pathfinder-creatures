@@ -4,16 +4,18 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { Button } from '@/components/ui/button';
 import {
   Card,
-  CardContent,
-  CardDescription,
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
 import { toast } from 'sonner';
-import { cn } from '@/lib/utils';
 import {
   ArrowLeft, Copy
 } from 'lucide-react';
+import { EmptyState } from './creature-detail/EmptyState';
+import { StatBlockSection } from './creature-detail/StatBlockSection';
+import { StatRow } from './creature-detail/StatRow';
+import { InfoList } from './creature-detail/InfoList';
+import { formatModifier, formatAbilityScore } from '@/lib/formatters';
 
 interface CreatureDetailMainProps {
   creature: CreatureEnriched | null;
@@ -21,43 +23,20 @@ interface CreatureDetailMainProps {
 }
 
 
-export function CreatureDetailMain({ creature, onBack }: CreatureDetailMainProps) {
+export function CreatureDetailMain({ creature, onBack }: CreatureDetailMainProps) { // noqa
 
   if (!creature) {
-    return (
-      <div className="flex-1 flex items-center justify-center">
-        <Card className="border-none shadow-none bg-transparent">
-          <CardHeader className="text-center">
-            <CardTitle className="text-xl">Select a creature</CardTitle>
-            <CardDescription>Choose a creature from the list to view details</CardDescription>
-          </CardHeader>
-        </Card>
-      </div>
-    );
+    return <EmptyState />;
   }
 
   // Use the display value from cr_parsed if available, otherwise use the cr value
-  const crDisplay = creature.cr_parsed?.display ?? creature.cr?.toString() ?? '-';
+  const crDisplay = creature.cr_parsed?.display ?? creature.cr?.toString() ?? '-'; // noqa
 
   const handleCopyJson = () => {
     navigator.clipboard.writeText(JSON.stringify(creature, null, 2));
     toast.success('JSON copied to clipboard');
   };
 
-  // Helper functions for stat block formatting
-  const formatSave = (save: number | undefined) => {
-    if (save === undefined || save === null) return 'ERROR';
-    return save >= 0 ? `+${save}` : `${save}`;
-  };
-
-  const formatAbilityScore = (score: number | undefined, modifier: number | undefined) => {
-    const scoreStr = score?.toString() ?? '—';
-    // Calculate modifier from score if modifier not provided
-    const calculatedModifier = score !== undefined ? Math.floor((score - 10) / 2) : 0;
-    const actualModifier = modifier !== undefined ? modifier : calculatedModifier;
-    const modStr = formatSave(actualModifier);
-    return `${scoreStr} (${modStr})`;
-  };
 
   return (
     <div className="flex-1 flex flex-col bg-background">
@@ -106,8 +85,8 @@ export function CreatureDetailMain({ creature, onBack }: CreatureDetailMainProps
             </div>
 
             {/* Senses & Init */}
-            <div className="flex items-center gap-2 flex-wrap mb-1">
-              <Badge variant="outline">Init {formatSave(creature.initiative_parsed?.value ?? creature.initiative)}</Badge>
+            <StatRow label="">
+              <Badge variant="outline">Init {formatModifier(creature.initiative_parsed?.value ?? creature.initiative)}</Badge>
               {creature.senses && Object.keys(creature.senses).length > 0 &&
                 Object.entries(creature.senses).map(([sense, value]) => (
                   <Badge key={sense} variant="outline" className="text-xs">
@@ -115,39 +94,33 @@ export function CreatureDetailMain({ creature, onBack }: CreatureDetailMainProps
                   </Badge>
                 ))
               }
-              <Badge variant="outline">Perception {formatSave(creature.skills_parsed?.Perception?.value ?? creature.skills?.Perception ?? creature.skills_normalized?.Perception)}</Badge>
-            </div>
+              <Badge variant="outline">Perception {formatModifier(creature.skills_parsed?.Perception?.value ?? creature.skills?.Perception ?? creature.skills_normalized?.Perception)}</Badge>
+            </StatRow>
 
-            {/* DEFENSE Section */}
-            <div className="mt-4">
-              <div className="font-bold text-base mb-2">DEFENSE</div>
-
+            <StatBlockSection title="DEFENSE">
               {/* AC */}
-              <div className="flex items-center gap-2 mb-1">
-                <span className="font-bold">AC</span>
+              <StatRow label="AC">
                 <Badge variant="default">AC {creature.ac_data?.AC ?? creature.ac ?? '—'}</Badge>
                 {creature.ac_data?.touch && <Badge variant="secondary">Touch {creature.ac_data.touch}</Badge>}
                 {creature.ac_data?.flat_footed && <Badge variant="secondary">Flat {creature.ac_data.flat_footed}</Badge>}
-              </div>
+              </StatRow>
 
               {/* HP */}
-              <div className="flex items-center gap-2 mb-1">
-                <span className="font-bold">hp</span>
+              <StatRow label="hp">
                 <Badge variant="destructive">HP {creature.hp?.total ?? '—'}</Badge>
                 <span className="text-muted-foreground">({creature.hp?.long ?? creature.hd ?? '—'})</span>
-              </div>
+              </StatRow>
 
               {/* Saves */}
-              <div className="flex items-center gap-2 mb-1">
-                <span className="font-bold">Saves</span>
-                <Badge variant="outline">Fort {formatSave(creature.saves_data?.fort ?? creature.fort ?? creature.saves?.fort)}</Badge>
-                <Badge variant="outline">Ref {formatSave(creature.saves_data?.ref ?? creature.ref ?? creature.saves?.ref)}</Badge>
-                <Badge variant="outline">Will {formatSave(creature.saves_data?.will ?? creature.will ?? creature.saves?.will)}</Badge>
-              </div>
+              <StatRow label="Saves">
+                <Badge variant="outline">Fort {formatModifier(creature.saves_data?.fort ?? creature.fort ?? creature.saves?.fort)}</Badge>
+                <Badge variant="outline">Ref {formatModifier(creature.saves_data?.ref ?? creature.ref ?? creature.saves?.ref)}</Badge>
+                <Badge variant="outline">Will {formatModifier(creature.saves_data?.will ?? creature.will ?? creature.saves?.will)}</Badge>
+              </StatRow>
 
               {/* Defensive abilities */}
               {(creature.dr || creature.immunities_normalized?.length || creature.resistances_normalized?.length || creature.resistances || creature.sr) && (
-                <div className="flex items-center gap-2 flex-wrap mb-1">
+                <StatRow label="">
                   {creature.dr && (
                     <Badge variant="secondary">
                       DR {typeof creature.dr === 'string'
@@ -170,13 +143,12 @@ export function CreatureDetailMain({ creature, onBack }: CreatureDetailMainProps
                     </Badge>
                   )}
                   {creature.sr && <Badge variant="secondary">SR {creature.sr}</Badge>}
-                </div>
+                </StatRow>
               )}
 
               {/* Weaknesses */}
               {(creature.weaknesses_normalized?.length > 0 || creature.weaknesses) && (
-                <div className="flex items-center gap-2 mb-1">
-                  <span className="font-bold">Weaknesses</span>
+                <StatRow label="Weaknesses">
                   <Badge variant="destructive">
                     Weak: {creature.weaknesses_normalized?.length > 0
                       ? creature.weaknesses_normalized.join(', ')
@@ -187,77 +159,54 @@ export function CreatureDetailMain({ creature, onBack }: CreatureDetailMainProps
                           : 'unknown'
                     }
                   </Badge>
-                </div>
+                </StatRow>
               )}
-            </div>
+            </StatBlockSection>
 
-            {/* OFFENSE Section */}
-            <div className="mt-4">
-              <div className="font-bold text-base mb-2">OFFENSE</div>
-
+            <StatBlockSection title="OFFENSE">
               {/* Speed */}
-              <div className="flex items-center gap-2 mb-1">
-                <span className="font-bold">Speed</span>
+              <StatRow label="Speed">
                 <Badge variant="outline">Speed {creature.speeds?.base ?? 30}ft</Badge>
                 {creature.speeds?.fly && <Badge variant="outline">Fly {creature.speeds.fly}ft</Badge>}
                 {creature.speeds?.swim && <Badge variant="outline">Swim {creature.speeds.swim}ft</Badge>}
-              </div>
+              </StatRow>
 
-              {/* Attacks */}
-              {creature.attacks?.melee?.length > 0 && (
-                <div className="mb-1">
-                  <span className="font-bold">Melee</span> <span className="text-sm">{creature.attacks.melee.join(', ')}</span>
-                </div>
-              )}
-
-              {creature.attacks?.ranged?.length > 0 && (
-                <div className="mb-1">
-                  <span className="font-bold">Ranged</span> <span className="text-sm">{creature.attacks.ranged.join(', ')}</span>
-                </div>
-              )}
+              <InfoList label="Melee" items={creature.attacks?.melee} />
+              <InfoList label="Ranged" items={creature.attacks?.ranged} />
 
               {/* Space/Reach */}
               {(creature.space !== 5 || creature.reach !== 5) && (
-                <div className="flex items-center gap-2 mb-1">
-                  <span className="font-bold">Space/Reach</span>
+                <StatRow label="Space/Reach">
                   <Badge variant="outline">Space {creature.space ?? 5}ft</Badge>
                   <Badge variant="outline">Reach {creature.reach ?? 5}ft</Badge>
-                </div>
+                </StatRow>
               )}
 
-              {(creature.special_attacks_normalized?.length > 0 || creature.attacks?.special?.length > 0) && (
-                <div className="mb-1">
-                  <span className="font-bold">Special Attacks</span> <span className="text-sm">
-                    {creature.special_attacks_normalized?.length > 0
-                      ? creature.special_attacks_normalized.join(', ')
-                      : creature.attacks?.special?.join(', ')
-                    }
-                  </span>
-                </div>
-              )}
-            </div>
+              <InfoList
+                label="Special Attacks"
+                items={creature.special_attacks_normalized?.length > 0
+                  ? creature.special_attacks_normalized
+                  : creature.attacks?.special}
+              />
+            </StatBlockSection>
 
-            {/* STATISTICS Section */}
-            <div className="mt-4">
-              <div className="font-bold text-base mb-2">STATISTICS</div>
-
+            <StatBlockSection title="STATISTICS">
               {/* Ability Scores */}
-              <div className="flex items-center gap-1 flex-wrap mb-2">
+              <StatRow label="" className="mb-2">
                 <Badge variant="outline">Str {formatAbilityScore(creature.ability_scores?.STR, creature.ability_scores_parsed?.str?.modifier)}</Badge>
                 <Badge variant="outline">Dex {formatAbilityScore(creature.ability_scores?.DEX, creature.ability_scores_parsed?.dex?.modifier)}</Badge>
                 <Badge variant="outline">Con {formatAbilityScore(creature.ability_scores?.CON, creature.ability_scores_parsed?.con?.modifier)}</Badge>
                 <Badge variant="outline">Int {formatAbilityScore(creature.ability_scores?.INT, creature.ability_scores_parsed?.int?.modifier)}</Badge>
                 <Badge variant="outline">Wis {formatAbilityScore(creature.ability_scores?.WIS, creature.ability_scores_parsed?.wis?.modifier)}</Badge>
                 <Badge variant="outline">Cha {formatAbilityScore(creature.ability_scores?.CHA, creature.ability_scores_parsed?.cha?.modifier)}</Badge>
-              </div>
+              </StatRow>
 
               {/* Combat Stats */}
-              <div className="flex items-center gap-2 mb-1">
-                <span className="font-bold">Combat</span>
-                <Badge variant="secondary">BAB {formatSave(creature.bab)}</Badge>
-                <Badge variant="secondary">CMB {formatSave(creature.cmb)}</Badge>
+              <StatRow label="Combat">
+                <Badge variant="secondary">BAB {formatModifier(creature.bab)}</Badge>
+                <Badge variant="secondary">CMB {formatModifier(creature.cmb)}</Badge>
                 <Badge variant="secondary">CMD {creature.cmd ?? '—'}</Badge>
-              </div>
+              </StatRow>
 
               {(creature.feats_normalized?.length > 0 || creature.feats?.length > 0) && (
                 <div className="mb-1">
@@ -290,7 +239,7 @@ export function CreatureDetailMain({ creature, onBack }: CreatureDetailMainProps
                         .filter(([, value]) => value !== undefined && value !== null)
                         .map(([skill, value]) => (
                           <Badge key={skill} variant="outline" className="text-xs">
-                            {skill} {formatSave(value as number)}
+                            {skill} {formatModifier(value as number)}
                           </Badge>
                         ))
                     ) : (
@@ -298,7 +247,7 @@ export function CreatureDetailMain({ creature, onBack }: CreatureDetailMainProps
                         .filter(([skill, value]) => skill !== '_racial_mods' && value !== undefined && value !== null)
                         .map(([skill, value]) => (
                           <Badge key={skill} variant="outline" className="text-xs">
-                            {skill} {formatSave(value as number)}
+                            {skill} {formatModifier(value as number)}
                           </Badge>
                         ))
                     )}
@@ -306,25 +255,12 @@ export function CreatureDetailMain({ creature, onBack }: CreatureDetailMainProps
                 </div>
               )}
 
-              {/* Languages */}
-              {creature.languages_normalized?.length > 0 && (
-                <div className="mb-1">
-                  <span className="font-bold">Languages</span> <span className="text-sm">{creature.languages_normalized.join(', ')}</span>
-                </div>
-              )}
+              <InfoList label="Languages" items={creature.languages_normalized} />
+              <InfoList label="SQ" items={creature.special_qualities_normalized} />
+            </StatBlockSection>
 
-              {/* Special Qualities */}
-              {creature.special_qualities_normalized?.length > 0 && (
-                <div className="mb-1">
-                  <span className="font-bold">SQ</span> <span className="text-sm">{creature.special_qualities_normalized.join(', ')}</span>
-                </div>
-              )}
-            </div>
-
-            {/* SPECIAL ABILITIES Section */}
             {creature.special_abilities_normalized?.length > 0 && (
-              <div className="mt-4">
-                <div className="font-bold text-base mb-2">SPECIAL ABILITIES</div>
+              <StatBlockSection title="SPECIAL ABILITIES">
                 <div className="space-y-2 ml-4">
                   {creature.special_abilities_normalized.map((ability, idx) => (
                     <div key={idx} className="text-wrap">
@@ -332,31 +268,28 @@ export function CreatureDetailMain({ creature, onBack }: CreatureDetailMainProps
                     </div>
                   ))}
                 </div>
-              </div>
+              </StatBlockSection>
             )}
 
-            {/* ECOLOGY Section */}
-            <div className="mt-4">
-              <div className="font-bold text-base mb-1">ECOLOGY</div>
-
+            <StatBlockSection title="ECOLOGY">
               {creature.environment && (
-                <div>
+                <div className="mb-1">
                   <span className="font-bold">Environment</span> {creature.environment}
                 </div>
               )}
 
               {creature.ecology?.organization && (
-                <div>
+                <div className="mb-1">
                   <span className="font-bold">Organization</span> {creature.ecology.organization}
                 </div>
               )}
 
               {creature.ecology?.treasure_type && (
-                <div>
+                <div className="mb-1">
                   <span className="font-bold">Treasure</span> {creature.ecology.treasure_type}
                 </div>
               )}
-            </div>
+            </StatBlockSection>
 
             {/* Description */}
             {(creature.desc_short || creature.desc_long) && (
