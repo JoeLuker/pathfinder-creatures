@@ -1,7 +1,7 @@
 import { z } from 'zod';
 
 // Enums for commonly used string fields
-export const CreatureTypeEnum = z.enum([
+const CreatureTypeEnum = z.enum([
   'aberration',
   'animal',
   'construct',
@@ -17,7 +17,7 @@ export const CreatureTypeEnum = z.enum([
   'vermin',
 ]);
 
-export const SizeEnum = z.enum([
+const SizeEnum = z.enum([
   'Fine',
   'Diminutive',
   'Tiny',
@@ -29,7 +29,7 @@ export const SizeEnum = z.enum([
   'Colossal',
 ]);
 
-export const AlignmentEnum = z.enum([
+const AlignmentEnum = z.enum([
   'Any alignment',
   'Any alignment (same as creator)',
   'CE',
@@ -50,7 +50,7 @@ export const AlignmentEnum = z.enum([
 ]);
 
 // Common subtypes (there are 111 total, including most common ones)
-export const SubtypeEnum = z.enum([
+const SubtypeEnum = z.enum([
   'Great Old One',
   'Hive',
   'Triaxian',
@@ -179,7 +179,7 @@ export const SubtypeEnum = z.enum([
 ]);
 
 // Movement types found in speeds object
-export const MovementTypeEnum = z.enum([
+const MovementTypeEnum = z.enum([
   'base',
   'burrow',
   'climb',
@@ -193,14 +193,14 @@ export const MovementTypeEnum = z.enum([
 ]);
 
 // Source schema
-export const SourceSchema = z.object({
+const SourceSchema = z.object({
   name: z.string(),
   page: z.number(),
   link: z.string().optional(),
 });
 
 // HD (Hit Dice) schemas
-export const RacialHDSchema = z.object({
+const RacialHDSchema = z.object({
   die: z.number(),
   num: z.number(),
   count: z.number().optional(),
@@ -208,20 +208,20 @@ export const RacialHDSchema = z.object({
   plus: z.number().optional(),
 });
 
-export const ClassHDSchema = z.object({
+const ClassHDSchema = z.object({
   name: z.string(),
   die: z.number(),
   num: z.number(),
 });
 
-export const HDSchema = z.object({
+const HDSchema = z.object({
   racial: RacialHDSchema.optional(),
   class: z.array(ClassHDSchema).optional(),
   num: z.number(),
 });
 
 // Health Points schema
-export const HealthPointsSchema = z.object({
+const HealthPointsSchema = z.object({
   total: z.number(),
   long: z.string(),
   HD: HDSchema.optional(),
@@ -235,7 +235,7 @@ export const HealthPointsSchema = z.object({
 });
 
 // Armor Class schema
-export const ArmorClassComponentsSchema = z.object({
+const ArmorClassComponentsSchema = z.object({
   dex: z.number().optional(),
   natural: z.number().optional(),
   size: z.number().optional(),
@@ -252,7 +252,7 @@ export const ArmorClassComponentsSchema = z.object({
   other: z.number().optional(),
 });
 
-export const ArmorClassSchema = z.object({
+const ArmorClassSchema = z.object({
   AC: z.number(),
   touch: z.number(),
   flat_footed: z.number(),
@@ -261,7 +261,7 @@ export const ArmorClassSchema = z.object({
 });
 
 // Saving Throws schema
-export const SavingThrowsSchema = z.object({
+const SavingThrowsSchema = z.object({
   fort: z.number(),
   ref: z.number(),
   will: z.number(),
@@ -272,7 +272,7 @@ export const SavingThrowsSchema = z.object({
 });
 
 // Ability Scores schema
-export const AbilityScoresSchema = z.object({
+const AbilityScoresSchema = z.object({
   STR: z.number().nullable().optional(),
   DEX: z.number().nullable().optional(),
   CON: z.number().nullable().optional(),
@@ -282,7 +282,7 @@ export const AbilityScoresSchema = z.object({
 });
 
 // Skills schema (flexible object with skill names as keys)
-export const SkillsSchema = z.record(z.string(), z.union([
+const SkillsSchema = z.record(z.string(), z.union([
   z.number(),
   z.string(),
   z.object({
@@ -292,7 +292,7 @@ export const SkillsSchema = z.record(z.string(), z.union([
 ]));
 
 // Feats schemas
-export const FeatSchema = z.object({
+const FeatSchema = z.object({
   name: z.string(),
   link: z.string().optional(),
   type: z.string().optional(),
@@ -300,7 +300,7 @@ export const FeatSchema = z.object({
 });
 
 // Race/Class information
-export const RaceClassSchema = z.object({
+const RaceClassSchema = z.object({
   raw: z.string(),
   race: z.string().optional(),
   class: z.array(z.object({
@@ -312,7 +312,7 @@ export const RaceClassSchema = z.object({
 });
 
 // Speeds schema
-export const SpeedsSchema = z.object({
+const SpeedsSchema = z.object({
   base: z.number().optional(),
   base_other: z.string().optional(),
   burrow: z.number().optional(),
@@ -329,7 +329,7 @@ export const SpeedsSchema = z.object({
 }).passthrough(); // Allow additional movement types
 
 // Attacks schema
-export const AttacksSchema = z.object({
+const AttacksSchema = z.object({
   melee: z.array(z.string()).optional(),
   ranged: z.array(z.string()).optional(),
   special: z.array(z.string()).optional(),
@@ -337,7 +337,7 @@ export const AttacksSchema = z.object({
 });
 
 // Spell-like abilities and spells
-export const SpellEntrySchema = z.object({
+const SpellEntrySchema = z.object({
   name: z.string(),
   DC: z.number().optional(),
   level: z.number().optional(),
@@ -347,14 +347,14 @@ export const SpellEntrySchema = z.object({
   source: z.string().optional(),
 });
 
-export const SpellGroupSchema = z.object({
+const SpellGroupSchema = z.object({
   level: z.number().optional(),
   name: z.string().optional(),
   frequency: z.string().optional(),
   spells: z.array(z.union([z.string(), SpellEntrySchema])),
 });
 
-export const SpellLikeAbilitiesSchema = z.object({
+const SpellLikeAbilitiesSchema = z.object({
   entries: z.array(SpellEntrySchema).optional(),
   sources: z.array(SourceSchema.extend({
     concentration: z.number().optional(),
@@ -364,26 +364,26 @@ export const SpellLikeAbilitiesSchema = z.object({
   symbols_special: z.boolean().optional(),
 });
 
-export const SpellsSchema = z.object({
+const SpellsSchema = z.object({
   entries: z.array(z.any()).optional(), // Complex nested structure
   sources: z.array(SourceSchema).optional(),
 });
 
 // Senses schema
-export const SensesSchema = z.record(z.string(), z.union([
+const SensesSchema = z.record(z.string(), z.union([
   z.boolean(),
   z.number(),
   z.string(),
 ]));
 
 // Resistances schema
-export const ResistancesSchema = z.record(z.string(), z.union([
+const ResistancesSchema = z.record(z.string(), z.union([
   z.number(),
   z.string(),
 ]));
 
 // Damage Reduction schema
-export const DREntrySchema = z.object({
+const DREntrySchema = z.object({
   amount: z.number(),
   types: z.array(z.string()),
   and: z.boolean().optional(),
@@ -391,7 +391,7 @@ export const DREntrySchema = z.object({
 });
 
 // Tactics schema
-export const TacticsSchema = z.object({
+const TacticsSchema = z.object({
   'Before Combat': z.string().optional(),
   'During Combat': z.string().optional(),
   'Morale': z.string().optional(),
@@ -400,14 +400,14 @@ export const TacticsSchema = z.object({
 }).passthrough();
 
 // Gear schema
-export const GearSchema = z.object({
+const GearSchema = z.object({
   combat: z.array(z.string()).optional(),
   other: z.array(z.string()).optional(),
   gear: z.array(z.string()).optional(),
 });
 
 // Ecology schema
-export const EcologySchema = z.object({
+const EcologySchema = z.object({
   environment: z.string().optional(),
   organization: z.string().optional(),
   treasure: z.string().optional(),
@@ -416,20 +416,20 @@ export const EcologySchema = z.object({
 });
 
 // Psychic Magic schema
-export const PsychicMagicEntrySchema = z.object({
+const PsychicMagicEntrySchema = z.object({
   name: z.string(),
   PE: z.number(),
   DC: z.number().optional(),
 });
 
-export const PsychicMagicSchema = z.object({
+const PsychicMagicSchema = z.object({
   PE: z.number().optional(),
   entries: z.array(PsychicMagicEntrySchema).optional(),
   sources: z.array(SourceSchema).optional(),
 });
 
 // Kineticist Wild Talents schema
-export const KineticistWildTalentsSchema = z.object({
+const KineticistWildTalentsSchema = z.object({
   Defense: z.array(z.string()).optional(),
   Infusions: z.array(z.string()).optional(),
   'Kinetic Blasts': z.array(z.string()).optional(),
@@ -438,7 +438,7 @@ export const KineticistWildTalentsSchema = z.object({
 });
 
 // Special Abilities schema (very flexible)
-export const SpecialAbilitiesSchema = z.record(z.string(), z.union([
+const SpecialAbilitiesSchema = z.record(z.string(), z.union([
   z.string(),
   z.object({
     description: z.string(),
@@ -448,19 +448,19 @@ export const SpecialAbilitiesSchema = z.record(z.string(), z.union([
 ]));
 
 // Parsed field schemas
-export const ParsedNumericFieldSchema = z.object({
+const ParsedNumericFieldSchema = z.object({
   value: z.number().nullable(),
   notes: z.string().nullable(),
   original: z.union([z.string(), z.number()]),
 });
 
-export const ParsedInitiativeSchema = z.object({
+const ParsedInitiativeSchema = z.object({
   value: z.number().nullable(),
   alternatives: z.array(z.number()).optional(),
   original: z.union([z.number(), z.array(z.number())]),
 });
 
-export const ParsedSpeedsSchema = z.object({
+const ParsedSpeedsSchema = z.object({
   base: z.number().nullable(),
   burrow: z.number().nullable(),
   climb: z.number().nullable(),
@@ -474,14 +474,14 @@ export const ParsedSpeedsSchema = z.object({
   })).optional(),
 });
 
-export const ParsedSpecialAbilitySchema = z.object({
+const ParsedSpecialAbilitySchema = z.object({
   name: z.string(),
   type: z.string().nullable(),
   description: z.string(),
   originalKey: z.string(),
 });
 
-export const ParsedDRSchema = z.object({
+const ParsedDRSchema = z.object({
   amount: z.number().optional(),
   types: z.array(z.string()).optional(),
   operator: z.enum(['or', 'and']).nullable().optional(),
@@ -489,7 +489,7 @@ export const ParsedDRSchema = z.object({
   unparseable: z.boolean().optional(),
 });
 
-export const MetadataSchema = z.object({
+const MetadataSchema = z.object({
   hasNumericCR: z.boolean(),
   hasValidInitiative: z.boolean(),
   hasSpecialAbilities: z.boolean(),
@@ -498,7 +498,7 @@ export const MetadataSchema = z.object({
 });
 
 // Main Creature Schema
-export const CreatureCompleteSchema = z.object({
+const CreatureCompleteSchema = z.object({
   // Core identification
   url: z.string(),
   name: z.string(),
@@ -622,7 +622,7 @@ export const CreatureCompleteSchema = z.object({
 });
 
 // Enriched Creature Schema (includes all parsed fields)
-export const CreatureEnrichedSchema = CreatureCompleteSchema.extend({
+const CreatureEnrichedSchema = CreatureCompleteSchema.extend({
   // Parsed numeric fields
   cr_parsed: ParsedNumericFieldSchema.optional(),
   mr_parsed: ParsedNumericFieldSchema.optional(),
@@ -663,7 +663,7 @@ export const CreatureEnrichedSchema = CreatureCompleteSchema.extend({
 });
 
 // Validated schema based on successful analysis of all 3,654 creatures
-export const CreatureEnrichedWithParsedSchema = CreatureEnrichedSchema.extend({
+const CreatureEnrichedWithParsedSchema = CreatureEnrichedSchema.extend({
   // Parsed versions of existing fields - all optional with flexible structure
   cr_parsed: z.object({
     value: z.number(),

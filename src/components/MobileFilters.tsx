@@ -22,6 +22,11 @@ interface MobileFiltersProps {
   setSortField: (field: SortField) => void;
   sortDirection: SortDirection;
   setSortDirection: (direction: SortDirection) => void;
+  // Shared sidebar state
+  expandedSections: Record<string, boolean>;
+  setExpandedSections: React.Dispatch<React.SetStateAction<Record<string, boolean>>>;
+  searchStates: Record<string, string>;
+  setSearchStates: React.Dispatch<React.SetStateAction<Record<string, string>>>;
 }
 
 export function MobileFilters(props: MobileFiltersProps) { // noqa
@@ -55,6 +60,10 @@ export function MobileFilters(props: MobileFiltersProps) { // noqa
             filteredCreatures={props.filteredCreatures}
             precomputedFilterOptions={props.precomputedFilterOptions}
             crDistribution={props.crDistribution}
+            expandedSections={props.expandedSections}
+            setExpandedSections={props.setExpandedSections}
+            searchStates={props.searchStates}
+            setSearchStates={props.setSearchStates}
           />
         </div>
         <div className="flex-none p-4 bg-surface-secondary border-t shadow-lg">

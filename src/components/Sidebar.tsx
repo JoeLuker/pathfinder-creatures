@@ -37,6 +37,11 @@ interface SidebarProps {
     minCR: number;
     maxCR: number;
   };
+  // Shared state for responsive consistency
+  expandedSections: Record<string, boolean>;
+  setExpandedSections: React.Dispatch<React.SetStateAction<Record<string, boolean>>>;
+  searchStates: Record<string, string>;
+  setSearchStates: React.Dispatch<React.SetStateAction<Record<string, string>>>;
 }
 
 export function Sidebar({ // noqa
@@ -46,17 +51,11 @@ export function Sidebar({ // noqa
   filteredCreatures,
   precomputedFilterOptions,
   crDistribution,
+  expandedSections,
+  setExpandedSections,
+  searchStates,
+  setSearchStates,
 }: SidebarProps) {
-  const [expandedSections, setExpandedSections] = useState<Record<string, boolean>>(() => {
-    return getAllCategories().reduce((acc, category) => {
-      // All filters collapsed by default
-      acc[category] = false;
-      return acc;
-    }, {} as Record<string, boolean>);
-  });
-
-  // Search states for multi-select filters
-  const [searchStates, setSearchStates] = useState<Record<string, string>>({});
 
   // Filter display states - show all values vs only values with data
   const [showAllValues, setShowAllValues] = useState<Record<string, boolean>>({});
@@ -92,7 +91,7 @@ export function Sidebar({ // noqa
     let count = 0;
 
     categoryFilters.forEach(filter => {
-      if (filter.type === 'multi-select') {
+      if (filter.type === 'multiSelect') {
         const values = (filters[filter.key as keyof Filters] as string[]) || [];
         count += values.length;
       } else if (filter.type === 'range') {

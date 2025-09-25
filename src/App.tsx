@@ -12,6 +12,7 @@ import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { LoadingSkeleton } from '@/components/LoadingSkeleton';
+import { getAllCategories } from '@/config/filters';
 
 function App() {
   const {
@@ -37,6 +38,17 @@ function App() {
   const [selectedCreature, setSelectedCreature] = useState<CreatureEnriched | null>(null);
   const [showFilters, setShowFilters] = useState(true);
   const [showCreatureList, setShowCreatureList] = useState(true);
+
+  // Shared sidebar state for responsive consistency
+  const [expandedSections, setExpandedSections] = useState<Record<string, boolean>>(() => {
+    return getAllCategories().reduce((acc, category) => {
+      // All filters collapsed by default
+      acc[category] = false;
+      return acc;
+    }, {} as Record<string, boolean>);
+  });
+
+  const [searchStates, setSearchStates] = useState<Record<string, string>>({});
 
   const handleCreatureClick = (creature: CreatureEnriched) => {
     setSelectedCreature(creature);
@@ -91,6 +103,10 @@ function App() {
                 setSortField={setSortField}
                 sortDirection={sortDirection}
                 setSortDirection={setSortDirection}
+                expandedSections={expandedSections}
+                setExpandedSections={setExpandedSections}
+                searchStates={searchStates}
+                setSearchStates={setSearchStates}
               />
             </div>
           </div>
@@ -166,6 +182,10 @@ function App() {
                   filteredCreatures={filteredCreatures}
                   precomputedFilterOptions={precomputedFilterOptions}
                   crDistribution={crDistribution}
+                  expandedSections={expandedSections}
+                  setExpandedSections={setExpandedSections}
+                  searchStates={searchStates}
+                  setSearchStates={setSearchStates}
                 />
               </div>
             </ScrollArea>

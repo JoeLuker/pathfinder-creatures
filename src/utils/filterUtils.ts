@@ -28,7 +28,7 @@ export const createDefaultFilters = (): Filters => {
 };
 
 // Apply a single filter to a creature
-export const applyFilter = (
+const applyFilter = (
   creature: any,
   filter: FilterConfig,
   filterValue: any,
