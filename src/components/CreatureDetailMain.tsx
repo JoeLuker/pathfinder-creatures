@@ -225,11 +225,9 @@ export function CreatureDetailMain({ creature, onBack }: CreatureDetailMainProps
                 </div>
               )}
 
-              {/* Special Attacks */}
               {(creature.special_attacks_normalized?.length > 0 || creature.attacks?.special?.length > 0) && (
                 <div className="mb-1">
-                  <span className="font-bold">Special Attacks</span>
-                  <span className="text-sm">
+                  <span className="font-bold">Special Attacks</span> <span className="text-sm">
                     {creature.special_attacks_normalized?.length > 0
                       ? creature.special_attacks_normalized.join(', ')
                       : creature.attacks?.special?.join(', ')
@@ -261,7 +259,6 @@ export function CreatureDetailMain({ creature, onBack }: CreatureDetailMainProps
                 <Badge variant="secondary">CMD {creature.cmd ?? '—'}</Badge>
               </div>
 
-              {/* Feats */}
               {(creature.feats_normalized?.length > 0 || creature.feats?.length > 0) && (
                 <div className="mb-1">
                   <span className="font-bold">Feats</span>

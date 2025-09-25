@@ -32,7 +32,8 @@ export const applyFilter = (
   creature: any,
   filter: FilterConfig,
   filterValue: any,
-  excludeMode: boolean = false
+  excludeMode: boolean = false,
+  filterMode: 'any' | 'all' = 'any'
 ): boolean => {
   const creatureValue = filter.getValue?.(creature);
 
@@ -58,11 +59,23 @@ export const applyFilter = (
       if (!creatureValue) return false;
 
       const creatureValues = Array.isArray(creatureValue) ? creatureValue : [creatureValue];
-      const matches = selectedValues.some((filterVal: string) =>
-        creatureValues.some((creatureVal: string) =>
-          creatureVal.toLowerCase() === filterVal.toLowerCase()
-        )
-      );
+
+      let matches: boolean;
+      if (filterMode === 'all') {
+        // ALL mode: creature must have ALL selected values
+        matches = selectedValues.every((filterVal: string) =>
+          creatureValues.some((creatureVal: string) =>
+            creatureVal.toLowerCase() === filterVal.toLowerCase()
+          )
+        );
+      } else {
+        // ANY mode: creature must have at least ONE selected value (default behavior)
+        matches = selectedValues.some((filterVal: string) =>
+          creatureValues.some((creatureVal: string) =>
+            creatureVal.toLowerCase() === filterVal.toLowerCase()
+          )
+        );
+      }
 
       return excludeMode ? !matches : matches;
     }
@@ -148,7 +161,9 @@ export const getPredictiveCount = (
   // Apply all filters to get the count
   return creatures.filter(creature => {
     return FILTER_DEFINITIONS.every(config => {
-      return applyFilter(creature, config, simulatedFilters, simulatedFilters.excludeMode?.[config.key as keyof typeof simulatedFilters.excludeMode]);
+      const isExcluded = simulatedFilters.excludeMode?.[config.key as keyof typeof simulatedFilters.excludeMode];
+      const filterModeValue = simulatedFilters.filterMode?.[config.key as keyof typeof simulatedFilters.filterMode] || 'any';
+      return applyFilter(creature, config, simulatedFilters, isExcluded, filterModeValue);
     });
   }).length;
 };

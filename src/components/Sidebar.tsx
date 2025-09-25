@@ -41,7 +41,7 @@ export function Sidebar({
 }: SidebarProps) {
   const [expandedSections, setExpandedSections] = useState<Record<string, boolean>>(
     getAllCategories().reduce((acc, category) => {
-      acc[category] = category === FILTER_CATEGORIES.BASIC;
+      acc[category] = false;
       return acc;
     }, {} as Record<string, boolean>)
   );
@@ -49,12 +49,29 @@ export function Sidebar({
   // Search states for multi-select filters
   const [searchStates, setSearchStates] = useState<Record<string, string>>({});
 
+  // Filter display states - show all values vs only values with data
+  const [showAllValues, setShowAllValues] = useState<Record<string, boolean>>({});
+
   const toggleSection = (section: string) => {
     setExpandedSections(prev => ({ ...prev, [section]: !prev[section] }));
   };
 
   const setSearchState = (filterKey: string, value: string) => {
     setSearchStates(prev => ({ ...prev, [filterKey]: value }));
+  };
+
+  const toggleShowAllValues = (filterKey: string) => {
+    setShowAllValues(prev => ({ ...prev, [filterKey]: !prev[filterKey] }));
+  };
+
+  const toggleFilterMode = (filterKey: string) => {
+    setFilters(prev => ({
+      ...prev,
+      filterMode: {
+        ...prev.filterMode,
+        [filterKey]: prev.filterMode?.[filterKey as keyof typeof prev.filterMode] === 'all' ? 'any' : 'all'
+      }
+    }));
   };
 
   // Generic toggle handler for multi-select filters
@@ -229,7 +246,11 @@ export function Sidebar({
                       break;
                   }
                   return acc;
-                }, { search: '' } as any);
+                }, {
+                  search: '',
+                  excludeMode: {},
+                  filterMode: {}
+                } as any);
                 setFilters(defaultFilters);
               }}
             >
@@ -464,32 +485,59 @@ export function Sidebar({
                       case 'multiSelect':
                         const uniqueValues = getUniqueValues(filter);
                         const searchValue = searchStates[filter.key] || '';
-                        const filteredValues = uniqueValues.filter(({ value }) =>
-                          value.toLowerCase().includes(searchValue.toLowerCase())
-                        );
+                        const showAll = showAllValues[filter.key] ?? false;
+
+                        // Filter by search and optionally by data availability
+                        const filteredValues = uniqueValues.filter(({ value, count }) => {
+                          const matchesSearch = value.toLowerCase().includes(searchValue.toLowerCase());
+                          const hasData = count > 0;
+                          return matchesSearch && (showAll || hasData);
+                        });
+
                         const currentValues = (filters[filter.key as keyof Filters] as string[]) || [];
                         const maxCount = Math.max(...uniqueValues.map(v => v.count));
+                        const currentFilterMode = filters.filterMode?.[filter.key as keyof typeof filters.filterMode] || 'any';
 
                         return (
                           <div key={filter.key} className="space-y-0.5">
                             <div className="flex items-center justify-between">
                               <span className="text-xs font-medium text-muted-foreground">{filter.label}</span>
-                              {currentValues.length > 0 && filter.excludeMode && (
+                              <div className="flex items-center gap-1">
                                 <Button
                                   variant="ghost"
                                   size="sm"
                                   className="h-5 px-2 text-xs"
-                                  onClick={() => setFilters(prev => ({
-                                    ...prev,
-                                    excludeMode: {
-                                      ...prev.excludeMode,
-                                      [filter.key]: !prev.excludeMode?.[filter.key as keyof typeof prev.excludeMode]
-                                    }
-                                  }))}
+                                  onClick={() => toggleShowAllValues(filter.key)}
                                 >
-                                  {(filters.excludeMode as any)?.[filter.key] ? 'Include' : 'Exclude'}
+                                  {showAll ? 'With Data' : 'Show All'}
                                 </Button>
-                              )}
+                                {currentValues.length > 1 && (
+                                  <Button
+                                    variant="ghost"
+                                    size="sm"
+                                    className="h-5 px-2 text-xs"
+                                    onClick={() => toggleFilterMode(filter.key)}
+                                  >
+                                    {currentFilterMode === 'all' ? 'ALL' : 'ANY'}
+                                  </Button>
+                                )}
+                                {currentValues.length > 0 && filter.excludeMode && (
+                                  <Button
+                                    variant="ghost"
+                                    size="sm"
+                                    className="h-5 px-2 text-xs"
+                                    onClick={() => setFilters(prev => ({
+                                      ...prev,
+                                      excludeMode: {
+                                        ...prev.excludeMode,
+                                        [filter.key]: !prev.excludeMode?.[filter.key as keyof typeof prev.excludeMode]
+                                      }
+                                    }))}
+                                  >
+                                    {(filters.excludeMode as any)?.[filter.key] ? 'Include' : 'Exclude'}
+                                  </Button>
+                                )}
+                              </div>
                             </div>
                             {filter.searchable && (
                               <Input
@@ -501,7 +549,7 @@ export function Sidebar({
                               />
                             )}
                             <div className="space-y-1 max-h-48 overflow-y-auto">
-                              {filteredValues.slice(0, 50).map(({ value, count }) => {
+                              {filteredValues.map(({ value, count }) => {
                                 const percentage = maxCount > 0 ? (count / maxCount) * 100 : 0;
                                 const isChecked = currentValues.includes(value);
 

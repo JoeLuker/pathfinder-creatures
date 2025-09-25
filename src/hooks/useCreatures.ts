@@ -145,6 +145,24 @@ export interface Filters {
     immunities?: boolean;
     weaknesses?: boolean;
   };
+
+  filterMode?: {
+    types?: 'any' | 'all';
+    sizes?: 'any' | 'all';
+    alignments?: 'any' | 'all';
+    subtypes?: 'any' | 'all';
+    movementTypes?: 'any' | 'all';
+    specialAbilities?: 'any' | 'all';
+    defensiveAbilities?: 'any' | 'all';
+    languages?: 'any' | 'all';
+    environments?: 'any' | 'all';
+    senseTypes?: 'any' | 'all';
+    sources?: 'any' | 'all';
+    drTypes?: 'any' | 'all';
+    resistanceTypes?: 'any' | 'all';
+    immunities?: 'any' | 'all';
+    weaknesses?: 'any' | 'all';
+  };
 }
 
 export type SortField = 'name' | 'cr' | 'type' | 'size';
@@ -159,7 +177,7 @@ export function useCreatures() {
   const [filters, setFilters] = useState<Filters>(createDefaultFilters());
   const [sortField, setSortField] = useState<SortField>('name');
   const [sortDirection, setSortDirection] = useState<SortDirection>('asc');
-  const [currentPage, setCurrentPage] = useState(1);
+  const [visibleCount, setVisibleCount] = useState(24);
   const itemsPerPage = 24;
 
   useEffect(() => {
@@ -215,7 +233,9 @@ export function useCreatures() {
     return searchResults.filter(creature => {
       // Apply each configured filter
       return FILTER_DEFINITIONS.every(filterConfig => {
-        return applyFilter(creature, filterConfig, filters, filters.excludeMode?.[filterConfig.key as keyof typeof filters.excludeMode]);
+        const isExcluded = filters.excludeMode?.[filterConfig.key as keyof typeof filters.excludeMode];
+        const filterModeValue = filters.filterMode?.[filterConfig.key as keyof typeof filters.filterMode] || 'any';
+        return applyFilter(creature, filterConfig, filters, isExcluded, filterModeValue);
       });
     });
   }, [creatures, filters]);
@@ -249,13 +269,15 @@ export function useCreatures() {
     return sorted;
   }, [filteredCreatures, sortField, sortDirection]);
 
-  const paginatedCreatures = useMemo(() => {
-    const startIndex = (currentPage - 1) * itemsPerPage;
-    const endIndex = startIndex + itemsPerPage;
-    return sortedCreatures.slice(startIndex, endIndex);
-  }, [sortedCreatures, currentPage]);
+  const visibleCreatures = useMemo(() => {
+    return sortedCreatures.slice(0, visibleCount);
+  }, [sortedCreatures, visibleCount]);
 
-  const totalPages = Math.ceil(sortedCreatures.length / itemsPerPage);
+  const hasMore = visibleCount < sortedCreatures.length;
+
+  const loadMore = () => {
+    setVisibleCount(prev => Math.min(prev + itemsPerPage, sortedCreatures.length));
+  };
 
   // Calculate CR distribution for histogram
   const crDistribution = useMemo(() => {
@@ -284,13 +306,13 @@ export function useCreatures() {
 
 
   useEffect(() => {
-    setCurrentPage(1);
+    setVisibleCount(itemsPerPage);
   }, [filters, sortField, sortDirection]);
 
   return {
-    creatures: paginatedCreatures,
+    creatures: visibleCreatures,
     allCreatures: creatures,
-    filteredCreatures: filteredCreatures, // Before pagination for predictive counts
+    filteredCreatures: filteredCreatures, // Before infinite scroll for predictive counts
     totalCreatures: creatures.length,
     filteredCount: sortedCreatures.length,
     loading,
@@ -301,9 +323,8 @@ export function useCreatures() {
     setSortField,
     sortDirection,
     setSortDirection,
-    currentPage,
-    setCurrentPage,
-    totalPages,
+    hasMore,
+    loadMore,
     crDistribution
   };
 }

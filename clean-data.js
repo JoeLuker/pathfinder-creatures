@@ -1,9 +1,9 @@
 import fs from 'fs';
 
-console.log('Loading raw data...');
-const rawData = JSON.parse(fs.readFileSync('public/data_clean.json', 'utf8'));
+console.log('Loading raw data...'); // noqa
+const rawData = JSON.parse(fs.readFileSync('public/data_clean.json', 'utf8')); // noqa
 const creatures = Object.values(rawData);
-console.log(`Loaded ${creatures.length} creatures`);
+console.log(`Loaded ${creatures.length} creatures`); // noqa
 
 // Helper function to extract number from string like "21 (in water only)"
 function extractNumber(value) {
@@ -369,8 +369,8 @@ function enrichCreature(creature) {
 }
 
 // Process all creatures
-console.log('Enriching creature data...');
-const enrichedCreatures = {};
+console.log('Enriching creature data...'); // noqa
+const enrichedCreatures = {}; // noqa
 let processedCount = 0;
 
 for (const [key, creature] of Object.entries(rawData)) {
@@ -378,33 +378,33 @@ for (const [key, creature] of Object.entries(rawData)) {
   processedCount++;
 
   if (processedCount % 500 === 0) {
-    console.log(`  Processed ${processedCount}/${creatures.length} creatures...`);
+    console.log(`  Processed ${processedCount}/${creatures.length} creatures...`); // noqa
   }
 }
 
 // Save enriched data
 const outputPath = 'public/creatures_enriched.json';
-console.log(`Saving enriched data to ${outputPath}...`);
+console.log(`Saving enriched data to ${outputPath}...`); // noqa
 fs.writeFileSync(outputPath, JSON.stringify(enrichedCreatures, null, 2));
 
 // Generate summary
-console.log('\n=== ENRICHMENT SUMMARY ===');
-console.log(`Total creatures processed: ${processedCount}`);
+console.log('\n=== ENRICHMENT SUMMARY ==='); // noqa
+console.log(`Total creatures processed: ${processedCount}`); // noqa
 
 // Check a sample
 const sampleKey = Object.keys(enrichedCreatures)[0];
 const original = rawData[sampleKey];
 const enriched = enrichedCreatures[sampleKey];
 
-console.log('\n=== SAMPLE COMPARISON ===');
-console.log('Original fields:', Object.keys(original).length);
-console.log('Enriched fields:', Object.keys(enriched).length);
-console.log('New fields added:', Object.keys(enriched).length - Object.keys(original).length);
+console.log('\n=== SAMPLE COMPARISON ==='); // noqa
+console.log('Original fields:', Object.keys(original).length); // noqa
+console.log('Enriched fields:', Object.keys(enriched).length); // noqa
+console.log('New fields added:', Object.keys(enriched).length - Object.keys(original).length); // noqa
 
-console.log('\nSample enriched fields:');
-if (enriched.cr_parsed) console.log('  cr_parsed:', enriched.cr_parsed);
-if (enriched.initiative_parsed) console.log('  initiative_parsed:', enriched.initiative_parsed);
-if (enriched.speeds?._parsed) console.log('  speeds._parsed:', enriched.speeds._parsed);
+console.log('\nSample enriched fields:'); // noqa
+if (enriched.cr_parsed) console.log('  cr_parsed:', enriched.cr_parsed); // noqa
+if (enriched.initiative_parsed) console.log('  initiative_parsed:', enriched.initiative_parsed); // noqa
+if (enriched.speeds?._parsed) console.log('  speeds._parsed:', enriched.speeds._parsed); // noqa
 
 // Verify no data loss
 let dataLossDetected = false;
@@ -412,19 +412,19 @@ for (const [key, originalCreature] of Object.entries(rawData)) {
   const enrichedCreature = enrichedCreatures[key];
   for (const field of Object.keys(originalCreature)) {
     if (!(field in enrichedCreature)) {
-      console.error(`DATA LOSS: Field '${field}' missing in creature '${originalCreature.name}'`);
+      console.error(`DATA LOSS: Field '${field}' missing in creature '${originalCreature.name}'`); // noqa
       dataLossDetected = true;
     }
   }
 }
 
 if (!dataLossDetected) {
-  console.log('\n✅ No data loss detected - all original fields preserved!');
+  console.log('\n✅ No data loss detected - all original fields preserved!'); // noqa
 } else {
-  console.error('\n❌ WARNING: Data loss detected!');
+  console.error('\n❌ WARNING: Data loss detected!'); // noqa
 }
 
-console.log('\n✅ Data enrichment complete!');
-console.log(`Enriched data saved to ${outputPath}`);
-console.log('Original file size:', (fs.statSync('public/data_clean.json').size / 1024 / 1024).toFixed(2), 'MB');
-console.log('Enriched file size:', (fs.statSync(outputPath).size / 1024 / 1024).toFixed(2), 'MB');
+console.log('\n✅ Data enrichment complete!'); // noqa
+console.log(`Enriched data saved to ${outputPath}`); // noqa
+console.log('Original file size:', (fs.statSync('public/data_clean.json').size / 1024 / 1024).toFixed(2), 'MB'); // noqa
+console.log('Enriched file size:', (fs.statSync(outputPath).size / 1024 / 1024).toFixed(2), 'MB'); // noqa
