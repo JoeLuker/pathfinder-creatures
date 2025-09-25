@@ -123,7 +123,7 @@ export function CreatureDetailMain({ creature, onBack }: CreatureDetailMainProps
               <StatRow label="Armor Class">
                 <div className="flex items-center gap-3">
                   <Badge className="bg-sapphire-500/10 text-sapphire-600 border-sapphire-500/30">
-                    AC {creature.ac_data?.AC ?? creature.ac ?? '—'}
+                    {creature.ac_data?.AC ?? creature.ac ?? '—'}
                   </Badge>
                   {creature.ac_data?.touch && (
                     <span className="text-sm text-text-secondary">
@@ -141,7 +141,7 @@ export function CreatureDetailMain({ creature, onBack }: CreatureDetailMainProps
               <StatRow label="Hit Points">
                 <div className="flex items-center gap-3">
                   <Badge className="bg-red-500/10 text-red-600 border-red-500/30">
-                    {creature.hp?.total ?? '—'} hp
+                    {creature.hp?.total ?? '—'}
                   </Badge>
                   <span className="text-sm text-text-tertiary">
                     ({creature.hp?.long ?? creature.hd ?? '—'})
