@@ -208,16 +208,6 @@ export function useCreatures() {
           console.time('Building creature indexes');
           const indexes = buildCreatureIndexes(creaturesArray);
           console.timeEnd('Building creature indexes');
-          // Index sizes: {
-            byType: indexes.byType.size,
-            bySize: indexes.bySize.size,
-            byAlignment: indexes.byAlignment.size,
-            bySubtype: indexes.bySubtype.size,
-            bySpecialAbility: indexes.bySpecialAbility.size,
-            byLanguage: indexes.byLanguage.size,
-            byEnvironment: indexes.byEnvironment.size,
-            totalCreatures: indexes.all.length
-          });
           setCreatureIndexes(indexes);
 
           // Precompute all filter options ONCE
@@ -272,16 +262,6 @@ export function useCreatures() {
           console.time('Building creature indexes');
           const indexes = buildCreatureIndexes(creaturesArray);
           console.timeEnd('Building creature indexes');
-          // Index sizes: {
-            byType: indexes.byType.size,
-            bySize: indexes.bySize.size,
-            byAlignment: indexes.byAlignment.size,
-            bySubtype: indexes.bySubtype.size,
-            bySpecialAbility: indexes.bySpecialAbility.size,
-            byLanguage: indexes.byLanguage.size,
-            byEnvironment: indexes.byEnvironment.size,
-            totalCreatures: indexes.all.length
-          });
           setCreatureIndexes(indexes);
 
           // Precompute filter options even in fallback
