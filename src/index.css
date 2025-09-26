@@ -200,12 +200,13 @@
     transition: background-color var(--duration-normal) var(--easing-out),
                 color var(--duration-normal) var(--easing-out);
     overflow-x: hidden;
-    max-width: 100vw;
+    width: 100%;
   }
 
   #root {
     overflow-x: hidden;
-    max-width: 100vw;
+    width: 100%;
+    position: relative;
   }
 
   /* Custom scrollbar styling */

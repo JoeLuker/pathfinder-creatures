@@ -81,7 +81,7 @@ function App() {
 
   // Responsive layout
   return (
-    <div className="h-screen bg-surface-secondary flex flex-col md:flex-row">
+    <div className="h-screen bg-surface-secondary flex flex-col md:flex-row overflow-x-hidden">
       {/* Mobile Header - only visible on mobile */}
       <header className="md:hidden bg-surface-primary border-border border-b sticky top-0 z-40 flex-none">
         <div className="px-2 py-2">
