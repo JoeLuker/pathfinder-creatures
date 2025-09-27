@@ -13,6 +13,7 @@ import { Button } from '@/components/ui/button';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { LoadingSkeleton } from '@/components/LoadingSkeleton';
 import { getAllCategories } from '@/config/filters';
+import { Footer } from '@/components/Footer';
 
 function App() {
   const {
@@ -81,7 +82,7 @@ function App() {
 
   // Responsive layout
   return (
-    <div className="h-screen bg-surface-secondary flex flex-col md:flex-row overflow-x-hidden">
+    <div className="min-h-screen bg-surface-secondary flex flex-col overflow-x-hidden">
       {/* Mobile Header - only visible on mobile */}
       <header className="md:hidden bg-surface-primary border-border border-b sticky top-0 z-40 flex-none">
         <div className="px-2 py-2">
@@ -153,7 +154,7 @@ function App() {
       )}
 
       {/* Desktop Layout - hidden on mobile */}
-      <div className="hidden md:flex flex-1">
+      <div className="hidden md:flex flex-1 md:flex-row">
         {/* Sidebar with Filters */}
         <aside className={`${showFilters ? 'w-96' : 'w-12'} transition-all duration-300 border-r border-border bg-surface-primary flex-shrink-0 relative`}>
           <div className={`h-full flex flex-col ${showFilters ? '' : 'opacity-0 pointer-events-none'}`}>
@@ -237,6 +238,9 @@ function App() {
           onBack={() => setSelectedCreature(null)}
         />
       </div>
+
+      {/* Footer */}
+      <Footer />
     </div>
   );
 }
