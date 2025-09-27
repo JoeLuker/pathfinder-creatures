@@ -31,7 +31,7 @@ export function CreatureDetailMain({ creature, onBack }: CreatureDetailMainProps
 
   const crDisplay = getCR(creature); // noqa
 
-  // Swipe gesture handling
+  // Swipe gesture handling for mobile navigation
   const [touchStart, setTouchStart] = useState<number | null>(null);
   const [touchEnd, setTouchEnd] = useState<number | null>(null);
 
@@ -485,7 +485,7 @@ export function CreatureDetailMain({ creature, onBack }: CreatureDetailMainProps
                   <div className="space-y-2">
                     {(() => {
                       // Group abilities by frequency
-                      const grouped = creature.spell_like_abilities!.entries!.reduce((acc, ability) => {
+                      const groupedAbilities = creature.spell_like_abilities!.entries!.reduce((acc, ability) => {
                         const freq = ability.freq || 'At will';
                         if (!acc[freq]) acc[freq] = [];
                         acc[freq].push(ability);
@@ -493,7 +493,7 @@ export function CreatureDetailMain({ creature, onBack }: CreatureDetailMainProps
                       }, {} as Record<string, typeof creature.spell_like_abilities.entries>);
 
                       const freqOrder = ['Constant', 'At will', '3/day', '2/day', '1/day', '1/week', '1/month', '1/year'];
-                      const sortedFreqs = Object.keys(grouped).sort((a, b) => {
+                      const sortedFreqs = Object.keys(groupedAbilities).sort((a, b) => {
                         const aIndex = freqOrder.findIndex(f => a.startsWith(f));
                         const bIndex = freqOrder.findIndex(f => b.startsWith(f));
                         if (aIndex === -1 && bIndex === -1) return a.localeCompare(b);
@@ -508,13 +508,13 @@ export function CreatureDetailMain({ creature, onBack }: CreatureDetailMainProps
                             {freq}
                           </Badge>
                           <div className="flex-1 flex flex-wrap gap-1">
-                            {grouped[freq].map((ability, idx) => (
+                            {groupedAbilities[freq].map((ability, idx) => (
                               <span key={`sla-${freq}-${ability.name}-${idx}`} className="text-sm">
                                 <span className="italic text-text-secondary">{ability.name}</span>
                                 {ability.DC && (
                                   <span className="text-xs text-muted-foreground"> (DC {ability.DC})</span>
                                 )}
-                                {idx < grouped[freq].length - 1 && <span className="text-muted-foreground">,</span>}
+                                {idx < groupedAbilities[freq].length - 1 && <span className="text-muted-foreground">,</span>}
                               </span>
                             ))}
                           </div>
