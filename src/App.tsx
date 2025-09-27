@@ -115,15 +115,15 @@ function App() {
 
       {/* Mobile Content - show either list or details */}
       {selectedCreature ? (
-        <div className="md:hidden flex-1">
+        <div className="md:hidden flex-1 flex flex-col">
           <CreatureDetailMain
             creature={selectedCreature}
             onBack={() => setSelectedCreature(null)}
           />
         </div>
       ) : (
-        <div className="md:hidden flex-1 p-2">
-          <div className="relative">
+        <div className="md:hidden flex-1 overflow-hidden">
+          <div className="relative mx-2 my-2">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
             <Input
               type="text"

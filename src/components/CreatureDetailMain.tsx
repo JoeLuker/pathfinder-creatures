@@ -36,16 +36,15 @@ export function CreatureDetailMain({ creature, onBack }: CreatureDetailMainProps
       toast.success('JSON copied to clipboard');
     } catch (err) {
       toast.error('Could not copy to clipboard');
-      console.error('Clipboard error:', err);
     }
   };
 
   return (
-    <div className="flex-1 flex flex-col bg-background">
+    <div className="flex-1 flex flex-col bg-background overflow-hidden">
       {/* Enhanced Header */}
       <div className="bg-surface-secondary border-b border-border">
-        <div className="max-w-4xl mx-auto px-6 py-4">
-          <div className="flex items-start justify-between gap-4">
+        <div className="max-w-4xl mx-auto px-3 md:px-6 py-4">
+          <div className="flex items-start justify-between gap-2 md:gap-4">
             <div className="flex items-start gap-3">
               <Button
                 onClick={onBack}
@@ -64,7 +63,7 @@ export function CreatureDetailMain({ creature, onBack }: CreatureDetailMainProps
                     </Badge>
                   )}
                 </h1>
-                <div className="flex items-center gap-4 text-sm mb-2">
+                <div className="flex items-center gap-2 md:gap-4 text-sm mb-2">
                   <div className="flex items-center gap-2">
                     <Badge className="bg-interactive-primary text-text-inverse border-0">
                       CR {crDisplay}
@@ -113,21 +112,21 @@ export function CreatureDetailMain({ creature, onBack }: CreatureDetailMainProps
               onClick={handleCopyJson}
               variant="outline"
               size="sm"
-              className="hover:bg-surface-tertiary"
+              className="hover:bg-surface-tertiary flex-shrink-0"
             >
-              <Copy className="h-4 w-4 mr-2" />
-              Copy JSON
+              <Copy className="h-4 w-4 md:mr-2" />
+              <span className="hidden md:inline">Copy JSON</span>
             </Button>
           </div>
         </div>
       </div>
 
       <ScrollArea className="flex-1">
-        <div className="max-w-4xl mx-auto p-6">
+        <div className="max-w-4xl mx-auto p-3 md:p-6">
           <div className="space-y-2">
             {/* Quick Stats Bar */}
-            <Card className="p-4 mb-6 bg-surface-secondary/50 border-border/50">
-              <div className="flex items-center gap-6 flex-wrap text-sm">
+            <Card className="p-3 md:p-4 mb-6 bg-surface-secondary/50 border-border/50">
+              <div className="flex items-center gap-3 md:gap-6 flex-wrap text-sm">
                 <div className="flex items-center gap-2">
                   <span className="text-text-secondary">Initiative</span>
                   <Badge variant="outline" className="font-mono">
@@ -555,7 +554,7 @@ export function CreatureDetailMain({ creature, onBack }: CreatureDetailMainProps
             {/* STATISTICS Section */}
             <StatBlockSection title="Statistics">
               <StatRow label="Abilities">
-                <div className="grid grid-cols-3 sm:grid-cols-6 gap-2">
+                <div className="grid grid-cols-2 xs:grid-cols-3 sm:grid-cols-6 gap-2">
                   {(['STR', 'DEX', 'CON', 'INT', 'WIS', 'CHA'] as const).map(ability => {
                     const { score, modifier } = getAbilityScore(creature, ability);
                     return (
@@ -773,7 +772,7 @@ export function CreatureDetailMain({ creature, onBack }: CreatureDetailMainProps
 
             {/* Description */}
             {creature.desc_long && (
-              <Card className="p-6 bg-surface-secondary/30 border-border/50">
+              <Card className="p-3 md:p-6 bg-surface-secondary/30 border-border/50">
                 <div className="flex items-center gap-2 mb-4">
                   <BookOpen className="h-4 w-4 text-interactive-primary" />
                   <h3 className="font-semibold text-sm uppercase tracking-wider text-text-secondary">
@@ -790,7 +789,7 @@ export function CreatureDetailMain({ creature, onBack }: CreatureDetailMainProps
 
             {/* Sources */}
             {creature.sources && Array.isArray(creature.sources) && creature.sources.length > 0 && (
-              <Card className="p-4 bg-surface-secondary/30 border-border/50">
+              <Card className="p-3 md:p-4 bg-surface-secondary/30 border-border/50">
                 <div className="flex items-center gap-2 mb-3">
                   <ScrollText className="h-4 w-4 text-interactive-primary" />
                   <h3 className="font-semibold text-sm uppercase tracking-wider text-text-secondary">

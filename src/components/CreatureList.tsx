@@ -82,7 +82,7 @@ export function CreatureList({
   return (
     <div className={`flex flex-col h-full ${className}`}>
       {/* List Header */}
-      <div className="p-2 border-b flex-none">
+      <div className="px-2 py-2 md:p-2 border-b flex-none">
         {/* Desktop layout */}
         <div className="hidden md:block">
           <div className="flex items-center justify-between mb-2">
@@ -146,7 +146,7 @@ export function CreatureList({
 
       {/* Creature List Content */}
       <ScrollArea className="flex-1" ref={scrollAreaRef}>
-        <div className="p-2">
+        <div className="px-2 py-2 md:p-2">
           {creatures.length === 0 ? (
             <div className="text-center py-8">
               <p className="text-muted-foreground">No creatures found</p>
@@ -165,7 +165,7 @@ export function CreatureList({
                 <div
                   key={creature.url}
                   onClick={() => handleCreatureClick(creature)}
-                  className={`cursor-pointer rounded-md border p-2 hover:shadow-md transition-all bg-surface-primary ${
+                  className={`cursor-pointer rounded-md border p-2 hover:shadow-md transition-all bg-surface-primary overflow-hidden ${
                     selectedCreature?.url === creature.url ? 'border-primary shadow-md' : ''
                   }`}
                 >
