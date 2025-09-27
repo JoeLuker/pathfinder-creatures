@@ -82,7 +82,7 @@ function App() {
 
   // Responsive layout
   return (
-    <div className="min-h-screen bg-surface-secondary flex flex-col overflow-x-hidden">
+    <div className="h-screen bg-surface-secondary flex flex-col overflow-hidden">
       {/* Mobile Header - only visible on mobile */}
       <header className="md:hidden bg-surface-primary border-border border-b sticky top-0 z-40 flex-none">
         <div className="px-2 py-2">
@@ -115,43 +115,47 @@ function App() {
       </header>
 
       {/* Mobile Content - show either list or details */}
-      {selectedCreature ? (
-        <div className="md:hidden flex-1 flex flex-col overflow-x-hidden px-2">
-          <CreatureDetailMain
-            creature={selectedCreature}
-            onBack={() => setSelectedCreature(null)}
-          />
-        </div>
-      ) : (
-        <div className="md:hidden flex-1 overflow-hidden">
-          <div className="relative mx-2 my-2">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-            <Input
-              type="text"
-              placeholder="Search creatures..."
-              value={filters.search}
-              onChange={(e) => setFilters(prev => ({ ...prev, search: e.target.value }))}
-              className="pl-10"
+      <div className="md:hidden flex-1 flex flex-col overflow-hidden">
+        {selectedCreature ? (
+          <div className="flex-1 flex flex-col overflow-hidden px-2">
+            <CreatureDetailMain
+              creature={selectedCreature}
+              onBack={() => setSelectedCreature(null)}
             />
           </div>
-          <CreatureList
-            creatures={creatures}
-            filteredCount={filteredCount}
-            totalCreatures={totalCreatures}
-            hasMore={hasMore}
-            loadMore={loadMore}
-            selectedCreature={selectedCreature}
-            onCreatureClick={handleCreatureClick}
-            filters={filters}
-            setFilters={setFilters}
-            sortField={sortField}
-            setSortField={setSortField}
-            sortDirection={sortDirection}
-            setSortDirection={setSortDirection}
-            className="h-full"
-          />
-        </div>
-      )}
+        ) : (
+          <div className="flex-1 flex flex-col overflow-hidden">
+            <div className="relative mx-2 my-2 flex-none">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+              <Input
+                type="text"
+                placeholder="Search creatures..."
+                value={filters.search}
+                onChange={(e) => setFilters(prev => ({ ...prev, search: e.target.value }))}
+                className="pl-10"
+              />
+            </div>
+            <div className="flex-1 overflow-hidden">
+              <CreatureList
+                creatures={creatures}
+                filteredCount={filteredCount}
+                totalCreatures={totalCreatures}
+                hasMore={hasMore}
+                loadMore={loadMore}
+                selectedCreature={selectedCreature}
+                onCreatureClick={handleCreatureClick}
+                filters={filters}
+                setFilters={setFilters}
+                sortField={sortField}
+                setSortField={setSortField}
+                sortDirection={sortDirection}
+                setSortDirection={setSortDirection}
+                className="h-full"
+              />
+            </div>
+          </div>
+        )}
+      </div>
 
       {/* Desktop Layout - hidden on mobile */}
       <div className="hidden md:flex flex-1 md:flex-row">
@@ -239,8 +243,10 @@ function App() {
         />
       </div>
 
-      {/* Footer */}
-      <Footer />
+      {/* Footer - always visible at bottom */}
+      <div className="flex-none">
+        <Footer />
+      </div>
     </div>
   );
 }
