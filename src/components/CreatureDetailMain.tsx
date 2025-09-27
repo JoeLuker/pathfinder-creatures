@@ -1,4 +1,5 @@
 import type { CreatureEnriched } from '@/types/creature-complete';
+import { useState } from 'react';
 import { Badge } from '@/components/ui/badge';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Button } from '@/components/ui/button';
@@ -30,6 +31,30 @@ export function CreatureDetailMain({ creature, onBack }: CreatureDetailMainProps
 
   const crDisplay = getCR(creature); // noqa
 
+  // Swipe gesture handling
+  const [touchStart, setTouchStart] = useState<number | null>(null);
+  const [touchEnd, setTouchEnd] = useState<number | null>(null);
+
+  const handleTouchStart = (e: React.TouchEvent) => {
+    setTouchEnd(null);
+    setTouchStart(e.targetTouches[0].clientX);
+  };
+
+  const handleTouchMove = (e: React.TouchEvent) => {
+    setTouchEnd(e.targetTouches[0].clientX);
+  };
+
+  const handleTouchEnd = () => {
+    if (!touchStart || !touchEnd) return;
+
+    const distance = touchStart - touchEnd;
+    const isLeftSwipe = distance > 100; // Swipe left threshold
+
+    if (isLeftSwipe) {
+      onBack();
+    }
+  };
+
   const handleCopyJson = async () => {
     try {
       await navigator.clipboard.writeText(JSON.stringify(creature, null, 2));
@@ -40,7 +65,12 @@ export function CreatureDetailMain({ creature, onBack }: CreatureDetailMainProps
   };
 
   return (
-    <div className="flex-1 flex flex-col bg-background overflow-hidden">
+    <div
+      className="flex-1 flex flex-col bg-background"
+      onTouchStart={handleTouchStart}
+      onTouchMove={handleTouchMove}
+      onTouchEnd={handleTouchEnd}
+    >
       {/* Enhanced Header */}
       <div className="bg-surface-secondary border-b border-border">
         <div className="max-w-4xl mx-auto px-3 md:px-6 py-4">
@@ -55,7 +85,7 @@ export function CreatureDetailMain({ creature, onBack }: CreatureDetailMainProps
                 <ArrowLeft className="h-4 w-4" />
               </Button>
               <div className="flex-1">
-                <h1 className="text-2xl font-bold text-text-primary mb-2">
+                <h1 className="text-2xl font-bold text-text-primary mb-2 break-words">
                   {creature.name}
                   {creature['is_3.5'] && (
                     <Badge className="ml-2 bg-amber-600 text-amber-100 text-xs">
@@ -122,7 +152,7 @@ export function CreatureDetailMain({ creature, onBack }: CreatureDetailMainProps
       </div>
 
       <ScrollArea className="flex-1">
-        <div className="max-w-4xl mx-auto p-3 md:p-6">
+        <div className="p-3 md:p-6">
           <div className="space-y-2">
             {/* Quick Stats Bar */}
             <Card className="p-3 md:p-4 mb-6 bg-surface-secondary/50 border-border/50">
@@ -474,7 +504,7 @@ export function CreatureDetailMain({ creature, onBack }: CreatureDetailMainProps
 
                       return sortedFreqs.map(freq => (
                         <div key={freq} className="flex gap-2">
-                          <Badge variant="secondary" className="min-w-fit text-xs">
+                          <Badge variant="secondary" className="text-xs">
                             {freq}
                           </Badge>
                           <div className="flex-1 flex flex-wrap gap-1">
@@ -523,7 +553,7 @@ export function CreatureDetailMain({ creature, onBack }: CreatureDetailMainProps
 
                       return sortedLevels.map(level => (
                         <div key={level} className="flex gap-2">
-                          <Badge variant="outline" className="min-w-fit text-xs">
+                          <Badge variant="outline" className="text-xs">
                             {level === 0 ? '0' : `${level}${level === 1 ? 'st' : level === 2 ? 'nd' : level === 3 ? 'rd' : 'th'}`}
                           </Badge>
                           <div className="flex-1 flex flex-wrap gap-x-2 gap-y-1">

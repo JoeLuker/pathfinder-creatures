@@ -17,7 +17,7 @@ export function StatRow({ label, children, className }: StatRowProps) { // noqa
   }
 
   return (
-    <div className={cn("grid grid-cols-[120px_1fr] gap-3 items-start", className)}>
+    <div className={cn("flex flex-col md:grid md:grid-cols-[120px_1fr] gap-1 md:gap-3 md:items-start", className)}>
       <span className="text-sm font-medium text-text-secondary">{label}</span>
       <div className="flex items-center gap-2 flex-wrap">
         {children}
