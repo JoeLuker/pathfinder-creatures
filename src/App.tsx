@@ -158,7 +158,7 @@ function App() {
       </div>
 
       {/* Desktop Layout - hidden on mobile */}
-      <div className="hidden md:flex flex-1 md:flex-row">
+      <div className="hidden md:flex flex-1 overflow-hidden">
         {/* Sidebar with Filters */}
         <aside className={`${showFilters ? 'w-96' : 'w-12'} transition-all duration-300 border-r border-border bg-surface-primary flex-shrink-0 relative`}>
           <div className={`h-full flex flex-col ${showFilters ? '' : 'opacity-0 pointer-events-none'}`}>
@@ -237,10 +237,12 @@ function App() {
         </div>
 
         {/* Detail View */}
-        <CreatureDetailMain
-          creature={selectedCreature}
-          onBack={() => setSelectedCreature(null)}
-        />
+        <div className="flex-1 overflow-hidden">
+          <CreatureDetailMain
+            creature={selectedCreature}
+            onBack={() => setSelectedCreature(null)}
+          />
+        </div>
       </div>
 
       {/* Footer - always visible at bottom */}
