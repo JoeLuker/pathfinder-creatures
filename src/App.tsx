@@ -117,7 +117,7 @@ function App() {
       {/* Mobile Content - show either list or details */}
       <div className="md:hidden flex-1 flex flex-col overflow-hidden">
         {selectedCreature ? (
-          <div className="flex-1 flex flex-col overflow-hidden px-2">
+          <div className="flex-1 flex flex-col overflow-auto px-2">
             <CreatureDetailMain
               creature={selectedCreature}
               onBack={() => setSelectedCreature(null)}
@@ -237,7 +237,7 @@ function App() {
         </div>
 
         {/* Detail View */}
-        <div className="flex-1 overflow-hidden">
+        <div className="flex-1 overflow-auto">
           <CreatureDetailMain
             creature={selectedCreature}
             onBack={() => setSelectedCreature(null)}
