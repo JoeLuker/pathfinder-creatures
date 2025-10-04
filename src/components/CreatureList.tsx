@@ -80,9 +80,9 @@ export function CreatureList({
     return () => observer.disconnect();
   }, [hasMore, loadMore]);
   return (
-    <div className={`flex flex-col h-full ${className}`}>
+    <div className={`flex flex-col ${className}`}>
       {/* List Header */}
-      <div className="px-2 py-2 md:p-2 border-b flex-none">
+      <div className="px-2 py-2 md:p-2 border-b md:flex-none">
         {/* Desktop layout */}
         <div className="hidden md:block">
           <div className="flex items-center justify-between mb-2">
@@ -145,8 +145,9 @@ export function CreatureList({
       </div>
 
       {/* Creature List Content */}
-      <ScrollArea className="flex-1" ref={scrollAreaRef}>
-        <div className="px-2 py-2 md:p-2">
+      <div className="md:flex-1 md:overflow-hidden">
+        <ScrollArea className="hidden md:block md:h-full" ref={scrollAreaRef}>
+          <div className="px-2 py-2 md:p-2">
           {creatures.length === 0 ? (
             <div className="text-center py-8">
               <p className="text-muted-foreground">No creatures found</p>
@@ -161,34 +162,121 @@ export function CreatureList({
             </div>
           ) : (
             <div className="space-y-0.5">
-              {creatures.map((creature) => (
-                <div
-                  key={creature.url}
-                  onClick={() => handleCreatureClick(creature)}
-                  className={`cursor-pointer rounded-md border p-2 hover:shadow-md transition-all bg-surface-primary overflow-hidden ${
-                    selectedCreature?.url === creature.url ? 'border-primary shadow-md' : ''
-                  }`}
-                >
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <h4 className="font-semibold text-sm">{creature.name}</h4>
-                      <p className="text-xs text-muted-foreground mt-1">
-                        {creature.size} {creature.type} • {creature.alignment}
-                      </p>
-                    </div>
-                    <div className="text-right">
-                      <div className="text-sm font-medium text-text-primary">
-                        CR {creature.cr_parsed?.display ?? creature.cr ?? '-'}
+              {creatures.map((creature) => {
+                const cr = creature.cr_parsed?.numeric ?? 0;
+                let crColor = 'text-status-success bg-status-success/10 border-status-success/30';
+                if (cr >= 16) {
+                  crColor = 'text-status-error bg-status-error/10 border-status-error/30';
+                } else if (cr >= 11) {
+                  crColor = 'text-status-warning bg-status-warning/10 border-status-warning/30';
+                } else if (cr >= 6) {
+                  crColor = 'text-interactive-primary bg-interactive-primary/10 border-interactive-primary/30';
+                }
+
+                return (
+                  <div
+                    key={creature.url}
+                    onClick={() => handleCreatureClick(creature)}
+                    className={`cursor-pointer rounded-md border p-3 hover:shadow-md transition-all bg-surface-primary overflow-hidden ${
+                      selectedCreature?.url === creature.url ? 'border-primary shadow-md ring-2 ring-primary/20' : ''
+                    }`}
+                  >
+                    <div className="flex items-center justify-between gap-3">
+                      <div className="flex-1 min-w-0">
+                        <h4 className="font-semibold text-base mb-1.5 truncate">{creature.name}</h4>
+                        <p className="text-xs text-text-tertiary">
+                          {creature.size} {creature.type} • {creature.alignment}
+                        </p>
                       </div>
-                      {creature.xp && (
-                        <div className="text-xs text-muted-foreground">
-                          {creature.xp.toLocaleString()} XP
+                      <div className="flex-shrink-0">
+                        <div className={`text-sm font-bold px-2.5 py-1 rounded-md border ${crColor}`}>
+                          CR {creature.cr_parsed?.display ?? creature.cr ?? '-'}
                         </div>
-                      )}
+                        {creature.xp && (
+                          <div className="text-xs text-text-tertiary text-right mt-1">
+                            {creature.xp.toLocaleString()} XP
+                          </div>
+                        )}
+                      </div>
                     </div>
                   </div>
-                </div>
-              ))}
+                );
+              })}
+            </div>
+          )}
+
+          {/* Infinite Scroll Sentinel */}
+          {hasMore && (
+            <div ref={sentinelRef} className="mt-4 flex items-center justify-center py-4">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={loadMore}
+                className="text-xs"
+              >
+                Load More...
+              </Button>
+            </div>
+          )}
+          </div>
+        </ScrollArea>
+
+        {/* Mobile: No ScrollArea, just natural flow */}
+        <div className="md:hidden px-2 py-2">
+          {creatures.length === 0 ? (
+            <div className="text-center py-8">
+              <p className="text-muted-foreground">No creatures found</p>
+              <Button
+                className="mt-2"
+                variant="outline"
+                size="sm"
+                onClick={() => setFilters(createDefaultFilters())}
+              >
+                Clear filters
+              </Button>
+            </div>
+          ) : (
+            <div className="space-y-0.5">
+              {creatures.map((creature) => {
+                const cr = creature.cr_parsed?.numeric ?? 0;
+                let crColor = 'text-status-success bg-status-success/10 border-status-success/30';
+                if (cr >= 16) {
+                  crColor = 'text-status-error bg-status-error/10 border-status-error/30';
+                } else if (cr >= 11) {
+                  crColor = 'text-status-warning bg-status-warning/10 border-status-warning/30';
+                } else if (cr >= 6) {
+                  crColor = 'text-interactive-primary bg-interactive-primary/10 border-interactive-primary/30';
+                }
+
+                return (
+                  <div
+                    key={creature.url}
+                    onClick={() => handleCreatureClick(creature)}
+                    className={`cursor-pointer rounded-md border p-3 hover:shadow-md transition-all bg-surface-primary overflow-hidden ${
+                      selectedCreature?.url === creature.url ? 'border-primary shadow-md ring-2 ring-primary/20' : ''
+                    }`}
+                  >
+                    <div className="flex items-center justify-between gap-3">
+                      <div className="flex-1 min-w-0">
+                        <h4 className="font-semibold text-base mb-1.5 truncate">{creature.name}</h4>
+                        <p className="text-xs text-text-tertiary">
+                          {creature.size} {creature.type} • {creature.alignment}
+                        </p>
+                      </div>
+                      <div className="flex-shrink-0">
+                        <div className={`text-sm font-bold px-2.5 py-1 rounded-md border ${crColor}`}>
+                          CR {creature.cr_parsed?.display ?? creature.cr ?? '-'}
+                        </div>
+                        {creature.xp && (
+                          <div className="text-xs text-text-tertiary text-right mt-1">
+                            {creature.xp.toLocaleString()} XP
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                );
+              })}
             </div>
           )}
 
@@ -206,7 +294,7 @@ export function CreatureList({
             </div>
           )}
         </div>
-      </ScrollArea>
+      </div>
     </div>
   );
 }

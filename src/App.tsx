@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useCreatures } from '@/hooks/useCreatures';
 import { CreatureDetailMain } from '@/components/CreatureDetailMain';
 import { CreatureList } from '@/components/CreatureList';
@@ -43,8 +43,8 @@ function App() {
   // Shared sidebar state for responsive consistency
   const [expandedSections, setExpandedSections] = useState<Record<string, boolean>>(() => {
     return getAllCategories().reduce((acc, category) => {
-      // All filters collapsed by default
-      acc[category] = false;
+      // Expand the most commonly used filters by default
+      acc[category] = category === 'Challenge' || category === 'Classification' || category === 'Physical';
       return acc;
     }, {} as Record<string, boolean>);
   });
@@ -82,16 +82,21 @@ function App() {
 
   // Responsive layout
   return (
-    <div className="h-screen bg-surface-secondary flex flex-col overflow-hidden">
+    <div className="min-h-screen md:h-screen bg-surface-secondary flex flex-col md:overflow-hidden">
       {/* Mobile Header - only visible on mobile */}
       <header className="md:hidden bg-surface-primary border-border border-b sticky top-0 z-40 flex-none">
-        <div className="px-2 py-2">
+        <div className="px-3 py-2.5">
           <div className="flex items-center justify-between">
             <h1 className="text-lg font-display font-semibold text-text-primary">Pathfinder Creatures</h1>
-            <div className="flex items-center gap-2">
-              <span className="text-sm text-text-secondary">
-                {filteredCount}
-              </span>
+            <div className="flex items-center gap-3">
+              <div className="flex flex-col items-end">
+                <span className="text-lg font-bold text-amber-600 dark:text-amber-400">
+                  {filteredCount.toLocaleString()}
+                </span>
+                <span className="text-[10px] text-text-tertiary -mt-1">
+                  creatures
+                </span>
+              </div>
               <ThemeToggle />
               <MobileFilters
                 filters={filters}
@@ -115,17 +120,17 @@ function App() {
       </header>
 
       {/* Mobile Content - show either list or details */}
-      <div className="md:hidden flex-1 flex flex-col overflow-hidden">
+      <div className="md:hidden flex-1">
         {selectedCreature ? (
-          <div className="flex-1 flex flex-col overflow-auto px-2">
+          <div className="px-2 pb-4">
             <CreatureDetailMain
               creature={selectedCreature}
               onBack={() => setSelectedCreature(null)}
             />
           </div>
         ) : (
-          <div className="flex-1 flex flex-col overflow-hidden">
-            <div className="relative mx-2 my-2 flex-none">
+          <div>
+            <div className="relative mx-2 my-2 sticky top-0 z-10 bg-surface-secondary py-2">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
               <Input
                 type="text"
@@ -135,7 +140,7 @@ function App() {
                 className="pl-10"
               />
             </div>
-            <div className="flex-1 overflow-hidden">
+            <div className="pb-4">
               <CreatureList
                 creatures={creatures}
                 filteredCount={filteredCount}
@@ -199,10 +204,11 @@ function App() {
             variant="ghost"
             size="sm"
             onClick={() => setShowFilters(!showFilters)}
-            className="absolute right-0 top-1/2 -translate-y-1/2 h-20 w-4 p-0 bg-surface-secondary border-l hover:bg-interactive-secondary z-10 rounded-l-md"
+            className="absolute right-0 top-1/2 -translate-y-1/2 h-24 w-11 p-0 bg-surface-secondary border-l hover:bg-interactive-secondary z-10 rounded-l-md shadow-md min-h-[96px] min-w-[44px]"
             title={showFilters ? "Hide filters" : "Show filters"}
+            aria-label={showFilters ? "Hide filters" : "Show filters"}
           >
-            {showFilters ? <ChevronLeft className="h-3 w-3" /> : <ChevronRight className="h-3 w-3" />}
+            {showFilters ? <ChevronLeft className="h-4 w-4" /> : <ChevronRight className="h-4 w-4" />}
           </Button>
         </aside>
 
@@ -229,10 +235,11 @@ function App() {
             variant="ghost"
             size="sm"
             onClick={() => setShowCreatureList(!showCreatureList)}
-            className="absolute right-0 top-1/2 -translate-y-1/2 h-20 w-4 p-0 bg-surface-secondary border-l hover:bg-interactive-secondary z-10 rounded-l-md"
+            className="absolute right-0 top-1/2 -translate-y-1/2 h-24 w-11 p-0 bg-surface-secondary border-l hover:bg-interactive-secondary z-10 rounded-l-md shadow-md min-h-[96px] min-w-[44px]"
             title={showCreatureList ? "Hide creature list" : "Show creature list"}
+            aria-label={showCreatureList ? "Hide creature list" : "Show creature list"}
           >
-            {showCreatureList ? <ChevronLeft className="h-3 w-3" /> : <ChevronRight className="h-3 w-3" />}
+            {showCreatureList ? <ChevronLeft className="h-4 w-4" /> : <ChevronRight className="h-4 w-4" />}
           </Button>
         </div>
 
@@ -245,7 +252,7 @@ function App() {
         </div>
       </div>
 
-      {/* Footer - always visible at bottom */}
+      {/* Footer - at bottom of content on mobile, fixed at bottom on desktop */}
       <div className="flex-none">
         <Footer />
       </div>

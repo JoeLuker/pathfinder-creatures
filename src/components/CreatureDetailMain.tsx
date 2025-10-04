@@ -88,7 +88,7 @@ export function CreatureDetailMain({ creature, onBack }: CreatureDetailMainProps
                 <h1 className="text-2xl font-bold text-text-primary mb-2 break-words">
                   {creature.name}
                   {creature['is_3.5'] && (
-                    <Badge className="ml-2 bg-amber-600 text-amber-100 text-xs">
+                    <Badge className="ml-2 bg-interactive-primary text-text-inverse text-xs">
                       3.5e
                     </Badge>
                   )}
@@ -375,7 +375,7 @@ export function CreatureDetailMain({ creature, onBack }: CreatureDetailMainProps
               {((creature.weaknesses_normalized && creature.weaknesses_normalized.length > 0) || creature.weaknesses) && (
                 <StatRow label="Weaknesses">
                   <div className="flex gap-1 flex-wrap">
-                    <Badge className="bg-red-500/10 text-red-600 border-red-500/30 text-xs">
+                    <Badge className="bg-status-error/10 text-status-error border-status-error/30 text-xs">
                       {creature.weaknesses_normalized && creature.weaknesses_normalized.length > 0
                         ? creature.weaknesses_normalized.join(', ')
                         : typeof creature.weaknesses === 'string'
@@ -632,7 +632,7 @@ export function CreatureDetailMain({ creature, onBack }: CreatureDetailMainProps
                   {creature.grapple_3_5 && (
                     <div className="flex items-center gap-1">
                       <span className="text-xs text-text-tertiary">Grapple (3.5e)</span>
-                      <Badge variant="outline" className="font-mono text-xs bg-amber-50 border-amber-200">
+                      <Badge variant="outline" className="font-mono text-xs bg-surface-secondary border-border">
                         {typeof creature.grapple_3_5 === 'number'
                           ? formatModifier(creature.grapple_3_5)
                           : creature.grapple_3_5

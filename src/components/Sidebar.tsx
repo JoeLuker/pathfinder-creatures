@@ -151,6 +151,7 @@ export function Sidebar({ // noqa
 
 
   const activeFiltersCount = getActiveFilterCount(filters);
+  const [globalFilterSearch, setGlobalFilterSearch] = useState('');
 
   return (
     <div className="space-y-2 md:space-y-1 h-full overflow-y-auto">
@@ -198,8 +199,24 @@ export function Sidebar({ // noqa
           )}
         </div>
 
+        {/* Global Filter Search */}
+        <div className="mb-3">
+          <Input
+            type="text"
+            placeholder="Search filters..."
+            value={globalFilterSearch}
+            onChange={(e) => setGlobalFilterSearch(e.target.value)}
+            className="h-9 text-sm"
+          />
+        </div>
+
         {/* Dynamic Filter Sections by Category */}
-        {getAllCategories().map(category => {
+        {getAllCategories().filter(category => {
+          if (!globalFilterSearch) return true;
+          const searchLower = globalFilterSearch.toLowerCase();
+          return category.toLowerCase().includes(searchLower) ||
+            getFiltersByCategory(category).some(f => f.label.toLowerCase().includes(searchLower));
+        }).map(category => {
           const categoryFilters = getFiltersByCategory(category);
           const isExpanded = expandedSections[category];
 
@@ -451,62 +468,74 @@ export function Sidebar({ // noqa
                         }));
 
                         const currentValues = (filters[filter.key as keyof Filters] as string[]) || [];
-                        const maxCount = showAll
-                          ? Math.max(...uniqueValues.map(v => v.count))
-                          : Math.max(...filteredValues.map(v => v.count), 1);
+                        const totalCreatures = filteredCreatures?.length || 1;
                         const currentFilterMode = filters.filterMode?.[filter.key as keyof typeof filters.filterMode] || 'any';
 
                         return (
-                          <div key={filter.key} className="space-y-1 md:space-y-0.5">
-                            <div className="flex items-center justify-between">
-                              <span className="text-xs font-medium text-muted-foreground">{filter.label}</span>
-                              <div className="flex items-center gap-1">
-                                <Button
-                                  variant={getToggleVariant(showAll)}
-                                  size="sm"
-                                  className="h-8 md:h-5 px-2 text-xs min-h-[32px] md:min-h-auto"
-                                  onClick={() => toggleShowAllValues(filter.key)}
-                                  title={showAll ? "Showing all options" : "Showing only options with data in current results"}
-                                >
-                                  {showAll ? '✓ All' : 'Filtered'}
-                                </Button>
-                                {currentValues.length > 1 && (
-                                  <Button
-                                    variant={getToggleVariant(currentFilterMode === 'all')}
-                                    size="sm"
-                                    className="h-8 md:h-5 px-2 text-xs min-h-[32px] md:min-h-auto"
-                                    onClick={() => toggleFilterMode(filter.key)}
-                                    title={currentFilterMode === 'all' ? "Creature must have ALL selected values" : "Creature can have ANY selected value"}
-                                  >
-                                    {currentFilterMode === 'all' ? '✓ All' : '✓ Any'}
-                                  </Button>
-                                )}
-                                {currentValues.length > 0 && filter.excludeMode && (
-                                  <Button
-                                    variant={(filters.excludeMode as any)?.[filter.key] ? "destructive" : "ghost"}
-                                    size="sm"
-                                    className="h-8 md:h-5 px-2 text-xs min-h-[32px] md:min-h-auto"
-                                    onClick={() => setFilters(prev => ({
-                                      ...prev,
-                                      excludeMode: {
-                                        ...prev.excludeMode,
-                                        [filter.key]: !prev.excludeMode?.[filter.key as keyof typeof prev.excludeMode]
-                                      }
-                                    }))}
-                                    title={(filters.excludeMode as any)?.[filter.key] ? "Hiding creatures with selected values" : "Showing creatures with selected values"}
-                                  >
-                                    {(filters.excludeMode as any)?.[filter.key] ? '✗ Exclude' : '✓ Include'}
-                                  </Button>
+                          <div key={filter.key} className="space-y-1.5">
+                            {filter.label && (
+                              <div className="space-y-1">
+                                <div className="flex items-center justify-between">
+                                  <span className="text-xs font-medium text-text-secondary">{filter.label}</span>
+                                  {currentValues.length > 0 && (
+                                    <span className="text-xs text-text-tertiary">
+                                      {currentValues.length} selected
+                                    </span>
+                                  )}
+                                </div>
+                                {/* Advanced controls - only show when relevant */}
+                                {(currentValues.length > 0 || uniqueValues.length > filteredValues.length) && (
+                                  <div className="flex items-center gap-1 flex-wrap">
+                                    {uniqueValues.length > filteredValues.length && (
+                                      <Button
+                                        variant={getToggleVariant(showAll)}
+                                        size="sm"
+                                        className="h-6 px-2 text-[10px]"
+                                        onClick={() => toggleShowAllValues(filter.key)}
+                                        title={showAll ? "Showing all options" : "Showing only options with data"}
+                                      >
+                                        {showAll ? 'All' : 'Available'}
+                                      </Button>
+                                    )}
+                                    {currentValues.length > 1 && (
+                                      <Button
+                                        variant={getToggleVariant(currentFilterMode === 'all')}
+                                        size="sm"
+                                        className="h-6 px-2 text-[10px]"
+                                        onClick={() => toggleFilterMode(filter.key)}
+                                        title={currentFilterMode === 'all' ? "Match ALL selected" : "Match ANY selected"}
+                                      >
+                                        {currentFilterMode === 'all' ? 'AND' : 'OR'}
+                                      </Button>
+                                    )}
+                                    {currentValues.length > 0 && filter.excludeMode && (
+                                      <Button
+                                        variant={(filters.excludeMode as any)?.[filter.key] ? "destructive" : "ghost"}
+                                        size="sm"
+                                        className="h-6 px-2 text-[10px]"
+                                        onClick={() => setFilters(prev => ({
+                                          ...prev,
+                                          excludeMode: {
+                                            ...prev.excludeMode,
+                                            [filter.key]: !prev.excludeMode?.[filter.key as keyof typeof prev.excludeMode]
+                                          }
+                                        }))}
+                                        title={(filters.excludeMode as any)?.[filter.key] ? "Excluding selected" : "Including selected"}
+                                      >
+                                        {(filters.excludeMode as any)?.[filter.key] ? 'Exclude' : 'Include'}
+                                      </Button>
+                                    )}
+                                  </div>
                                 )}
                               </div>
-                            </div>
-                            {filter.searchable && (
+                            )}
+                            {filter.searchable && uniqueValues.length > 10 && (
                               <Input
                                 type="text"
-                                placeholder={`Search ${filter.label.toLowerCase()}...`}
+                                placeholder={`Search...`}
                                 value={searchValue}
                                 onChange={(e) => setSearchState(filter.key, e.target.value)}
-                                className="h-10 md:h-7 text-xs min-h-[40px] md:min-h-auto"
+                                className="h-8 text-xs"
                               />
                             )}
                             {filteredValues.length > 100 ? (
@@ -517,28 +546,29 @@ export function Sidebar({ // noqa
                                 rowHeight={VIRTUAL_ROW_HEIGHT}
                                 rowComponent={({ index, style }) => {
                                   const { value, count } = filteredValues[index];
-                                  const percentage = maxCount > 0 ? (count / maxCount) * 100 : 0;
+                                  const percentage = totalCreatures > 0 ? (count / totalCreatures) * 100 : 0;
                                   const isChecked = currentValues.includes(value);
 
                                   return (
                                     <div style={style}>
-                                      <label
-                                        className="relative flex items-center justify-between px-2 py-2 md:py-1 hover:bg-surface-secondary rounded cursor-pointer min-h-[44px] md:min-h-auto"
-                                      >
-                                        <div
-                                          className="absolute inset-0 bg-interactive-primary opacity-20 rounded"
-                                          style={{ width: `${percentage}%` }}
+                                      <label className="flex items-center gap-2 px-1 py-1 hover:bg-surface-secondary rounded cursor-pointer group">
+                                        <input
+                                          type="checkbox"
+                                          checked={isChecked}
+                                          onChange={() => handleMultiSelectToggle(filter.key, value)}
+                                          className="rounded border-border flex-shrink-0"
                                         />
-                                        <div className="relative flex items-center gap-2 flex-1">
-                                          <input
-                                            type="checkbox"
-                                            checked={isChecked}
-                                            onChange={() => handleMultiSelectToggle(filter.key, value)}
-                                            className="rounded border-border"
-                                          />
-                                          <span className="text-sm capitalize">{value}</span>
+                                        <div
+                                          className="flex items-center gap-2 flex-1 min-w-0"
+                                          style={{
+                                            backgroundImage: `linear-gradient(to right, color-mix(in srgb, var(--color-interactive-primary) 20%, transparent) 0%, color-mix(in srgb, var(--color-interactive-primary) 20%, transparent) ${percentage}%, transparent ${percentage}%)`
+                                          }}
+                                        >
+                                          <span className="text-xs flex-1 min-w-0 truncate" title={value}>{value}</span>
+                                          <span className="text-xs text-text-tertiary flex-shrink-0 opacity-60 group-hover:opacity-100">
+                                            {count}
+                                          </span>
                                         </div>
-                                        <span className="relative text-xs text-muted-foreground font-medium">{count}</span>
                                       </label>
                                     </div>
                                   );
@@ -547,30 +577,32 @@ export function Sidebar({ // noqa
                               />
                             ) : (
                               // Use regular rendering for small lists
-                              <div className="space-y-1 max-h-48 overflow-y-auto">
-                                {filteredValues.map(({ value, count }) => {
-                                  const percentage = maxCount > 0 ? (count / maxCount) * 100 : 0;
+                              <div className="space-y-0.5 max-h-64 overflow-y-auto">
+                                {filteredValues.map(({ value, count }, index) => {
                                   const isChecked = currentValues.includes(value);
-
+                                  const percentage = totalCreatures > 0 ? (count / totalCreatures) * 100 : 0;
                                   return (
                                     <label
                                       key={value}
-                                      className="relative flex items-center justify-between px-2 py-2 md:py-1 hover:bg-surface-secondary rounded cursor-pointer min-h-[44px] md:min-h-auto"
+                                      className="flex items-center gap-2 px-1 py-1 hover:bg-surface-secondary rounded cursor-pointer group"
                                     >
-                                      <div
-                                        className="absolute inset-0 bg-interactive-primary opacity-20 rounded"
-                                        style={{ width: `${percentage}%` }}
+                                      <input
+                                        type="checkbox"
+                                        checked={isChecked}
+                                        onChange={() => handleMultiSelectToggle(filter.key, value)}
+                                        className="rounded border-border flex-shrink-0"
                                       />
-                                      <div className="relative flex items-center gap-2 flex-1">
-                                        <input
-                                          type="checkbox"
-                                          checked={isChecked}
-                                          onChange={() => handleMultiSelectToggle(filter.key, value)}
-                                          className="rounded border-border"
-                                        />
-                                        <span className="text-sm capitalize">{value}</span>
+                                      <div
+                                        className="flex items-center gap-2 flex-1 min-w-0"
+                                        style={{
+                                          backgroundImage: `linear-gradient(to right, color-mix(in srgb, var(--color-interactive-primary) 20%, transparent) 0%, color-mix(in srgb, var(--color-interactive-primary) 20%, transparent) ${percentage}%, transparent ${percentage}%)`
+                                        }}
+                                      >
+                                        <span className="text-xs flex-1 min-w-0 truncate" title={value}>{value}</span>
+                                        <span className="text-xs text-text-tertiary flex-shrink-0 opacity-60 group-hover:opacity-100">
+                                          {count}
+                                        </span>
                                       </div>
-                                      <span className="relative text-xs text-muted-foreground font-medium">{count}</span>
                                     </label>
                                   );
                                 })}
