@@ -125,6 +125,9 @@ export interface Filters {
   immunities: string[];
   weaknesses: string[];
 
+  // Feats
+  feats: string[];
+
   // Attack types
   hasMeleeAttacks: boolean | null;
   hasRangedAttacks: boolean | null;
@@ -154,6 +157,7 @@ export interface Filters {
     resistanceTypes?: boolean;
     immunities?: boolean;
     weaknesses?: boolean;
+    feats?: boolean;
   };
 
   filterMode?: {
@@ -172,6 +176,7 @@ export interface Filters {
     resistanceTypes?: 'any' | 'all';
     immunities?: 'any' | 'all';
     weaknesses?: 'any' | 'all';
+    feats?: 'any' | 'all';
   };
 }
 

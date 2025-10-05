@@ -20,6 +20,7 @@ export interface CreatureIndexes {
   byDRType: Map<string, Set<CreatureEnriched>>;
   byResistanceType: Map<string, Set<CreatureEnriched>>;
   byMovementType: Map<string, Set<CreatureEnriched>>;
+  byFeat: Map<string, Set<CreatureEnriched>>;
 
   // Sorted arrays for range queries (binary search)
   byCR: { cr: number; creatures: CreatureEnriched[] }[];
@@ -60,6 +61,7 @@ export function buildCreatureIndexes(creatures: CreatureEnriched[]): CreatureInd
     byDRType: new Map(),
     byResistanceType: new Map(),
     byMovementType: new Map(),
+    byFeat: new Map(),
     byCR: [],
     byHP: [],
     byAC: [],
@@ -132,6 +134,12 @@ export function buildCreatureIndexes(creatures: CreatureEnriched[]): CreatureInd
     const weaknesses = creature.weaknesses_normalized || creature.weaknesses || [];
     weaknesses.forEach(weakness => {
       if (weakness) addToIndex(indexes.byWeakness, String(weakness).toLowerCase(), creature);
+    });
+
+    // Feats
+    const feats = creature.feats_normalized || creature.feats || [];
+    feats.forEach(feat => {
+      if (feat) addToIndex(indexes.byFeat, String(feat).toLowerCase(), creature);
     });
 
     // Senses

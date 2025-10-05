@@ -229,6 +229,7 @@ function App() {
               setSortField={setSortField}
               sortDirection={sortDirection}
               setSortDirection={setSortDirection}
+              className="h-full"
             />
           </div>
           <Button

@@ -692,7 +692,7 @@ export const FILTER_DEFINITIONS: FilterConfig[] = [
   // Feats
   {
     key: 'feats',
-    label: '',
+    label: 'Feats',
     type: 'multiSelect',
     category: FILTER_CATEGORIES.FEATS,
     searchable: true,

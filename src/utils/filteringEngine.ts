@@ -315,6 +315,36 @@ export function filterCreaturesWithIndexes(
     }
   }
 
+  // Feats filter
+  if (filters.feats.length > 0) {
+    const featSet = new Set<CreatureEnriched>();
+    filters.feats.forEach(feat => {
+      const creatures = indexes.byFeat.get(feat.toLowerCase());
+      if (creatures) {
+        creatures.forEach(c => featSet.add(c));
+      }
+    });
+    const mode = filters.filterMode?.feats || 'any';
+    if (mode === 'all') {
+      // ALL mode: creature must have ALL selected feats
+      const allFeatsSet = new Set<CreatureEnriched>();
+      indexes.all.forEach(creature => {
+        const creatureFeats = (creature.feats_normalized || creature.feats || [])
+          .map(f => String(f).toLowerCase());
+        if (filters.feats.every(feat => creatureFeats.includes(feat.toLowerCase()))) {
+          allFeatsSet.add(creature);
+        }
+      });
+      filterSets.push(allFeatsSet);
+    } else if (filters.excludeMode?.feats) {
+      const excludeSet = new Set(indexes.all);
+      featSet.forEach(c => excludeSet.delete(c));
+      filterSets.push(excludeSet);
+    } else {
+      filterSets.push(featSet);
+    }
+  }
+
   // CR range filter (using binary search)
   if (filters.crMin !== null || filters.crMax !== null) {
     const crSet = getRangeFromSortedArray(

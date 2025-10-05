@@ -163,7 +163,7 @@ export function CreatureList({
           ) : (
             <div className="space-y-0.5">
               {creatures.map((creature) => {
-                const cr = creature.cr_parsed?.numeric ?? 0;
+                const cr = creature.cr_parsed?.value ?? 0;
                 let crColor = 'text-status-success bg-status-success/10 border-status-success/30';
                 if (cr >= 16) {
                   crColor = 'text-status-error bg-status-error/10 border-status-error/30';
@@ -238,7 +238,7 @@ export function CreatureList({
           ) : (
             <div className="space-y-0.5">
               {creatures.map((creature) => {
-                const cr = creature.cr_parsed?.numeric ?? 0;
+                const cr = creature.cr_parsed?.value ?? 0;
                 let crColor = 'text-status-success bg-status-success/10 border-status-success/30';
                 if (cr >= 16) {
                   crColor = 'text-status-error bg-status-error/10 border-status-error/30';

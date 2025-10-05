@@ -315,6 +315,19 @@ export function CreatureDetailMain({ creature, onBack }: CreatureDetailMainProps
               )}
 
               {/* Defensive Abilities */}
+              {creature.defensive_abilities_normalized && creature.defensive_abilities_normalized.length > 0 && (
+                <StatRow label="Defensive Abilities">
+                  <div className="flex gap-1 flex-wrap">
+                    {creature.defensive_abilities_normalized.map((ability, idx) => (
+                      <Badge key={`defensive-ability-${ability}-${idx}`} variant="secondary" className="text-xs">
+                        {ability}
+                      </Badge>
+                    ))}
+                  </div>
+                </StatRow>
+              )}
+
+              {/* DR and SR */}
               {(creature.dr || creature.sr) && (
                 <StatRow label="Defenses">
                   <div className="flex items-center gap-2 flex-wrap">
@@ -752,10 +765,10 @@ export function CreatureDetailMain({ creature, onBack }: CreatureDetailMainProps
             )}
 
             {/* SPECIAL ABILITIES Section */}
-            {((creature.special_abilities_parsed && creature.special_abilities_parsed.length > 0) || (creature.special_abilities_normalized && creature.special_abilities_normalized.length > 0)) && (
+            {((creature.special_abilities?._parsed && creature.special_abilities._parsed.length > 0) || (creature.special_abilities_normalized && creature.special_abilities_normalized.length > 0)) && (
               <StatBlockSection title="Special Abilities">
                 <div className="space-y-3">
-                  {(creature.special_abilities_parsed || creature.special_abilities_normalized || []).map((ability, idx) => (
+                  {(creature.special_abilities?._parsed || creature.special_abilities_normalized || []).map((ability, idx) => (
                     <Card key={`ability-${typeof ability === 'string' ? ability.substring(0, 20) : (ability as any).name}-${idx}`} className="p-3 bg-surface-secondary/30 border-border/50">
                       {typeof ability === 'string' ? (
                         <p className="text-sm leading-relaxed">{ability}</p>
