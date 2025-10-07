@@ -5,7 +5,7 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { toast } from 'sonner';
-import { ArrowLeft, Copy, ScrollText, BookOpen } from 'lucide-react';
+import { ArrowLeft, Copy, ScrollText, BookOpen, Shield, Swords, BarChart3, Sparkles, Globe, Brain, Flame, Package } from 'lucide-react';
 import { EmptyState } from './creature-detail/EmptyState';
 import { StatBlockSection } from './creature-detail/StatBlockSection';
 import { StatRow } from './creature-detail/StatRow';
@@ -72,20 +72,20 @@ export function CreatureDetailMain({ creature, onBack }: CreatureDetailMainProps
       onTouchEnd={handleTouchEnd}
     >
       {/* Enhanced Header */}
-      <div className="bg-surface-secondary border-b border-border">
-        <div className="max-w-4xl mx-auto px-3 md:px-6 py-4">
+      <div className="bg-gradient-to-b from-surface-secondary to-surface-primary border-b border-border shadow-sm">
+        <div className="max-w-4xl mx-auto px-3 md:px-6 py-5">
           <div className="flex items-start justify-between gap-2 md:gap-4">
-            <div className="flex items-start gap-3">
+            <div className="flex items-start gap-3 flex-1">
               <Button
                 onClick={onBack}
                 variant="ghost"
                 size="icon"
-                className="mt-1 hover:bg-surface-tertiary"
+                className="mt-1.5 hover:bg-surface-tertiary"
               >
                 <ArrowLeft className="h-4 w-4" />
               </Button>
-              <div className="flex-1">
-                <h1 className="text-2xl font-bold text-text-primary mb-2 break-words">
+              <div className="flex-1 min-w-0">
+                <h1 className="text-3xl font-bold text-text-primary mb-3 break-words">
                   {creature.name}
                   {creature['is_3.5'] && (
                     <Badge className="ml-2 bg-interactive-primary text-text-inverse text-xs">
@@ -93,21 +93,22 @@ export function CreatureDetailMain({ creature, onBack }: CreatureDetailMainProps
                     </Badge>
                   )}
                 </h1>
-                <div className="flex items-center gap-2 md:gap-4 text-sm mb-2">
+                <div className="flex flex-wrap items-center gap-3 text-sm mb-3">
                   <div className="flex items-center gap-2">
-                    <Badge className="bg-interactive-primary text-text-inverse border-0">
+                    <Badge className="bg-interactive-primary text-text-inverse border-0 px-3 py-1">
                       CR {crDisplay}
                     </Badge>
                     {creature.mr && (
-                      <Badge className="bg-purple-600 text-text-inverse border-0">
+                      <Badge className="bg-purple-600 text-text-inverse border-0 px-3 py-1">
                         MR {creature.mr}
                       </Badge>
                     )}
-                    <span className="text-text-secondary">
-                      {getXP(creature)} XP
+                    <span className="text-text-secondary font-medium">
+                      {getXP(creature).toLocaleString()} XP
                     </span>
                   </div>
-                  <div className="text-text-secondary">
+                  <div className="h-4 w-px bg-border" />
+                  <div className="text-text-secondary font-medium">
                     {creature.alignment || 'N'} {creature.size} {creature.type}
                     {creature.subtypes_normalized && creature.subtypes_normalized.length > 0 && (
                       <span className="text-text-tertiary"> ({creature.subtypes_normalized.join(', ')})</span>
@@ -155,31 +156,35 @@ export function CreatureDetailMain({ creature, onBack }: CreatureDetailMainProps
         <div className="p-3 md:p-6">
           <div className="space-y-2">
             {/* Quick Stats Bar */}
-            <Card className="p-3 md:p-4 mb-6 bg-surface-secondary/50 border-border/50">
-              <div className="flex items-center gap-3 md:gap-6 flex-wrap text-sm">
+            <Card className="p-4 md:p-5 mb-6 bg-gradient-to-r from-surface-secondary/60 to-surface-primary/60 border-border shadow-sm">
+              <div className="flex items-center gap-4 md:gap-8 flex-wrap">
                 <div className="flex items-center gap-2">
-                  <span className="text-text-secondary">Initiative</span>
-                  <Badge variant="outline" className="font-mono">
+                  <span className="text-text-secondary font-medium text-sm">Initiative</span>
+                  <Badge variant="outline" className="font-mono font-semibold px-2.5 py-1">
                     {formatModifier(getInitiative(creature))}
                   </Badge>
                 </div>
 
                 {creature.senses && Object.keys(creature.senses).length > 0 && (
-                  <div className="flex items-center gap-2">
-                    <span className="text-text-secondary">Senses</span>
-                    <div className="flex gap-1 flex-wrap">
-                      {Object.entries(creature.senses).map(([sense, value]) => (
-                        <Badge key={sense} variant="secondary" className="text-xs">
-                          {sense}{typeof value === 'number' ? ` ${value}ft` : ''}
-                        </Badge>
-                      ))}
+                  <>
+                    <div className="h-6 w-px bg-border" />
+                    <div className="flex items-center gap-2">
+                      <span className="text-text-secondary font-medium text-sm">Senses</span>
+                      <div className="flex gap-1 flex-wrap">
+                        {Object.entries(creature.senses).map(([sense, value]) => (
+                          <Badge key={sense} variant="secondary" className="text-xs font-medium">
+                            {sense}{typeof value === 'number' ? ` ${value}ft` : ''}
+                          </Badge>
+                        ))}
+                      </div>
                     </div>
-                  </div>
+                  </>
                 )}
 
+                <div className="h-6 w-px bg-border" />
                 <div className="flex items-center gap-2">
-                  <span className="text-text-secondary">Perception</span>
-                  <Badge variant="outline" className="font-mono">
+                  <span className="text-text-secondary font-medium text-sm">Perception</span>
+                  <Badge variant="outline" className="font-mono font-semibold px-2.5 py-1">
                     {formatModifier(getPerception(creature))}
                   </Badge>
                 </div>
@@ -187,7 +192,7 @@ export function CreatureDetailMain({ creature, onBack }: CreatureDetailMainProps
             </Card>
 
             {/* DEFENSE Section */}
-            <StatBlockSection title="Defense">
+            <StatBlockSection title="Defense" icon={Shield}>
               <StatRow label="Armor Class">
                 <div className="flex flex-col gap-1">
                   <div className="flex items-center gap-3">
@@ -404,7 +409,7 @@ export function CreatureDetailMain({ creature, onBack }: CreatureDetailMainProps
             </StatBlockSection>
 
             {/* OFFENSE Section */}
-            <StatBlockSection title="Offense">
+            <StatBlockSection title="Offense" icon={Swords}>
               <StatRow label="Movement">
                 <div className="flex items-center gap-2 flex-wrap">
                   {(() => {
@@ -595,7 +600,7 @@ export function CreatureDetailMain({ creature, onBack }: CreatureDetailMainProps
             </StatBlockSection>
 
             {/* STATISTICS Section */}
-            <StatBlockSection title="Statistics">
+            <StatBlockSection title="Statistics" icon={BarChart3}>
               <StatRow label="Abilities">
                 <div className="grid grid-cols-2 xs:grid-cols-3 sm:grid-cols-6 gap-2">
                   {(['STR', 'DEX', 'CON', 'INT', 'WIS', 'CHA'] as const).map(ability => {
@@ -724,7 +729,7 @@ export function CreatureDetailMain({ creature, onBack }: CreatureDetailMainProps
 
             {/* Psychic Magic */}
             {creature.psychic_magic && (
-              <StatBlockSection title="Psychic Magic">
+              <StatBlockSection title="Psychic Magic" icon={Brain}>
                 <div className="text-sm space-y-2">
                   {Object.entries(creature.psychic_magic).map(([key, value]) => (
                     <div key={key}>
@@ -738,7 +743,7 @@ export function CreatureDetailMain({ creature, onBack }: CreatureDetailMainProps
 
             {/* Kineticist Wild Talents */}
             {creature.kineticist_wild_talents && (
-              <StatBlockSection title="Wild Talents">
+              <StatBlockSection title="Wild Talents" icon={Flame}>
                 <div className="text-sm space-y-2">
                   {Object.entries(creature.kineticist_wild_talents).map(([key, value]) => (
                     <div key={key}>
@@ -752,7 +757,7 @@ export function CreatureDetailMain({ creature, onBack }: CreatureDetailMainProps
 
             {/* GEAR Section for NPCs */}
             {creature.gear?.gear && creature.gear.gear.length > 0 && (
-              <StatBlockSection title="Gear">
+              <StatBlockSection title="Gear" icon={Package}>
                 <div className="space-y-2">
                   {creature.gear.gear.map((item, idx) => (
                     <div key={`gear-${item}-${idx}`} className="flex items-start gap-2">
@@ -766,19 +771,26 @@ export function CreatureDetailMain({ creature, onBack }: CreatureDetailMainProps
 
             {/* SPECIAL ABILITIES Section */}
             {((creature.special_abilities?._parsed && creature.special_abilities._parsed.length > 0) || (creature.special_abilities_normalized && creature.special_abilities_normalized.length > 0)) && (
-              <StatBlockSection title="Special Abilities">
+              <StatBlockSection title="Special Abilities" icon={Sparkles}>
                 <div className="space-y-3">
                   {(creature.special_abilities?._parsed || creature.special_abilities_normalized || []).map((ability, idx) => (
-                    <Card key={`ability-${typeof ability === 'string' ? ability.substring(0, 20) : (ability as any).name}-${idx}`} className="p-3 bg-surface-secondary/30 border-border/50">
+                    <Card key={`ability-${typeof ability === 'string' ? ability.substring(0, 20) : (ability as any).name}-${idx}`} className="p-4 bg-gradient-to-br from-surface-secondary/40 to-surface-primary/40 border-border/60 hover:border-interactive-primary/40 transition-colors">
                       {typeof ability === 'string' ? (
-                        <p className="text-sm leading-relaxed">{ability}</p>
+                        <p className="text-sm leading-relaxed text-text-secondary">{ability}</p>
                       ) : (
                         <div>
-                          <p className="font-semibold text-sm mb-1">
-                            {(ability as any).name}
-                            {(ability as any).type && ` (${(ability as any).type})`}
-                          </p>
-                          <p className="text-sm leading-relaxed text-muted-foreground">
+                          <div className="flex items-center gap-2 mb-2">
+                            <div className="h-1.5 w-1.5 rounded-full bg-interactive-primary" />
+                            <p className="font-semibold text-base text-text-primary">
+                              {(ability as any).name}
+                              {(ability as any).type && (
+                                <span className="ml-2 text-xs font-normal text-text-tertiary px-2 py-0.5 bg-surface-tertiary rounded">
+                                  {(ability as any).type}
+                                </span>
+                              )}
+                            </p>
+                          </div>
+                          <p className="text-sm leading-relaxed text-text-secondary pl-3.5">
                             {(ability as any).description}
                           </p>
                         </div>
@@ -791,7 +803,7 @@ export function CreatureDetailMain({ creature, onBack }: CreatureDetailMainProps
 
             {/* ECOLOGY Section */}
             {(creature.environment || creature.ecology?.organization || creature.ecology?.treasure_type) && (
-              <StatBlockSection title="Ecology">
+              <StatBlockSection title="Ecology" icon={Globe}>
                 {creature.environment && (
                   <StatRow label="Environment">
                     <span className="text-sm">{creature.environment}</span>
@@ -815,15 +827,17 @@ export function CreatureDetailMain({ creature, onBack }: CreatureDetailMainProps
 
             {/* Description */}
             {creature.desc_long && (
-              <Card className="p-3 md:p-6 bg-surface-secondary/30 border-border/50">
-                <div className="flex items-center gap-2 mb-4">
-                  <BookOpen className="h-4 w-4 text-interactive-primary" />
-                  <h3 className="font-semibold text-sm uppercase tracking-wider text-text-secondary">
+              <Card className="p-4 md:p-6 bg-gradient-to-br from-surface-secondary/40 to-surface-primary/40 border-border/60">
+                <div className="flex items-center gap-3 mb-4">
+                  <div className="flex items-center justify-center h-7 w-7 rounded-lg bg-interactive-primary/10 text-interactive-primary">
+                    <BookOpen className="h-4 w-4" />
+                  </div>
+                  <h3 className="font-semibold text-base uppercase tracking-wide text-text-primary">
                     Description
                   </h3>
                 </div>
                 <div className="prose prose-sm max-w-none">
-                  <p className="text-text-secondary leading-relaxed">
+                  <p className="text-text-secondary leading-relaxed text-sm">
                     {creature.desc_long}
                   </p>
                 </div>
@@ -832,26 +846,28 @@ export function CreatureDetailMain({ creature, onBack }: CreatureDetailMainProps
 
             {/* Sources */}
             {creature.sources && Array.isArray(creature.sources) && creature.sources.length > 0 && (
-              <Card className="p-3 md:p-4 bg-surface-secondary/30 border-border/50">
-                <div className="flex items-center gap-2 mb-3">
-                  <ScrollText className="h-4 w-4 text-interactive-primary" />
-                  <h3 className="font-semibold text-sm uppercase tracking-wider text-text-secondary">
+              <Card className="p-4 md:p-5 bg-gradient-to-br from-surface-secondary/40 to-surface-primary/40 border-border/60">
+                <div className="flex items-center gap-3 mb-4">
+                  <div className="flex items-center justify-center h-7 w-7 rounded-lg bg-interactive-primary/10 text-interactive-primary">
+                    <ScrollText className="h-4 w-4" />
+                  </div>
+                  <h3 className="font-semibold text-base uppercase tracking-wide text-text-primary">
                     Sources
                   </h3>
                 </div>
-                <div className="space-y-1">
+                <div className="space-y-2">
                   {creature.sources.map((source, idx) => (
-                    <div key={`source-${source.name || source}-${idx}`} className="flex items-center justify-between text-sm">
-                      <span className="text-text-secondary">
+                    <div key={`source-${source.name || source}-${idx}`} className="flex items-center justify-between text-sm p-2 rounded-lg hover:bg-surface-tertiary/50 transition-colors">
+                      <span className="text-text-secondary font-medium">
                         {source.name}
-                        {source.page && <span className="text-text-tertiary">, p. {source.page}</span>}
+                        {source.page && <span className="text-text-tertiary font-normal">, p. {source.page}</span>}
                       </span>
                       {source.link && (
                         <a
                           href={source.link}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="text-interactive-primary hover:text-interactive-primary-hover transition-colors"
+                          className="text-interactive-primary hover:text-interactive-primary-hover transition-colors font-medium"
                         >
                           View →
                         </a>

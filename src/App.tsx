@@ -204,11 +204,11 @@ function App() {
             variant="ghost"
             size="sm"
             onClick={() => setShowFilters(!showFilters)}
-            className="absolute right-0 top-1/2 -translate-y-1/2 h-24 w-11 p-0 bg-surface-secondary border-l hover:bg-interactive-secondary z-10 rounded-l-md shadow-md min-h-[96px] min-w-[44px]"
+            className="absolute -right-3 top-4 h-8 w-6 p-0 bg-surface-secondary/90 backdrop-blur-sm border border-border hover:bg-surface-tertiary hover:border-interactive-primary/50 z-10 rounded-md shadow-sm transition-all"
             title={showFilters ? "Hide filters" : "Show filters"}
             aria-label={showFilters ? "Hide filters" : "Show filters"}
           >
-            {showFilters ? <ChevronLeft className="h-4 w-4" /> : <ChevronRight className="h-4 w-4" />}
+            {showFilters ? <ChevronLeft className="h-3.5 w-3.5 text-text-tertiary" /> : <ChevronRight className="h-3.5 w-3.5 text-text-tertiary" />}
           </Button>
         </aside>
 
@@ -236,11 +236,11 @@ function App() {
             variant="ghost"
             size="sm"
             onClick={() => setShowCreatureList(!showCreatureList)}
-            className="absolute right-0 top-1/2 -translate-y-1/2 h-24 w-11 p-0 bg-surface-secondary border-l hover:bg-interactive-secondary z-10 rounded-l-md shadow-md min-h-[96px] min-w-[44px]"
+            className="absolute -right-3 top-4 h-8 w-6 p-0 bg-surface-secondary/90 backdrop-blur-sm border border-border hover:bg-surface-tertiary hover:border-interactive-primary/50 z-10 rounded-md shadow-sm transition-all"
             title={showCreatureList ? "Hide creature list" : "Show creature list"}
             aria-label={showCreatureList ? "Hide creature list" : "Show creature list"}
           >
-            {showCreatureList ? <ChevronLeft className="h-4 w-4" /> : <ChevronRight className="h-4 w-4" />}
+            {showCreatureList ? <ChevronLeft className="h-3.5 w-3.5 text-text-tertiary" /> : <ChevronRight className="h-3.5 w-3.5 text-text-tertiary" />}
           </Button>
         </div>
 

@@ -227,26 +227,28 @@ export function Sidebar({ // noqa
               return (
                 <div key={category} className="border-t pt-3 mt-1">
                   <button
-                    className="flex items-center justify-between w-full text-left mb-2"
+                    className="flex items-center justify-between w-full text-left mb-2 py-1.5 px-1 -mx-1 rounded-md hover:bg-surface-secondary transition-colors group"
                     onClick={() => toggleSection(category)}
                   >
-                    <div className="flex items-center gap-2">
-                      {crFilter.icon && <crFilter.icon className="h-4 w-4" />}
-                      <span className="text-sm font-medium">{category}</span>
+                    <div className="flex items-center gap-2 flex-1 min-w-0">
+                      {crFilter.icon && <crFilter.icon className="h-4 w-4 flex-shrink-0" />}
+                      <span className="text-sm font-medium truncate">{category}</span>
                       {(() => {
                         const activeCount = getCategoryActiveCount(category);
                         return activeCount > 0 ? (
-                          <span className="bg-interactive-primary text-text-inverse text-xs px-2 py-0.5 rounded-full font-medium">
+                          <span className="flex-shrink-0 h-5 min-w-[20px] px-1.5 flex items-center justify-center bg-interactive-primary text-text-inverse text-xs rounded-full font-semibold">
                             {activeCount}
                           </span>
                         ) : null;
                       })()}
                     </div>
-                    {isExpanded ? (
-                      <ChevronUp className="h-4 w-4" />
-                    ) : (
-                      <ChevronDown className="h-4 w-4" />
-                    )}
+                    <div className="flex-shrink-0 ml-2">
+                      {isExpanded ? (
+                        <ChevronUp className="h-4 w-4 text-text-tertiary group-hover:text-text-secondary transition-colors" />
+                      ) : (
+                        <ChevronDown className="h-4 w-4 text-text-tertiary group-hover:text-text-secondary transition-colors" />
+                      )}
+                    </div>
                   </button>
                   {isExpanded && (
                     <div className="space-y-1">
@@ -383,29 +385,31 @@ export function Sidebar({ // noqa
           return (
             <div key={category} className="border-t pt-3 mt-1">
               <button
-                className="flex items-center justify-between w-full text-left mb-2 py-2 px-1 -mx-1 rounded-md hover:bg-surface-secondary min-h-[44px] md:min-h-auto md:py-0"
+                className="flex items-center justify-between w-full text-left mb-2 py-1.5 px-1 -mx-1 rounded-md hover:bg-surface-secondary transition-colors group"
                 onClick={() => toggleSection(category)}
               >
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-2 flex-1 min-w-0">
                   {(() => {
                     const IconComponent = categoryFilters[0]?.icon;
-                    return IconComponent ? <IconComponent className="h-4 w-4" /> : null;
+                    return IconComponent ? <IconComponent className="h-4 w-4 flex-shrink-0" /> : null;
                   })()}
-                  <span className="text-sm font-medium">{category}</span>
+                  <span className="text-sm font-medium truncate">{category}</span>
                   {(() => {
                     const activeCount = getCategoryActiveCount(category);
                     return activeCount > 0 ? (
-                      <span className="bg-interactive-primary text-text-inverse text-xs px-2 py-0.5 rounded-full font-medium">
+                      <span className="flex-shrink-0 h-5 min-w-[20px] px-1.5 flex items-center justify-center bg-interactive-primary text-text-inverse text-xs rounded-full font-semibold">
                         {activeCount}
                       </span>
                     ) : null;
                   })()}
                 </div>
-                {isExpanded ? (
-                  <ChevronUp className="h-4 w-4" />
-                ) : (
-                  <ChevronDown className="h-4 w-4" />
-                )}
+                <div className="flex-shrink-0 ml-2">
+                  {isExpanded ? (
+                    <ChevronUp className="h-4 w-4 text-text-tertiary group-hover:text-text-secondary transition-colors" />
+                  ) : (
+                    <ChevronDown className="h-4 w-4 text-text-tertiary group-hover:text-text-secondary transition-colors" />
+                  )}
+                </div>
               </button>
               {isExpanded && (
                 <div className="space-y-2 md:space-y-1">
