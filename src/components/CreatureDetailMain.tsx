@@ -771,10 +771,10 @@ export function CreatureDetailMain({ creature, onBack }: CreatureDetailMainProps
             )}
 
             {/* SPECIAL ABILITIES Section */}
-            {((creature.special_abilities?._parsed && creature.special_abilities._parsed.length > 0) || (creature.special_abilities_normalized && creature.special_abilities_normalized.length > 0)) && (
+            {((creature.special_abilities?._parsed && Array.isArray(creature.special_abilities._parsed) && creature.special_abilities._parsed.length > 0) || (creature.special_abilities_normalized && creature.special_abilities_normalized.length > 0)) && (
               <StatBlockSection title="Special Abilities" icon={Sparkles}>
                 <div className="space-y-2 md:space-y-3">
-                  {(creature.special_abilities?._parsed || creature.special_abilities_normalized || []).map((ability, idx) => (
+                  {(Array.isArray(creature.special_abilities?._parsed) ? creature.special_abilities._parsed : creature.special_abilities_normalized || []).map((ability: any, idx: number) => (
                     <Card key={`ability-${typeof ability === 'string' ? ability.substring(0, 20) : (ability as any).name}-${idx}`} className="p-3 md:p-4 bg-gradient-to-br from-surface-secondary/40 to-surface-primary/40 border-border/60 hover:border-interactive-primary/40 transition-colors">
                       {typeof ability === 'string' ? (
                         <p className="text-xs md:text-sm leading-relaxed text-text-secondary">{ability}</p>
