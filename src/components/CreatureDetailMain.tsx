@@ -73,19 +73,20 @@ export function CreatureDetailMain({ creature, onBack }: CreatureDetailMainProps
     >
       {/* Enhanced Header */}
       <div className="bg-gradient-to-b from-surface-secondary to-surface-primary border-b border-border shadow-sm">
-        <div className="max-w-4xl mx-auto px-3 md:px-6 py-5">
+        <div className="max-w-4xl mx-auto px-3 md:px-6 py-3 md:py-5">
           <div className="flex items-start justify-between gap-2 md:gap-4">
-            <div className="flex items-start gap-3 flex-1">
+            <div className="flex items-start gap-2 md:gap-3 flex-1 min-w-0">
               <Button
                 onClick={onBack}
-                variant="ghost"
-                size="icon"
-                className="mt-1.5 hover:bg-surface-tertiary"
+                variant="outline"
+                size="sm"
+                className="mt-0.5 md:mt-1.5 hover:bg-surface-tertiary flex-shrink-0 md:px-2"
               >
-                <ArrowLeft className="h-4 w-4" />
+                <ArrowLeft className="h-4 w-4 md:mr-0" />
+                <span className="md:hidden ml-1">Back</span>
               </Button>
               <div className="flex-1 min-w-0">
-                <h1 className="text-3xl font-bold text-text-primary mb-3 break-words">
+                <h1 className="text-xl md:text-3xl font-bold text-text-primary mb-2 md:mb-3 break-words">
                   {creature.name}
                   {creature['is_3.5'] && (
                     <Badge className="ml-2 bg-interactive-primary text-text-inverse text-xs">
@@ -93,22 +94,22 @@ export function CreatureDetailMain({ creature, onBack }: CreatureDetailMainProps
                     </Badge>
                   )}
                 </h1>
-                <div className="flex flex-wrap items-center gap-3 text-sm mb-3">
-                  <div className="flex items-center gap-2">
-                    <Badge className="bg-interactive-primary text-text-inverse border-0 px-3 py-1">
+                <div className="flex flex-wrap items-center gap-2 md:gap-3 text-sm mb-2 md:mb-3">
+                  <div className="flex items-center gap-2 flex-wrap">
+                    <Badge className="bg-interactive-primary text-text-inverse border-0 px-2 md:px-3 py-1">
                       CR {crDisplay}
                     </Badge>
                     {creature.mr && (
-                      <Badge className="bg-purple-600 text-text-inverse border-0 px-3 py-1">
+                      <Badge className="bg-purple-600 text-text-inverse border-0 px-2 md:px-3 py-1">
                         MR {creature.mr}
                       </Badge>
                     )}
-                    <span className="text-text-secondary font-medium">
+                    <span className="text-text-secondary font-medium text-xs md:text-sm">
                       {getXP(creature).toLocaleString()} XP
                     </span>
                   </div>
-                  <div className="h-4 w-px bg-border" />
-                  <div className="text-text-secondary font-medium">
+                  <div className="hidden md:block h-4 w-px bg-border" />
+                  <div className="text-text-secondary font-medium text-xs md:text-sm w-full md:w-auto">
                     {creature.alignment || 'N'} {creature.size} {creature.type}
                     {creature.subtypes_normalized && creature.subtypes_normalized.length > 0 && (
                       <span className="text-text-tertiary"> ({creature.subtypes_normalized.join(', ')})</span>
@@ -156,20 +157,20 @@ export function CreatureDetailMain({ creature, onBack }: CreatureDetailMainProps
         <div className="p-3 md:p-6">
           <div className="space-y-2">
             {/* Quick Stats Bar */}
-            <Card className="p-4 md:p-5 mb-6 bg-gradient-to-r from-surface-secondary/60 to-surface-primary/60 border-border shadow-sm">
-              <div className="flex items-center gap-4 md:gap-8 flex-wrap">
+            <Card className="p-3 md:p-5 mb-4 md:mb-6 bg-gradient-to-r from-surface-secondary/60 to-surface-primary/60 border-border shadow-sm">
+              <div className="flex items-center gap-3 md:gap-8 flex-wrap">
                 <div className="flex items-center gap-2">
-                  <span className="text-text-secondary font-medium text-sm">Initiative</span>
-                  <Badge variant="outline" className="font-mono font-semibold px-2.5 py-1">
+                  <span className="text-text-secondary font-medium text-xs md:text-sm">Initiative</span>
+                  <Badge variant="outline" className="font-mono font-semibold px-2 md:px-2.5 py-0.5 md:py-1 text-xs md:text-sm">
                     {formatModifier(getInitiative(creature))}
                   </Badge>
                 </div>
 
                 {creature.senses && Object.keys(creature.senses).length > 0 && (
                   <>
-                    <div className="h-6 w-px bg-border" />
-                    <div className="flex items-center gap-2">
-                      <span className="text-text-secondary font-medium text-sm">Senses</span>
+                    <div className="hidden md:block h-6 w-px bg-border" />
+                    <div className="flex items-center gap-2 flex-wrap w-full md:w-auto">
+                      <span className="text-text-secondary font-medium text-xs md:text-sm">Senses</span>
                       <div className="flex gap-1 flex-wrap">
                         {Object.entries(creature.senses).map(([sense, value]) => (
                           <Badge key={sense} variant="secondary" className="text-xs font-medium">
@@ -181,10 +182,10 @@ export function CreatureDetailMain({ creature, onBack }: CreatureDetailMainProps
                   </>
                 )}
 
-                <div className="h-6 w-px bg-border" />
+                <div className="hidden md:block h-6 w-px bg-border" />
                 <div className="flex items-center gap-2">
-                  <span className="text-text-secondary font-medium text-sm">Perception</span>
-                  <Badge variant="outline" className="font-mono font-semibold px-2.5 py-1">
+                  <span className="text-text-secondary font-medium text-xs md:text-sm">Perception</span>
+                  <Badge variant="outline" className="font-mono font-semibold px-2 md:px-2.5 py-0.5 md:py-1 text-xs md:text-sm">
                     {formatModifier(getPerception(creature))}
                   </Badge>
                 </div>
@@ -602,13 +603,13 @@ export function CreatureDetailMain({ creature, onBack }: CreatureDetailMainProps
             {/* STATISTICS Section */}
             <StatBlockSection title="Statistics" icon={BarChart3}>
               <StatRow label="Abilities">
-                <div className="grid grid-cols-2 xs:grid-cols-3 sm:grid-cols-6 gap-2">
+                <div className="flex items-center gap-3 md:gap-4 flex-wrap">
                   {(['STR', 'DEX', 'CON', 'INT', 'WIS', 'CHA'] as const).map(ability => {
                     const { score, modifier } = getAbilityScore(creature, ability);
                     return (
-                      <div key={ability} className="text-center">
-                        <div className="text-xs text-text-tertiary mb-1">{ability}</div>
-                        <Badge variant="outline" className="w-full justify-center">
+                      <div key={ability} className="flex items-center gap-1.5">
+                        <span className="text-xs font-medium text-text-tertiary">{ability}</span>
+                        <Badge variant="outline" className="font-mono font-semibold px-2 md:px-2.5">
                           {formatAbilityScore(score, modifier)}
                         </Badge>
                       </div>
@@ -772,25 +773,27 @@ export function CreatureDetailMain({ creature, onBack }: CreatureDetailMainProps
             {/* SPECIAL ABILITIES Section */}
             {((creature.special_abilities?._parsed && creature.special_abilities._parsed.length > 0) || (creature.special_abilities_normalized && creature.special_abilities_normalized.length > 0)) && (
               <StatBlockSection title="Special Abilities" icon={Sparkles}>
-                <div className="space-y-3">
+                <div className="space-y-2 md:space-y-3">
                   {(creature.special_abilities?._parsed || creature.special_abilities_normalized || []).map((ability, idx) => (
-                    <Card key={`ability-${typeof ability === 'string' ? ability.substring(0, 20) : (ability as any).name}-${idx}`} className="p-4 bg-gradient-to-br from-surface-secondary/40 to-surface-primary/40 border-border/60 hover:border-interactive-primary/40 transition-colors">
+                    <Card key={`ability-${typeof ability === 'string' ? ability.substring(0, 20) : (ability as any).name}-${idx}`} className="p-3 md:p-4 bg-gradient-to-br from-surface-secondary/40 to-surface-primary/40 border-border/60 hover:border-interactive-primary/40 transition-colors">
                       {typeof ability === 'string' ? (
-                        <p className="text-sm leading-relaxed text-text-secondary">{ability}</p>
+                        <p className="text-xs md:text-sm leading-relaxed text-text-secondary">{ability}</p>
                       ) : (
                         <div>
-                          <div className="flex items-center gap-2 mb-2">
-                            <div className="h-1.5 w-1.5 rounded-full bg-interactive-primary" />
-                            <p className="font-semibold text-base text-text-primary">
-                              {(ability as any).name}
-                              {(ability as any).type && (
-                                <span className="ml-2 text-xs font-normal text-text-tertiary px-2 py-0.5 bg-surface-tertiary rounded">
-                                  {(ability as any).type}
-                                </span>
-                              )}
-                            </p>
+                          <div className="flex items-start gap-2 mb-1.5 md:mb-2">
+                            <div className="h-1.5 w-1.5 rounded-full bg-interactive-primary mt-1.5 flex-shrink-0" />
+                            <div className="flex-1 min-w-0">
+                              <p className="font-semibold text-sm md:text-base text-text-primary">
+                                {(ability as any).name}
+                                {(ability as any).type && (
+                                  <span className="ml-2 text-xs font-normal text-text-tertiary px-1.5 md:px-2 py-0.5 bg-surface-tertiary rounded whitespace-nowrap">
+                                    {(ability as any).type}
+                                  </span>
+                                )}
+                              </p>
+                            </div>
                           </div>
-                          <p className="text-sm leading-relaxed text-text-secondary pl-3.5">
+                          <p className="text-xs md:text-sm leading-relaxed text-text-secondary pl-0 md:pl-3.5">
                             {(ability as any).description}
                           </p>
                         </div>
@@ -827,17 +830,17 @@ export function CreatureDetailMain({ creature, onBack }: CreatureDetailMainProps
 
             {/* Description */}
             {creature.desc_long && (
-              <Card className="p-4 md:p-6 bg-gradient-to-br from-surface-secondary/40 to-surface-primary/40 border-border/60">
-                <div className="flex items-center gap-3 mb-4">
-                  <div className="flex items-center justify-center h-7 w-7 rounded-lg bg-interactive-primary/10 text-interactive-primary">
-                    <BookOpen className="h-4 w-4" />
+              <Card className="p-3 md:p-6 bg-gradient-to-br from-surface-secondary/40 to-surface-primary/40 border-border/60">
+                <div className="flex items-center gap-2 md:gap-3 mb-3 md:mb-4">
+                  <div className="flex items-center justify-center h-6 w-6 md:h-7 md:w-7 rounded-lg bg-interactive-primary/10 text-interactive-primary flex-shrink-0">
+                    <BookOpen className="h-3.5 w-3.5 md:h-4 md:w-4" />
                   </div>
-                  <h3 className="font-semibold text-base uppercase tracking-wide text-text-primary">
+                  <h3 className="font-semibold text-sm md:text-base uppercase tracking-wide text-text-primary">
                     Description
                   </h3>
                 </div>
                 <div className="prose prose-sm max-w-none">
-                  <p className="text-text-secondary leading-relaxed text-sm">
+                  <p className="text-text-secondary leading-relaxed text-xs md:text-sm">
                     {creature.desc_long}
                   </p>
                 </div>
@@ -846,19 +849,19 @@ export function CreatureDetailMain({ creature, onBack }: CreatureDetailMainProps
 
             {/* Sources */}
             {creature.sources && Array.isArray(creature.sources) && creature.sources.length > 0 && (
-              <Card className="p-4 md:p-5 bg-gradient-to-br from-surface-secondary/40 to-surface-primary/40 border-border/60">
-                <div className="flex items-center gap-3 mb-4">
-                  <div className="flex items-center justify-center h-7 w-7 rounded-lg bg-interactive-primary/10 text-interactive-primary">
-                    <ScrollText className="h-4 w-4" />
+              <Card className="p-3 md:p-5 bg-gradient-to-br from-surface-secondary/40 to-surface-primary/40 border-border/60">
+                <div className="flex items-center gap-2 md:gap-3 mb-3 md:mb-4">
+                  <div className="flex items-center justify-center h-6 w-6 md:h-7 md:w-7 rounded-lg bg-interactive-primary/10 text-interactive-primary flex-shrink-0">
+                    <ScrollText className="h-3.5 w-3.5 md:h-4 md:w-4" />
                   </div>
-                  <h3 className="font-semibold text-base uppercase tracking-wide text-text-primary">
+                  <h3 className="font-semibold text-sm md:text-base uppercase tracking-wide text-text-primary">
                     Sources
                   </h3>
                 </div>
-                <div className="space-y-2">
+                <div className="space-y-1.5 md:space-y-2">
                   {creature.sources.map((source, idx) => (
-                    <div key={`source-${source.name || source}-${idx}`} className="flex items-center justify-between text-sm p-2 rounded-lg hover:bg-surface-tertiary/50 transition-colors">
-                      <span className="text-text-secondary font-medium">
+                    <div key={`source-${source.name || source}-${idx}`} className="flex items-center justify-between text-xs md:text-sm p-1.5 md:p-2 rounded-lg hover:bg-surface-tertiary/50 transition-colors gap-2">
+                      <span className="text-text-secondary font-medium flex-1 min-w-0">
                         {source.name}
                         {source.page && <span className="text-text-tertiary font-normal">, p. {source.page}</span>}
                       </span>
@@ -867,7 +870,7 @@ export function CreatureDetailMain({ creature, onBack }: CreatureDetailMainProps
                           href={source.link}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="text-interactive-primary hover:text-interactive-primary-hover transition-colors font-medium"
+                          className="text-interactive-primary hover:text-interactive-primary-hover transition-colors font-medium flex-shrink-0 text-xs md:text-sm"
                         >
                           View →
                         </a>

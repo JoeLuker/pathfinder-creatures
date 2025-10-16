@@ -4,7 +4,7 @@ import { CreatureDetailMain } from '@/components/CreatureDetailMain';
 import { CreatureList } from '@/components/CreatureList';
 import { Sidebar } from '@/components/Sidebar';
 import { Input } from '@/components/ui/input';
-import { Search } from 'lucide-react';
+import { Search, ArrowUp } from 'lucide-react';
 import { MobileFilters } from '@/components/MobileFilters';
 import { ThemeToggle } from '@/components/ThemeToggle';
 import type { CreatureEnriched } from '@/types/creature-complete';
@@ -39,6 +39,7 @@ function App() {
   const [selectedCreature, setSelectedCreature] = useState<CreatureEnriched | null>(null);
   const [showFilters, setShowFilters] = useState(true);
   const [showCreatureList, setShowCreatureList] = useState(true);
+  const [showScrollTop, setShowScrollTop] = useState(false);
 
   // Shared sidebar state for responsive consistency
   const [expandedSections, setExpandedSections] = useState<Record<string, boolean>>(() => {
@@ -53,6 +54,20 @@ function App() {
 
   const handleCreatureClick = (creature: CreatureEnriched) => {
     setSelectedCreature(creature);
+  };
+
+  // Handle scroll to top button visibility on mobile
+  useEffect(() => {
+    const handleScroll = () => {
+      setShowScrollTop(window.scrollY > 400);
+    };
+
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
+  const scrollToTop = () => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   if (loading) {
@@ -159,6 +174,18 @@ function App() {
               />
             </div>
           </div>
+        )}
+
+        {/* Scroll to Top Button - Mobile only */}
+        {showScrollTop && !selectedCreature && (
+          <Button
+            onClick={scrollToTop}
+            size="icon"
+            className="md:hidden fixed bottom-20 right-4 h-12 w-12 rounded-full shadow-lg bg-interactive-primary hover:bg-interactive-primary-hover text-white z-30"
+            aria-label="Scroll to top"
+          >
+            <ArrowUp className="h-5 w-5" />
+          </Button>
         )}
       </div>
 

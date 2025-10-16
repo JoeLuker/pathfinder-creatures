@@ -210,11 +210,11 @@ export function CreatureList({
             <div ref={sentinelRef} className="mt-4 flex items-center justify-center py-4">
               <Button
                 variant="outline"
-                size="sm"
+                size="default"
                 onClick={loadMore}
-                className="text-xs"
+                className="text-sm min-h-[44px]"
               >
-                Load More...
+                Load More ({(filteredCount - creatures.length).toLocaleString()} remaining)
               </Button>
             </div>
           )}
@@ -282,14 +282,14 @@ export function CreatureList({
 
           {/* Infinite Scroll Sentinel */}
           {hasMore && (
-            <div ref={sentinelRef} className="mt-4 flex items-center justify-center py-4">
+            <div ref={sentinelRef} className="mt-4 py-2">
               <Button
                 variant="outline"
-                size="sm"
+                size="lg"
                 onClick={loadMore}
-                className="text-xs"
+                className="w-full text-sm min-h-[48px]"
               >
-                Load More...
+                Load More ({(filteredCount - creatures.length).toLocaleString()} remaining)
               </Button>
             </div>
           )}

@@ -80,30 +80,75 @@ export function ActiveFilters({ filters, setFilters }: ActiveFiltersProps) {
 
   if (activeFilters.length === 0) return null;
 
+  const maxVisibleMobile = 3;
+  const showMoreMobile = activeFilters.length > maxVisibleMobile;
+
   return (
     <div className="bg-interactive-secondary/30 rounded-md border border-border p-2 mb-2">
-      <div className="flex items-start gap-2">
-        <div className="hidden md:flex items-center gap-2 text-sm text-text-secondary pt-1">
+      <div className="flex items-center gap-2">
+        <div className="hidden md:flex items-center gap-2 text-sm text-text-secondary flex-shrink-0">
           <Filter className="h-4 w-4 text-interactive-primary" />
           <span className="font-medium">Active:</span>
         </div>
-        <div className="flex flex-wrap gap-1.5 flex-1">
+
+        {/* Mobile: Horizontal scroll with max visible */}
+        <div className="md:hidden flex-1 overflow-x-auto scrollbar-hide -mx-1 px-1">
+          <div className="flex gap-1.5 min-w-max">
+            {activeFilters.slice(0, maxVisibleMobile).map((filter, index) => (
+              <Badge
+                key={`${filter.label}-${filter.value}-${index}`}
+                variant="secondary"
+                className="pl-2 pr-1 py-0.5 flex items-center gap-1 bg-interactive-secondary text-text-primary border-border hover:bg-interactive-secondary-hover transition-colors flex-shrink-0"
+              >
+                <span className="text-xs font-medium capitalize whitespace-nowrap">{filter.value}</span>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="h-4 w-4 p-0 hover:bg-interactive-secondary-hover rounded-full"
+                  onClick={filter.clear}
+                  aria-label={`Remove ${filter.label} filter`}
+                >
+                  <X className="h-3 w-3 text-text-secondary" />
+                </Button>
+              </Badge>
+            ))}
+            {showMoreMobile && (
+              <Badge variant="outline" className="pl-2 pr-2 py-0.5 text-xs text-text-secondary flex-shrink-0">
+                +{activeFilters.length - maxVisibleMobile} more
+              </Badge>
+            )}
+            <Button
+              variant="outline"
+              size="sm"
+              className="h-7 px-2 text-xs flex-shrink-0"
+              onClick={() => {
+                const defaultFilters = createDefaultFilters();
+                setFilters({ ...defaultFilters, search: filters.search });
+              }}
+            >
+              Clear All
+            </Button>
+          </div>
+        </div>
+
+        {/* Desktop: Wrap as before */}
+        <div className="hidden md:flex md:flex-wrap gap-1.5 flex-1">
           {activeFilters.map((filter, index) => (
             <Badge
               key={`${filter.label}-${filter.value}-${index}`}
               variant="secondary"
-              className="pl-2.5 pr-1.5 py-1 md:py-0.5 flex items-center gap-1.5 bg-interactive-secondary text-text-primary border-border hover:bg-interactive-secondary-hover transition-colors min-h-[32px] md:min-h-auto"
+              className="pl-2 pr-1 py-0.5 flex items-center gap-1 bg-interactive-secondary text-text-primary border-border hover:bg-interactive-secondary-hover transition-colors"
             >
-              <span className="text-xs text-text-secondary hidden md:inline">{filter.label}:</span>
+              <span className="text-xs text-text-secondary">{filter.label}:</span>
               <span className="text-xs font-medium capitalize">{filter.value}</span>
               <Button
                 variant="ghost"
                 size="sm"
-                className="h-6 w-6 md:h-4 md:w-4 p-0 ml-0.5 hover:bg-interactive-secondary-hover rounded-full min-h-[24px] md:min-h-auto"
+                className="h-4 w-4 p-0 hover:bg-interactive-secondary-hover rounded-full"
                 onClick={filter.clear}
                 aria-label={`Remove ${filter.label} filter`}
               >
-                <X className="h-3.5 w-3.5 md:h-3 md:w-3 text-text-secondary" />
+                <X className="h-3 w-3 text-text-secondary" />
               </Button>
             </Badge>
           ))}
@@ -111,7 +156,7 @@ export function ActiveFilters({ filters, setFilters }: ActiveFiltersProps) {
             <Button
               variant="outline"
               size="sm"
-              className="h-8 md:h-7 px-2.5 text-xs min-h-[32px] md:min-h-auto"
+              className="h-7 px-2.5 text-xs"
               onClick={() => {
                 const defaultFilters = createDefaultFilters();
                 setFilters({ ...defaultFilters, search: filters.search });
